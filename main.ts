@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { crypto } from "https://deno.land/std@0.177.0/crypto/mod.ts";
-// 🔥 AES Library ခေါ်သုံးခြင်း
-import { AES, enc } from "https://deno.land/x/crypto_js@v4.2.0/mod.ts";
+
+// ✅ Link အသစ် (Working Import)
+import CryptoJS from "https://esm.sh/crypto-js@4.2.0";
 
 import { getMovies, addOrUpdateMovie, deleteMovie } from "./db.ts";
 import { renderWebsite } from "./ui.ts";
@@ -59,11 +60,10 @@ serve(async (req) => {
         // 4 Hours Expiry
         const expiry = Date.now() + (4 * 60 * 60 * 1000); 
         
-        // 🔐 AES ENCRYPTION (အစားထိုးလိုက်သောနေရာ)
-        // Base64 အစား AES နဲ့ လင့်ခ်ကို ဝှက်လိုက်ပါမယ်
-        const encryptedUrl = AES.encrypt(realUrl, ADMIN_PASSWORD).toString();
+        // 🔐 AES ENCRYPTION (Corrected Syntax)
+        const encryptedUrl = CryptoJS.AES.encrypt(realUrl, ADMIN_PASSWORD).toString();
         
-        // URL Safe ဖြစ်အောင် + / = တွေကို ပြောင်းမယ်
+        // URL Safe
         const safeUrl = encodeURIComponent(encryptedUrl);
 
         const signature = await createSignature(safeUrl + expiry);
@@ -71,7 +71,7 @@ serve(async (req) => {
         
         return new Response(JSON.stringify({ token }), { headers: { "content-type": "application/json" } });
     } catch (e) {
-        return new Response("Error", { status: 500 });
+        return new Response("Error: " + e.message, { status: 500 });
     }
   }
 
@@ -104,12 +104,12 @@ serve(async (req) => {
              return new Response("⚠️ Watch in App only!", { status: 403 });
         }
 
-        // 🔐 AES DECRYPTION (ပြန်ဖော်ခြင်း)
+        // 🔐 AES DECRYPTION (Corrected Syntax)
         const encryptedUrl = decodeURIComponent(safeUrl);
-        const bytes = AES.decrypt(encryptedUrl, ADMIN_PASSWORD);
-        const realUrl = bytes.toString(enc.Utf8);
+        const bytes = CryptoJS.AES.decrypt(encryptedUrl, ADMIN_PASSWORD);
+        const realUrl = bytes.toString(CryptoJS.enc.Utf8);
 
-        if(!realUrl.startsWith("http")) throw new Error("Decryption Failed");
+        if(!realUrl || !realUrl.startsWith("http")) throw new Error("Decryption Failed");
 
         // ✅ Redirect to Real URL
         return Response.redirect(realUrl, 302);
