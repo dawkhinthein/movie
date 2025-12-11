@@ -1,4 +1,10 @@
 export function renderWebsite() {
+  
+  // 🔥 Server-Side Helper (Deno က သုံးဖို့)
+  function getServerSkeleton() {
+    return Array(5).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
+  }
+
   return `
   <!DOCTYPE html>
   <html>
@@ -9,7 +15,7 @@ export function renderWebsite() {
     <style>
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; }
       
-      /* --- Header --- */
+      /* Header */
       header { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); padding: 10px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: bold; font-size: 20px; text-decoration: none; cursor:pointer;}
       
@@ -18,7 +24,7 @@ export function renderWebsite() {
       .search-input:focus { width: 160px; }
       .search-btn { cursor: pointer; padding: 5px; font-size: 16px; border-radius: 50%; }
 
-      /* --- Shimmer / Skeleton Animation (🔥 Added) --- */
+      /* 🔥 Skeleton Animation */
       @keyframes shimmer {
         0% { background-position: -1000px 0; }
         100% { background-position: 1000px 0; }
@@ -30,7 +36,7 @@ export function renderWebsite() {
         border-radius: 6px;
       }
 
-      /* --- Home Layout --- */
+      /* Home Layout */
       .home-section { padding: 15px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 10px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 600; border-left: 3px solid #e50914; padding-left: 10px; }
@@ -41,7 +47,7 @@ export function renderWebsite() {
       .scroll-row::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
       .scroll-row .card { min-width: 110px; max-width: 110px; }
 
-      /* --- Grid & Cards --- */
+      /* Grid */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
@@ -55,7 +61,7 @@ export function renderWebsite() {
       .back-nav { display: none; padding: 10px 15px; }
       .back-btn { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold;}
 
-      /* --- Modal & Player --- */
+      /* Modal */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       
@@ -77,14 +83,13 @@ export function renderWebsite() {
       p.desc { color: #aaa; font-size: 13px; margin-top: 10px; line-height: 1.5; }
       .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
 
-      /* Accordion Styles */
+      /* Accordion */
       .accordion { background-color: #2a2a2a; color: #eee; cursor: pointer; padding: 12px; width: 100%; border: none; text-align: left; outline: none; font-size: 14px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 4px; }
       .accordion.active { background-color: #e50914; color: white; }
       .accordion:after { content: '+'; font-size: 18px; }
       .accordion.active:after { content: '-'; }
       
       .panel { padding: 0 5px; background-color: #111; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-      
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 10px 5px; max-height: 300px; overflow-y: auto; }
       .ep-btn { background: #333; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 11px; text-align: center; }
       .ep-btn:hover { background: #444; }
@@ -110,7 +115,7 @@ export function renderWebsite() {
                 <span class="section-title">Latest Movies</span>
                 <a class="see-more" onclick="openCategory('movies')">See More ></a>
             </div>
-            <div class="scroll-row" id="row_movies">${getSkeletonRow()}</div>
+            <div class="scroll-row" id="row_movies">${getServerSkeleton()}</div>
         </div>
 
         <div class="home-section">
@@ -118,15 +123,15 @@ export function renderWebsite() {
                 <span class="section-title">TV Series</span>
                 <a class="see-more" onclick="openCategory('series')">See More ></a>
             </div>
-            <div class="scroll-row" id="row_series">${getSkeletonRow()}</div>
+            <div class="scroll-row" id="row_series">${getServerSkeleton()}</div>
         </div>
 
         <div class="home-section">
             <div class="section-head">
-                <span class="section-title" style="border-color: #ff0055;">18+ Collections</span>
+                <span class="section-title">18+ Collections</span>
                 <a class="see-more" onclick="openCategory('18+')">See More ></a>
             </div>
-            <div class="scroll-row" id="row_18">${getSkeletonRow()}</div>
+            <div class="scroll-row" id="row_18">${getServerSkeleton()}</div>
         </div>
     </div>
 
@@ -150,7 +155,6 @@ export function renderWebsite() {
                 <div class="play-btn-circle"></div>
             </div>
             <video id="video" controls playsinline controlsList="nodownload"></video>
-            
             <div class="player-overlay" id="playerOverlay">
                 <div class="top-controls">
                     <button class="ctrl-btn" onclick="closePlayer()">❌ Close</button>
@@ -160,7 +164,6 @@ export function renderWebsite() {
                 </div>
             </div>
         </div>
-        
         <div class="info-sec">
           <h2 id="m_title"></h2>
           <div style="margin:8px 0" id="m_tags"></div>
@@ -175,10 +178,15 @@ export function renderWebsite() {
       let currentVideoLink = "";
       let controlsTimeout;
 
+      // 🔥 Client-Side Skeleton Generator
+      function getClientSkeleton(count) {
+        return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
+      }
+
       window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
-        const view = urlParams.get('view'); 
+        const view = urlParams.get('view');
 
         if (!movieId) closePlayerInternal();
         if (view === 'grid') showGridInternal();
@@ -266,8 +274,7 @@ export function renderWebsite() {
         const newUrl = \`?view=grid&q=\${encodeURIComponent(query)}\`;
         window.history.pushState({path:newUrl},'',newUrl);
 
-        // 🔥 Skeleton Loading for Search
-        document.getElementById('mainGrid').innerHTML = getSkeletonRow(10);
+        document.getElementById('mainGrid').innerHTML = getClientSkeleton(10);
         document.getElementById('pagControls').style.display = 'none';
         
         const res = await fetch(\`/api/search?q=\${encodeURIComponent(query)}\`);
@@ -279,9 +286,7 @@ export function renderWebsite() {
       function handleSearchKey(e) { if (e.key === 'Enter') executeSearch(); }
 
       async function fetchMovies(page, cat) {
-        // 🔥 Skeleton Loading for Grid
-        document.getElementById('mainGrid').innerHTML = getSkeletonRow(10);
-        
+        document.getElementById('mainGrid').innerHTML = getClientSkeleton(10);
         const res = await fetch(\`/api/movies?page=\${page}&cat=\${cat}\`);
         const json = await res.json();
         allMoviesData = json.data;
@@ -327,7 +332,6 @@ export function renderWebsite() {
         const urlParams = new URLSearchParams(window.location.search);
         const view = urlParams.get('view');
         const viewParam = view ? \`&view=\${view}\` : '';
-        
         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + id + viewParam;
         window.history.pushState({path:newUrl},'',newUrl);
       }
@@ -365,12 +369,10 @@ export function renderWebsite() {
       function renderAccordion(episodes) {
         const container = document.getElementById('ep_section');
         container.innerHTML = "";
-        
         const seasons = {};
         episodes.forEach(ep => {
             let group = "Videos"; 
             const match = ep.label.match(/^(Season \\d+|S\\d+)/i);
-            
             if(match) {
                 let g = match[0];
                 if(g.toUpperCase().startsWith('S') && !g.toUpperCase().startsWith('SEASON')) {
@@ -379,7 +381,6 @@ export function renderWebsite() {
                 group = g;
             }
             if(ep.label === 'Movie') group = "Movie";
-
             if(!seasons[group]) seasons[group] = [];
             seasons[group].push(ep);
         });
@@ -388,28 +389,21 @@ export function renderWebsite() {
             const btn = document.createElement('button');
             btn.className = "accordion";
             btn.innerHTML = key;
-            
             const panel = document.createElement('div');
             panel.className = "panel";
-            
             const grid = document.createElement('div');
             grid.className = "episode-grid";
             grid.innerHTML = seasons[key].map(ep => {
                 const cleanLabel = ep.label.replace(key, '').trim() || ep.label;
                 return \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}')">\${cleanLabel}</button>\`;
             }).join('');
-            
             panel.appendChild(grid);
             container.appendChild(btn);
             container.appendChild(panel);
-
             btn.addEventListener("click", function() {
                 this.classList.toggle("active");
-                if (panel.style.maxHeight) { 
-                    panel.style.maxHeight = null; 
-                } else { 
-                    panel.style.maxHeight = "400px"; 
-                }
+                if (panel.style.maxHeight) { panel.style.maxHeight = null; } 
+                else { panel.style.maxHeight = "400px"; }
             });
         });
       }
@@ -447,10 +441,8 @@ export function renderWebsite() {
         closePlayerInternal();
         const urlParams = new URLSearchParams(window.location.search);
         const view = urlParams.get('view');
-        
         let newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
         if(view) newUrl += \`?view=\${view}\`; 
-        
         window.history.pushState({path:newUrl},'',newUrl);
       }
 
@@ -471,12 +463,6 @@ export function renderWebsite() {
         } else div.style.display = 'none';
       }
       function changePage(d) { fetchMovies(currentPage + d, currentCategory); }
-      
-      // 🔥 Helper function for repeating skeleton
-      function getSkeletonRow(count = 5) {
-        // Returns the skeleton HTML repeated 'count' times
-        return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
-      }
     </script>
   </body>
   </html>
