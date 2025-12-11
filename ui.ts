@@ -12,76 +12,49 @@ export function renderWebsite() {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-      /* --- GLOBAL RESET --- */
+      /* ... (Keep previous CSS exactly same until #vip-lock) ... */
+      /* --- Paste previous CSS here --- */
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
-      
-      /* --- HEADER --- */
       header { background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px); padding: 12px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; letter-spacing: 1px; }
-      
       .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; transition: 0.3s; }
       .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
-
-      /* --- 🔥 PAGE TRANSITION LOADER --- */
-      #global-loader {
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: #121212; z-index: 9999;
-          display: flex; justify-content: center; align-items: center;
-          transition: opacity 0.3s;
-      }
-      .spinner {
-          width: 40px; height: 40px; border: 4px solid #333;
-          border-top: 4px solid #e50914; border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-      }
+      #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
+      .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
-
-      /* --- USER SIDEBAR --- */
       .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
       .user-panel.open { transform: translateX(0); }
       .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
       .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; outline: none; }
       .auth-input:focus { border-color: #e50914; }
       .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; transition: 0.2s; }
-      .auth-btn:active { transform: scale(0.98); }
       .auth-btn.secondary { background: #333; margin-top: 5px; }
-
-      /* --- HOME LAYOUT --- */
       .home-section { padding: 20px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 12px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 700; border-left: 4px solid #e50914; padding-left: 10px; }
       .see-more { color: #aaa; font-size: 12px; cursor: pointer; font-weight: 600; text-decoration: none; }
-      
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
       .scroll-row .card { min-width: 115px; max-width: 115px; }
-
-      /* --- GRID SYSTEM --- */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      
       .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-      .card:active { transform: scale(0.96); }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
-      
       .back-nav { display: none; padding: 10px 15px; align-items: center; gap: 10px; background: #121212; position: sticky; top: 59px; z-index: 40; border-bottom: 1px solid #222; }
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-      
-      /* --- PLAYER MODAL --- */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:200; overflow-y: auto; animation: slideUp 0.3s ease-out; }
       @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
       video { width: 100%; height: 100%; background: black; }
       
-      /* 🔥 FIX: VIP LOCK CENTERED */
+      /* 🔥 FIX: BUTTON OVERFLOW & CENTERED LOCK */
       #vip-lock { 
           display: none; position: absolute; top:0; left:0; width:100%; height:100%; 
           background: #000; /* Solid Black */
@@ -90,8 +63,14 @@ export function renderWebsite() {
       }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
       #vip-lock p { color: #ccc; font-size: 14px; margin-bottom: 20px; max-width: 80%; line-height: 1.5; }
+      
+      /* New style for the button to prevent overflow */
+      .lock-btn {
+          background: #e50914; color: white; border: none; padding: 12px 30px; 
+          border-radius: 30px; font-weight: bold; font-size: 14px; 
+          max-width: 200px; width: 100%; cursor: pointer;
+      }
 
-      /* Info & Controls */
       .info-sec { padding: 20px; }
       h2#m_title { margin: 0; color: #fff; font-size: 18px; line-height: 1.3; }
       .action-row { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
@@ -100,16 +79,12 @@ export function renderWebsite() {
       .dl-btn { background: #4db8ff; color: #000; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: bold; }
       .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
       p.desc { color: #bbb; font-size: 14px; line-height: 1.6; margin-top: 15px; }
-
-      /* Episodes */
       .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 6px; }
       .accordion.active { background-color: #333; color: #e50914; }
       .panel { padding: 0 5px; background-color: #151515; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 15px 5px; max-height: 350px; overflow-y: auto; }
       .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 12px; text-align: center; }
       .ep-btn.active { background: #e50914; color: white; border-color: #e50914; font-weight: bold; }
-
-      /* Player Overlays */
       .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 15px; box-sizing: border-box; transition: opacity 0.3s; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%, transparent 70%, rgba(0,0,0,0.6)); }
       .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(4px); }
       .top-controls { display: flex; justify-content: flex-end; }
@@ -117,15 +92,10 @@ export function renderWebsite() {
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
-      
-      /* Error / Fallback */
       #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
       .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; display:flex; align-items:center; gap:8px; }
-
       .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 20px;}
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
-      
-      /* Skeleton */
       @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
     </style>
@@ -215,7 +185,7 @@ export function renderWebsite() {
                 <div style="font-size:40px; margin-bottom:10px;">👑</div>
                 <h2>Premium Content</h2>
                 <p>This content requires a VIP subscription.<br>Please login or redeem a code.</p>
-                <button class="auth-btn" style="width:auto; padding:10px 30px;" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button>
+                <button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button>
             </div>
 
             <div id="error-msg">
@@ -249,14 +219,12 @@ export function renderWebsite() {
       let currentUser = JSON.parse(localStorage.getItem('user_session') || 'null');
       let currentMovieId = "";
       
-      // --- LOADER ---
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
       function hideLoader() { loader.classList.add('hidden-loader'); }
 
       function getClientSkeleton(count) { return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join(''); }
 
-      // --- INITIALIZATION ---
       window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
@@ -270,7 +238,7 @@ export function renderWebsite() {
         updateProfileUI();
         await loadHomeData();
         setupPlayerIdle();
-        hideLoader(); // Init done
+        hideLoader();
         
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
@@ -288,7 +256,6 @@ export function renderWebsite() {
         });
       };
 
-      // --- AUTH ---
       function toggleUserPanel() { document.getElementById('userPanel').classList.toggle('open'); }
 
       function updateProfileUI() {
@@ -296,9 +263,16 @@ export function renderWebsite() {
               document.getElementById('loginForm').style.display = 'none';
               document.getElementById('profileView').style.display = 'block';
               document.getElementById('u_name').innerText = currentUser.username;
-              const isVip = currentUser.vipExpiry > Date.now();
-              document.getElementById('u_status').innerHTML = isVip ? 
-                  '<span style="color:#ffd700">👑 VIP Active</span>' : 'Free Account';
+              const exp = currentUser.vipExpiry;
+              if(exp > Date.now()) {
+                  // 🔥 DATE LOGIC: DD.MM.YYYY (P-XX Left)
+                  const date = new Date(exp);
+                  const dStr = date.getDate().toString().padStart(2,'0') + '.' + (date.getMonth()+1).toString().padStart(2,'0') + '.' + date.getFullYear();
+                  const daysLeft = Math.ceil((exp - Date.now()) / (1000*60*60*24));
+                  document.getElementById('u_status').innerHTML = \`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Left)</span>\`;
+              } else {
+                  document.getElementById('u_status').innerText = 'Free Plan';
+              }
           } else {
               document.getElementById('loginForm').style.display = 'block';
               document.getElementById('profileView').style.display = 'none';
@@ -348,9 +322,7 @@ export function renderWebsite() {
           } else alert("Invalid Code");
       }
 
-      // --- DATA ---
       async function loadHomeData() {
-        // 🔥 Use Promise.all to fetch parallel
         await Promise.all([
             fetchRow('movies', 'row_movies'),
             fetchRow('series', 'row_series'),
@@ -369,7 +341,7 @@ export function renderWebsite() {
       }
 
       function createCardHtml(m) {
-        const tag = m.isPremium ? '<div class="prem-tag">👑 VIP</div>' : '';
+        const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : '';
         return \`<div class="card" onclick="openModalById('\${m.id}')">
             <img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'">
             \${tag}
@@ -377,7 +349,6 @@ export function renderWebsite() {
         </div>\`;
       }
 
-      // --- NAV ---
       function goHome() {
         showLoader();
         setTimeout(() => {
@@ -385,7 +356,7 @@ export function renderWebsite() {
             window.history.pushState({path:newUrl},'',newUrl);
             goHomeInternal();
             hideLoader();
-        }, 300); // Fake delay for effect
+        }, 300);
       }
       function goHomeInternal() {
         document.getElementById('homeView').style.display = 'block';
@@ -486,7 +457,6 @@ export function renderWebsite() {
         else grid.innerHTML = data.map(m => createCardHtml(m)).join('');
       }
 
-      // --- PLAYER ---
       async function fetchSingleMovie(id) {
         showLoader();
         resetPlayerUI();
@@ -670,13 +640,11 @@ export function renderWebsite() {
 
         if (realUrl.includes('.m3u8')) {
             vid.src = "";
-            // Native First (Mobile)
             if (vid.canPlayType('application/vnd.apple.mpegurl')) {
                 vid.src = realUrl;
                 vid.addEventListener('loadedmetadata', () => vid.play().catch(e=>console.log(e)));
                 vid.onerror = () => tryHlsJs(vid, realUrl, showFallback);
             } 
-            // HLS.js (Desktop)
             else {
                 tryHlsJs(vid, realUrl, showFallback);
             }
