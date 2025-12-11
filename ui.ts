@@ -21,9 +21,11 @@ export function renderWebsite() {
       .search-input:focus { width: 160px; }
       .search-btn { cursor: pointer; padding: 5px; font-size: 16px; border-radius: 50%; }
 
+      /* Animation */
       @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
 
+      /* Home */
       .home-section { padding: 15px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 10px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 600; border-left: 3px solid #e50914; padding-left: 10px; }
@@ -33,6 +35,7 @@ export function renderWebsite() {
       .scroll-row::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
       .scroll-row .card { min-width: 110px; max-width: 110px; }
 
+      /* Grid */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
@@ -41,9 +44,13 @@ export function renderWebsite() {
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 6px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ccc; }
       .card-tag { position: absolute; top: 4px; right: 4px; background: rgba(229, 9, 20, 0.9); color: #fff; font-size: 8px; padding: 2px 4px; border-radius: 3px; }
-      .back-nav { display: none; padding: 10px 15px; }
+      
+      /* Navigation Buttons */
+      .back-nav { display: none; padding: 10px 15px; gap:10px; }
       .back-btn { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold;}
+      .fav-btn-menu { background: #333; color: #e50914; border: 1px solid #e50914; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold;}
 
+      /* Player Modal */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
@@ -52,7 +59,7 @@ export function renderWebsite() {
       .player-overlay.hidden { opacity: 0; }
       .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.7); color: white; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(5px); }
       .top-controls { display: flex; justify-content: flex-end; }
-      .bottom-controls { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 25px; }
+      .bottom-controls { display: flex; justify-content: flex-end; margin-bottom: 25px; }
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
@@ -61,10 +68,6 @@ export function renderWebsite() {
       #error-msg p { color: #ddd; margin-bottom: 15px; font-size: 14px; font-weight:500; }
       .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; display:flex; align-items:center; gap:8px; transition:0.2s; }
       .retry-btn:hover { background: #e50914; border-color:#e50914; }
-
-      /* 🔥 QUALITY SELECTOR STYLE */
-      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
-      .quality-select option { background: #222; color: white; }
 
       .info-sec { padding: 15px; }
       h2 { margin: 0; color: #fff; font-size: 18px; }
@@ -81,6 +84,11 @@ export function renderWebsite() {
       .ep-btn:hover { background: #444; }
       .ep-btn.active { background: #e50914; color: white; border-color: #e50914; font-weight: bold; }
 
+      /* 🔥 FAV BUTTON & ACTIONS */
+      .action-row { display:flex; gap:10px; margin-top:10px; }
+      .fav-btn { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display:flex; align-items:center; gap:5px; }
+      .fav-btn.active { color: #e50914; border: 1px solid #e50914; }
+
       .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 20px;}
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
     </style>
@@ -96,6 +104,10 @@ export function renderWebsite() {
     </header>
 
     <div id="homeView">
+        <div style="padding: 10px 15px; display:flex; gap:10px;">
+            <button class="fav-btn-menu" onclick="openFavorites()">❤️ My Favorites</button>
+        </div>
+
         <div class="home-section">
             <div class="section-head"><span class="section-title">Latest Movies</span><a class="see-more" onclick="openCategory('movies')">See More ></a></div>
             <div class="scroll-row" id="row_movies">${getServerSkeleton()}</div>
@@ -110,7 +122,10 @@ export function renderWebsite() {
         </div>
     </div>
 
-    <div class="back-nav" id="backNav"><button class="back-btn" onclick="goHome()">⬅ Back to Home</button></div>
+    <div class="back-nav" id="backNav">
+        <button class="back-btn" onclick="goHome()">⬅ Back to Home</button>
+        <span id="gridTitle" style="color:#aaa; font-size:14px; font-weight:bold; padding-top:5px;"></span>
+    </div>
     
     <div class="container" id="gridViewContainer">
       <div class="grid" id="mainGrid"></div>
@@ -136,15 +151,18 @@ export function renderWebsite() {
 
             <div class="player-overlay" id="playerOverlay">
                 <div class="top-controls"><button class="ctrl-btn" onclick="closePlayer()">❌ Close</button></div>
-                <div class="bottom-controls">
-                    <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
-                    <button class="ctrl-btn" onclick="toggleFullScreen()">⛶ Full</button>
-                </div>
+                <div class="bottom-controls"><button class="ctrl-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button></div>
             </div>
         </div>
+        
         <div class="info-sec">
           <h2 id="m_title"></h2>
-          <div style="margin:8px 0" id="m_tags"></div>
+          
+          <div class="action-row">
+             <div id="m_tags" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
+             <button id="favBtn" class="fav-btn" onclick="toggleFavorite()">❤️ Add to Fav</button>
+          </div>
+
           <p id="m_desc" class="desc"></p>
           <div id="ep_section" style="margin-top:15px;"></div>
         </div>
@@ -155,8 +173,7 @@ export function renderWebsite() {
       let currentPage = 1, currentCategory = 'all', allMoviesData = [];
       let currentVideoLink = "";
       let controlsTimeout;
-      // 🔥 Global HLS instance to control quality
-      window.hlsInstance = null;
+      let currentMovieId = ""; // To track current movie for continue watching
 
       function getClientSkeleton(count) {
         return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
@@ -174,6 +191,16 @@ export function renderWebsite() {
       window.onload = async () => {
         loadHomeData();
         setupPlayerIdle();
+        
+        // 🔥 Setup Continue Watching Listener
+        const vid = document.getElementById('video');
+        vid.addEventListener('timeupdate', () => {
+            if(vid.currentTime > 5 && currentMovieId) {
+                // Save progress (MovieID + VideoLink as unique key if needed, or just MovieID)
+                localStorage.setItem('watch_' + currentMovieId, vid.currentTime.toString());
+            }
+        });
+
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
@@ -213,6 +240,7 @@ export function renderWebsite() {
         </div>\`;
       }
 
+      // --- Navigation Functions ---
       function goHome() {
         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
         window.history.pushState({path:newUrl},'',newUrl);
@@ -227,12 +255,13 @@ export function renderWebsite() {
       function showGridInternal() {
         document.getElementById('homeView').style.display = 'none';
         document.getElementById('gridViewContainer').style.display = 'block';
-        document.getElementById('backNav').style.display = 'block';
+        document.getElementById('backNav').style.display = 'flex';
       }
 
       function openCategory(cat, pushState = true) {
         currentCategory = cat;
         showGridInternal();
+        document.getElementById('gridTitle').innerText = cat.toUpperCase().replace('%20', ' ');
         if(pushState) {
             const encodedCat = encodeURIComponent(cat);
             const newUrl = \`?view=grid&cat=\${encodedCat}\`;
@@ -241,10 +270,50 @@ export function renderWebsite() {
         fetchMovies(1, cat);
       }
 
+      // 🔥 OPEN FAVORITES
+      async function openFavorites() {
+        showGridInternal();
+        document.getElementById('gridTitle').innerText = "MY FAVORITES";
+        document.getElementById('mainGrid').innerHTML = getClientSkeleton(5);
+        document.getElementById('pagControls').style.display = 'none';
+        
+        // Push state
+        const newUrl = \`?view=grid&cat=fav\`;
+        window.history.pushState({path:newUrl},'',newUrl);
+
+        // Get IDs from LocalStorage
+        const favs = JSON.parse(localStorage.getItem('my_favs') || '[]');
+        if(favs.length === 0) {
+            document.getElementById('mainGrid').innerHTML = '<p style="text-align:center; padding:20px;">No favorites yet.</p>';
+            return;
+        }
+
+        // We need to fetch search logic to get multiple IDs or fetch one by one.
+        // For simplicity, we assume we have a search endpoint or we fetch all relevant.
+        // Better approach: We fetch page 1 of 'all' and filter client side OR better backend support.
+        // Since we don't have 'get_by_ids' API, we will try to fetch 'all' mostly.
+        // Workaround: Loop fetch 'get_movie' for each ID (A bit slow but works for small lists)
+        
+        let html = '';
+        for(const id of favs) {
+            try {
+                const res = await fetch(\`/api/get_movie?id=\${id}\`);
+                const m = await res.json();
+                if(m && m.title) {
+                    html += createCardHtml(m);
+                    // Also store in allMoviesData so we can open it
+                    if(!allMoviesData.find(x=>x.id === m.id)) allMoviesData.push(m);
+                }
+            } catch(e){}
+        }
+        document.getElementById('mainGrid').innerHTML = html || '<p>Error loading favorites</p>';
+      }
+
       async function executeSearch() {
         const query = document.getElementById('searchInput').value;
         if(!query) return goHome();
         showGridInternal();
+        document.getElementById('gridTitle').innerText = "SEARCH: " + query;
         const newUrl = \`?view=grid&q=\${encodeURIComponent(query)}\`;
         window.history.pushState({path:newUrl},'',newUrl);
         document.getElementById('mainGrid').innerHTML = getClientSkeleton(10);
@@ -314,6 +383,7 @@ export function renderWebsite() {
       }
 
       function setupModal(movie) {
+        currentMovieId = movie.id; // 🔥 Track ID
         const modal = document.getElementById('playerModal');
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -326,8 +396,10 @@ export function renderWebsite() {
         document.getElementById('video').pause();
         document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
         document.getElementById('error-msg').style.display = "none";
-        document.getElementById('qualitySelect').style.display = "none"; // Hide quality initially
         
+        // 🔥 UPDATE FAVORITE BUTTON STATE
+        updateFavBtnState();
+
         if (!movie.episodes || movie.episodes.length <= 1) {
              document.getElementById('ep_section').style.display = 'none';
              currentVideoLink = (movie.episodes && movie.episodes[0]) ? movie.episodes[0].link : movie.link; 
@@ -338,11 +410,47 @@ export function renderWebsite() {
         }
       }
 
+      // 🔥 FAVORITE LOGIC
+      function updateFavBtnState() {
+          const favs = JSON.parse(localStorage.getItem('my_favs') || '[]');
+          const btn = document.getElementById('favBtn');
+          if(favs.includes(currentMovieId)) {
+              btn.innerHTML = "❤️ Saved";
+              btn.classList.add('active');
+          } else {
+              btn.innerHTML = "🤍 Add to Fav";
+              btn.classList.remove('active');
+          }
+      }
+
+      window.toggleFavorite = function() {
+          if(!currentMovieId) return;
+          let favs = JSON.parse(localStorage.getItem('my_favs') || '[]');
+          if(favs.includes(currentMovieId)) {
+              favs = favs.filter(id => id !== currentMovieId);
+          } else {
+              favs.push(currentMovieId);
+          }
+          localStorage.setItem('my_favs', JSON.stringify(favs));
+          updateFavBtnState();
+      };
+
       function startPlayback() {
         document.getElementById('coverOverlay').style.display = 'none';
         const vid = document.getElementById('video');
         vid.style.display = 'block';
-        playViaSecureToken(currentVideoLink);
+        
+        // 🔥 Check Continue Watching
+        const savedTime = localStorage.getItem('watch_' + currentMovieId);
+        
+        playViaSecureToken(currentVideoLink).then(() => {
+            if(savedTime) {
+                // Small timeout to ensure video metadata loaded
+                setTimeout(() => {
+                    vid.currentTime = parseFloat(savedTime);
+                }, 500);
+            }
+        });
       }
       
       function renderAccordion(episodes) {
@@ -395,17 +503,11 @@ export function renderWebsite() {
         else startPlayback();
       }
 
-      // 🔥 AUTO-QUALITY PLAYER LOGIC
       async function playViaSecureToken(realUrl) {
         const vid = document.getElementById('video');
         vid.style.display = 'block';
         document.getElementById('error-msg').style.display = "none"; 
         
-        // Reset quality selector
-        const qSelect = document.getElementById('qualitySelect');
-        qSelect.innerHTML = "";
-        qSelect.style.display = "none";
-
         const showFallback = () => {
             vid.style.display = 'none'; 
             const errDiv = document.getElementById('error-msg');
@@ -414,11 +516,8 @@ export function renderWebsite() {
             errDiv.style.display = "flex"; 
         };
 
-        // 1. M3U8 Direct Play with Quality Switching
         if (realUrl.includes('.m3u8')) {
             vid.src = ""; 
-            
-            // Priority 1: Native Player (Mobile) - Auto quality
             if (vid.canPlayType('application/vnd.apple.mpegurl')) {
                 vid.src = realUrl;
                 vid.addEventListener('loadedmetadata', () => {
@@ -426,14 +525,12 @@ export function renderWebsite() {
                 });
                 vid.onerror = () => tryHlsJs(vid, realUrl, showFallback);
             } 
-            // Priority 2: HLS.js (PC/Desktop) - Manual quality
             else {
                 tryHlsJs(vid, realUrl, showFallback);
             }
             return;
         }
 
-        // 2. MP4/Other
         try {
             const res = await fetch('/api/sign_url', { method: 'POST', body: JSON.stringify({ url: realUrl }) });
             const json = await res.json();
@@ -447,40 +544,12 @@ export function renderWebsite() {
 
       function tryHlsJs(vid, url, fallbackCb) {
           if (Hls.isSupported()) {
-                if(window.hlsInstance) window.hlsInstance.destroy(); // Clear old instance
-                
-                const config = { debug: false, enableWorker: true, lowLatencyMode: true };
-                const hls = new Hls(config);
-                window.hlsInstance = hls; // Store global
-                
+                const hls = new Hls({ debug: false });
                 hls.loadSource(url);
                 hls.attachMedia(vid);
-                
-                hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
                     vid.play().catch(() => {});
-                    
-                    // 🔥 BUILD QUALITY MENU
-                    const levels = data.levels;
-                    const select = document.getElementById('qualitySelect');
-                    if(levels.length > 1) {
-                        select.innerHTML = "";
-                        // Auto Option
-                        const autoOpt = document.createElement('option');
-                        autoOpt.value = -1;
-                        autoOpt.text = "Auto";
-                        select.appendChild(autoOpt);
-                        
-                        // Quality Options (High to Low typically)
-                        levels.forEach((level, index) => {
-                            const opt = document.createElement('option');
-                            opt.value = index;
-                            opt.text = level.height + "p"; // e.g. 720p
-                            select.appendChild(opt);
-                        });
-                        select.style.display = "block";
-                    }
                 });
-                
                 hls.on(Hls.Events.ERROR, function (event, data) {
                     if (data.fatal) {
                         hls.destroy();
@@ -491,17 +560,9 @@ export function renderWebsite() {
               fallbackCb();
           }
       }
-      
-      // 🔥 Called when Quality Select changes
-      window.changeQuality = function(sel) {
-          if(window.hlsInstance) {
-              window.hlsInstance.currentLevel = parseInt(sel.value);
-          }
-      }
 
       function closePlayerInternal() {
         const vid = document.getElementById('video'); vid.pause(); vid.src="";
-        if(window.hlsInstance) { window.hlsInstance.destroy(); window.hlsInstance = null; }
         document.getElementById('playerModal').style.display = 'none';
         document.body.style.overflow = 'auto';
         if (document.fullscreenElement) document.exitFullscreen();
