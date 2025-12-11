@@ -1,4 +1,3 @@
-// ui.ts
 export function renderWebsite() {
   return `
   <!DOCTYPE html>
@@ -10,7 +9,6 @@ export function renderWebsite() {
     <style>
       body { background: #121212; color: #e0e0e0; font-family: sans-serif; margin:0; padding-bottom: 60px; }
       header { background: #181818; padding: 10px; position: sticky; top:0; z-index:50; border-bottom: 2px solid #e50914; display:flex; justify-content:center; gap:5px; flex-wrap:wrap;}
-      
       .nav-btn { background: #333; color: #aaa; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight:bold;}
       .nav-btn.active { background: #e50914; color: white; }
       
@@ -31,17 +29,13 @@ export function renderWebsite() {
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 900px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
       
-      /* 🔥 VIDEO AREA (COVER + PLAY BUTTON) */
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
-      
-      /* Cover Overlay */
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: 0.2s; }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
       .cover-overlay:hover .play-btn-circle { transform: scale(1.1); background: #f00; }
 
-      video { width: 100%; height: 100%; background: black; display: none; } /* Initially Hidden */
-      
+      video { width: 100%; height: 100%; background: black; display: none; }
       .controls { padding: 10px; background: #1a1a1a; display: flex; justify-content: space-between; }
       .btn-icon { background: #333; color: white; border:none; padding: 5px 12px; border-radius: 4px; cursor: pointer; }
 
@@ -51,7 +45,9 @@ export function renderWebsite() {
       .tag-pill { background: #333; color: #aaa; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
       p.desc { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; margin-top: 10px;}
       
-      .episode-list { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
+      /* 🔥 SEASON DROPDOWN STYLE */
+      .season-select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #444; border-radius: 5px; margin-bottom: 10px; font-size: 14px; font-weight: bold; }
+      .episode-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
       .ep-btn { background: #222; border: 1px solid #444; color: white; padding: 10px; cursor: pointer; border-radius: 4px; text-align: center; font-size: 12px; }
       .ep-btn:hover, .ep-btn.active { background: #e50914; border-color: #e50914; font-weight: bold; }
     </style>
@@ -79,9 +75,7 @@ export function renderWebsite() {
             <div id="coverOverlay" class="cover-overlay" onclick="startPlayback()">
                 <div class="play-btn-circle"></div>
             </div>
-            
-            <video id="video" controls playsinline></video>
-        </div>
+            <video id="video" controls playsinline controlsList="nodownload"></video> </div>
         
         <div class="controls">
             <button class="btn-icon" onclick="closePlayer()">❌ Close</button>
@@ -92,8 +86,8 @@ export function renderWebsite() {
           <h2 id="m_title"></h2>
           <div class="tags-row" id="m_tags"></div>
           
-          <div id="ep_section" style="display:none">
-            <h4 style="color:#e50914; margin: 15px 0 5px 0;">Select Episode:</h4>
+          <div id="ep_section" style="display:none; margin-top:20px;">
+            <select id="season_select" class="season-select" onchange="loadEpisodes(this.value)"></select>
             <div class="episode-list" id="ep_list"></div>
           </div>
 
@@ -104,7 +98,7 @@ export function renderWebsite() {
 
     <script>
       let currentPage = 1, currentCategory = 'all', allMoviesData = [];
-      let currentVideoLink = ""; // To store link for play click
+      let currentVideoLink = "", currentEpisodes = [];
 
       fetchMovies(1, 'all');
 
@@ -149,7 +143,6 @@ export function renderWebsite() {
       }
       function changePage(d) { fetchMovies(currentPage + d, currentCategory); }
 
-      // 🔥 OPEN MODAL LOGIC
       function openModal(index) {
         const movie = allMoviesData[index];
         const modal = document.getElementById('playerModal');
@@ -159,45 +152,73 @@ export function renderWebsite() {
         document.getElementById('m_title').innerText = movie.title;
         document.getElementById('m_desc').innerText = movie.description || "";
         
-        // Setup Cover Image
         const coverDiv = document.getElementById('coverOverlay');
-        const coverUrl = movie.cover || movie.image; // Use cover if exists, else poster
+        const coverUrl = movie.cover || movie.image;
         coverDiv.style.backgroundImage = \`url('\${coverUrl}')\`;
-        
-        // Reset View: Show Cover, Hide Video
         coverDiv.style.display = 'flex';
         document.getElementById('video').style.display = 'none';
         document.getElementById('video').pause();
         
-        // Tags
         document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
 
-        // Episodes setup
         const epSection = document.getElementById('ep_section');
-        const epList = document.getElementById('ep_list');
-        
-        // Determine first link
-        const firstLink = movie.episodes[0].link;
-        currentVideoLink = firstLink; // Store for Play Click
+        currentEpisodes = movie.episodes;
 
         if (movie.episodes.length === 1) {
             epSection.style.display = 'none';
+            currentVideoLink = movie.episodes[0].link;
         } else {
             epSection.style.display = 'block';
-            epList.innerHTML = movie.episodes.map((ep, idx) => \`
-                <button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}')">\${ep.label}</button>
-            \`).join('');
-            if(epList.firstChild) epList.firstChild.classList.add('active');
+            organizeSeasons(movie.episodes);
         }
       }
 
-      // 🔥 Called when User clicks the Cover Image
-      function startPlayback() {
-        document.getElementById('coverOverlay').style.display = 'none'; // Hide Cover
-        const vid = document.getElementById('video');
-        vid.style.display = 'block'; // Show Video
+      // 🔥 Season Organization Logic
+      function organizeSeasons(episodes) {
+        const seasonSelect = document.getElementById('season_select');
+        const seasons = {};
         
-        loadAndPlay(currentVideoLink);
+        // Group by Season (e.g., S1, Season 1)
+        episodes.forEach(ep => {
+            const match = ep.label.match(/(S\d+|Season \d+)/i);
+            const seasonName = match ? match[0].toUpperCase() : "SEASON 1"; // Default
+            if(!seasons[seasonName]) seasons[seasonName] = [];
+            seasons[seasonName].push(ep);
+        });
+
+        // Populate Dropdown
+        seasonSelect.innerHTML = Object.keys(seasons).map(s => \`<option value="\${s}">\${s}</option>\`).join('');
+        
+        // Load First Season
+        loadEpisodes(Object.keys(seasons)[0], seasons);
+        
+        // Store map for change event
+        seasonSelect.seasonMap = seasons;
+        seasonSelect.onchange = (e) => loadEpisodes(e.target.value, seasons);
+      }
+
+      function loadEpisodes(seasonKey, seasonMap) {
+        // If triggered by onchange, seasonMap needs to be retrieved
+        const map = seasonMap || document.getElementById('season_select').seasonMap;
+        const eps = map[seasonKey];
+        
+        const epList = document.getElementById('ep_list');
+        epList.innerHTML = eps.map(ep => \`
+            <button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}')">\${ep.label.replace(seasonKey, '').trim() || ep.label}</button>
+        \`).join('');
+        
+        // Auto select first ep of season
+        if(epList.firstChild) {
+            currentVideoLink = eps[0].link;
+        }
+      }
+
+      function startPlayback() {
+        document.getElementById('coverOverlay').style.display = 'none';
+        const vid = document.getElementById('video');
+        vid.style.display = 'block';
+        
+        loadAndPlayProtected(currentVideoLink); // 🔥 Use Protected Load
       }
 
       function switchEpisode(btn, link) {
@@ -205,23 +226,45 @@ export function renderWebsite() {
         btn.classList.add('active');
         currentVideoLink = link;
         
-        // If video is already visible, play immediately. Else, wait for cover click.
         if(document.getElementById('video').style.display !== 'none') {
-            loadAndPlay(link);
+            loadAndPlayProtected(link);
         } else {
-            // User hasn't clicked play yet, just update the link
-            startPlayback(); // Auto start if switching episodes
+            startPlayback();
         }
       }
 
-      function loadAndPlay(url) {
+      // 🔥 BLOB URL PROTECTION (Hides Real Link)
+      async function loadAndPlayProtected(url) {
         const vid = document.getElementById('video');
+        
+        // M3U8 (Cannot blob easily, but HLS hides fragments)
         if(Hls.isSupported() && url.includes('.m3u8')) {
           const hls = new Hls(); hls.loadSource(url); hls.attachMedia(vid);
           hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
-        } else { 
-            vid.src = url; 
-            vid.play(); 
+          return;
+        }
+
+        // MP4: Fetch as Blob -> Create Object URL -> Play
+        // Note: Cross-Origin (CORS) must be allowed on the video server for this to work perfectly.
+        // If CORS fails, it falls back to normal src (protection disabled).
+        try {
+            // Check if we can fetch (CORS check)
+            const response = await fetch(url, { method: 'HEAD' }); 
+            if(response.ok) {
+                // Stream response as blob
+                const blobRes = await fetch(url);
+                const blob = await blobRes.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                vid.src = blobUrl;
+                vid.play();
+                console.log("Protected Blob URL created");
+            } else {
+                throw new Error("CORS or Network Error");
+            }
+        } catch (err) {
+            console.warn("Blob protection failed (CORS?), falling back to direct link.");
+            vid.src = url;
+            vid.play();
         }
       }
 
