@@ -1,25 +1,40 @@
-// db.ts
 const kv = await Deno.openKv();
+
+export interface Episode {
+  label: string; // ဥပမာ: "S1 E1"
+  link: string;  // Video Link
+}
 
 export interface Movie {
   id: string;
   title: string;
   image: string;
-  link: string;
+  episodes: Episode[]; // Series အတွက် Link အများကြီး
   description: string;
   category: string;
+  tags: string[]; // Tags (Horror, 2025...)
+  timestamp: number;
 }
 
-export async function addMovie(data: any) {
-  const id = Date.now().toString();
-  await kv.set(["movies", id], { id, ...data });
+export async function addOrUpdateMovie(data: any) {
+  // ID ပါလာရင် Edit (Update), မပါရင် New (Add)
+  const id = data.id || Date.now().toString();
+  const movie: Movie = {
+    id,
+    title: data.title,
+    image: data.image,
+    episodes: data.episodes, // Array of links
+    description: data.description,
+    category: data.category,
+    tags: data.tags, // Array of tags
+    timestamp: Date.now() // For sorting
+  };
+  
+  await kv.set(["movies", id], movie);
 }
 
 export async function deleteMovie(id: string) {
   await kv.delete(["movies", id]);
-  // Delete reviews associated with movie
-  const reviews = kv.list({ prefix: ["reviews", id] });
-  for await (const r of reviews) await kv.delete(r.key);
 }
 
 export async function getMovies(page: number = 1, category: string = "all") {
@@ -30,14 +45,14 @@ export async function getMovies(page: number = 1, category: string = "all") {
   }
 
   // Latest First
-  allMovies.reverse();
+  allMovies.sort((a, b) => b.timestamp - a.timestamp);
 
-  // Filter
+  // Filter Category
   if (category !== "all") {
     allMovies = allMovies.filter((m) => m.category === category);
   }
 
-  // Pagination Logic
+  // Pagination
   const ITEMS_PER_PAGE = 15;
   const totalMovies = allMovies.length;
   const totalPages = Math.ceil(totalMovies / ITEMS_PER_PAGE);
@@ -51,21 +66,4 @@ export async function getMovies(page: number = 1, category: string = "all") {
     hasNext: page < totalPages,
     hasPrev: page > 1,
   };
-}
-
-// Review System
-export async function addReview(movieId: string, user: string, text: string) {
-  const reviewId = Date.now().toString();
-  await kv.set(["reviews", movieId, reviewId], {
-    user: user || "Anonymous",
-    text,
-    date: new Date().toLocaleDateString(),
-  });
-}
-
-export async function getReviews(movieId: string) {
-  const entries = kv.list({ prefix: ["reviews", movieId] });
-  const reviews = [];
-  for await (const entry of entries) reviews.push(entry.value);
-  return reviews.reverse();
 }
