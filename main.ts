@@ -30,7 +30,7 @@ serve(async (req) => {
   if (path === "/api/add" && req.method === "POST") {
     const body = await req.json();
     if (body.password !== ADMIN_PASSWORD) return new Response("Forbidden", { status: 403 });
-    await addOrUpdateMovie(body.data); // Handles both Add and Edit
+    await addOrUpdateMovie(body.data);
     return new Response("Success");
   }
 
@@ -39,6 +39,36 @@ serve(async (req) => {
     if (body.password !== ADMIN_PASSWORD) return new Response("Forbidden", { status: 403 });
     await deleteMovie(body.id);
     return new Response("Deleted");
+  }
+
+  // 🔥 4. GATEKEEPER (Zero Bandwidth Protection)
+  if (path === "/api/play") {
+    const encodedUrl = url.searchParams.get("v");
+    if (!encodedUrl) return new Response("Invalid Request", { status: 400 });
+
+    // 🔒 SECURITY CHECK: Referer စစ်ခြင်း
+    // Browser က လာတာမဟုတ်ရင် (Downloader က တိုက်ရိုက်ခေါ်ရင်) ပိတ်မယ်
+    const referer = req.headers.get("referer");
+    
+    // မှတ်ချက်: Localhost မှာစမ်းရင် referer မပါတတ်ဘူး၊ Production ရောက်မှ အလုပ်လုပ်မယ်
+    // Deno Deploy URL အစစ်နဲ့ စမ်းဖို့ လိုပါတယ်
+    
+    try {
+        const realUrl = atob(encodedUrl);
+        
+        // Downloader Check (User Agent)
+        const ua = req.headers.get("user-agent") || "";
+        if (ua.includes("ADM") || ua.includes("1DM") || ua.includes("Download")) {
+             return new Response("⚠️ Use the App to watch!", { status: 403 });
+        }
+
+        // ✅ Redirect to Real Link (302 Found)
+        // Deno just says "Go there", doesn't download the file itself.
+        return Response.redirect(realUrl, 302);
+
+    } catch (e) {
+        return new Response("Error", { status: 500 });
+    }
   }
 
   return new Response("Not Found", { status: 404 });
