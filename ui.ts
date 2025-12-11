@@ -40,10 +40,33 @@ export function renderWebsite() {
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; }
-      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
+      
+      /* --- 🔥 CARD DESIGN (Updated) --- */
+      .card { 
+          background: #1f1f1f; border-radius: 8px; overflow: hidden; 
+          cursor: pointer; position: relative; transition: transform 0.2s; 
+      }
+      .card img { 
+          width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; 
+          pointer-events: none; /* Block long press */
+      }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
-      .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
+      
+      /* 🔥 TAGS FIXED */
+      .prem-tag { 
+          position: absolute; top: 5px; left: 5px; 
+          background: #ffd700; color: #000; 
+          font-size: 9px; font-weight: bold; 
+          padding: 2px 6px; border-radius: 4px; z-index: 2; 
+      }
+      
+      .year-tag { 
+          position: absolute; top: 5px; right: 5px; 
+          background: rgba(0,0,0,0.85); color: #fff; 
+          font-size: 10px; font-weight: bold; 
+          padding: 2px 6px; border-radius: 4px; z-index: 2; 
+          border: 1px solid rgba(255,255,255,0.2);
+      }
       
       .back-nav { display: none; padding: 10px 15px; align-items: center; gap: 10px; background: #121212; position: sticky; top: 59px; z-index: 40; border-bottom: 1px solid #222; }
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
@@ -51,40 +74,11 @@ export function renderWebsite() {
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:200; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
+      video { width: 100%; height: 100%; background: black; }
       
-      /* 🔥 NATIVE CONTROLS FIX */
-      video { width: 100%; height: 100%; background: black; display: block; }
-      /* Ensure native controls are clickable */
-      video::-webkit-media-controls { z-index: 2147483647; }
-
-      /* 🔥 CONTROLS OVERLAY - MOVED TO TOP ONLY */
-      .player-overlay { 
-          position: absolute; top: 0; left: 0; width: 100%; 
-          /* Remove height 100% to avoid covering bottom */
-          height: 60px; 
-          display: flex; justify-content: flex-end; align-items: center;
-          padding: 10px; box-sizing: border-box; 
-          transition: opacity 0.3s; 
-          pointer-events: none; /* Let clicks pass */
-          background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-          z-index: 20;
-      }
-      
-      /* Buttons inside overlay */
-      .ctrl-group { display: flex; gap: 10px; pointer-events: auto; }
-      .ctrl-btn { background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(4px); }
-      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
-      .quality-select option { background: #222; color: white; }
-
-      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
-      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
-
       #vip-lock { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 25; }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
       .lock-btn { background: #e50914; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 14px; width: auto; cursor: pointer; }
-      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
-      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
 
       .info-sec { padding: 20px; }
       .action-row { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
@@ -96,12 +90,28 @@ export function renderWebsite() {
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 15px 5px; max-height: 350px; overflow-y: auto; }
       .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 12px; text-align: center; }
       .ep-btn.active { background: #e50914; color: white; border-color: #e50914; font-weight: bold; }
+      
+      .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 15px; box-sizing: border-box; transition: opacity 0.3s; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%, transparent 70%, rgba(0,0,0,0.6)); }
+      .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; }
+      .top-controls { display: flex; justify-content: flex-end; }
+      .bottom-controls { display: flex; justify-content: flex-end; gap: 10px; }
+      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
+      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
+      
+      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
+      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
+      
+      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
+      .quality-select option { background: #222; color: white; }
+
+      #scroll-sentinel { height: 50px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
+      #bottom-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
 
       #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px); animation: fadeIn 0.2s; }
       .alert-box { background: #1e1e1e; width: 85%; max-width: 320px; border-radius: 12px; padding: 25px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; transform: scale(0.9); animation: popIn 0.3s forwards; }
       .alert-btn { background: #e50914; color: white; border: none; padding: 12px 0; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-      #scroll-sentinel { height: 50px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
-      #bottom-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+      
       @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
     </style>
@@ -147,28 +157,12 @@ export function renderWebsite() {
       <div class="modal-content">
         <div class="video-area" id="videoWrapper">
             <div id="coverOverlay" class="cover-overlay" onclick="startPlayback()"><div class="play-btn-circle"></div></div>
-            
             <video id="video" controls playsinline controlsList="nodownload"></video>
-            
             <div id="vip-lock"><div style="font-size:40px; margin-bottom:10px;">👑</div><h2 style="color:#ffd700;">Premium</h2><p style="color:#ccc;">VIP required.</p><button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button></div>
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
-            
-            <div class="player-overlay" id="playerOverlay">
-                <div class="ctrl-group">
-                    <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
-                    <button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button>
-                    <button class="ctrl-btn" onclick="closePlayer()">✕</button>
-                </div>
-            </div>
+            <div class="player-overlay" id="playerOverlay"><div class="top-controls"><button class="ctrl-btn" onclick="closePlayer()">✕</button></div><div class="bottom-controls"><select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select><button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button></div></div>
         </div>
-        
-        <div class="info-sec">
-          <div id="ep_section" style="margin-bottom:20px;"></div>
-          <h2 id="m_title" style="margin:0;">Loading...</h2>
-          <div style="margin:10px 0" id="m_tags"></div>
-          <div class="action-row"><button id="favBtn" class="fav-btn" onclick="toggleFavorite()">🤍 Fav</button><div id="dl_area"></div></div>
-          <p id="m_desc" style="color:#bbb; font-size:14px; line-height:1.6;"></p>
-        </div>
+        <div class="info-sec"><div id="ep_section" style="margin-bottom:20px;"></div><h2 id="m_title" style="margin:0;">Loading...</h2><div style="margin:10px 0" id="m_tags"></div><div class="action-row"><button id="favBtn" class="fav-btn" onclick="toggleFavorite()">🤍 Fav</button><div id="dl_area"></div></div><p id="m_desc" style="color:#bbb; font-size:14px; line-height:1.6;"></p></div>
       </div>
     </div>
 
@@ -207,7 +201,6 @@ export function renderWebsite() {
         vid.addEventListener('timeupdate', () => { if(vid.currentTime > 5 && currentMovieId) localStorage.setItem('watch_' + currentMovieId, vid.currentTime); });
       };
 
-      // 🔥 AUTO HIDE TOP CONTROLS ONLY
       function setupPlayerIdle() {
           const w = document.getElementById('videoWrapper');
           const o = document.getElementById('playerOverlay');
@@ -225,7 +218,15 @@ export function renderWebsite() {
       function setupInfiniteScroll() { const sentinel = document.getElementById('scroll-sentinel'); if(!sentinel) return; observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting && !isLoading && hasMore) { fetchMovies(currentPage + 1, currentCategory, true); } }, { rootMargin: '100px' }); observer.observe(sentinel); }
       async function fetchMovies(page, cat, append=false) { if(isLoading) return; isLoading = true; document.getElementById('bottom-spinner').style.display = 'block'; const encodedCat = (cat==='all'||cat==='movies'||cat==='series') ? cat : encodeURIComponent(cat); const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodedCat}\`); const json = await res.json(); isLoading = false; document.getElementById('bottom-spinner').style.display = 'none'; if(json.data.length === 0) { hasMore = false; if(append) document.getElementById('end-msg').style.display = 'block'; return; } allMoviesData = append ? allMoviesData.concat(json.data) : json.data; renderGrid(json.data, append); currentPage = page; }
       function renderGrid(data, append) { const grid = document.getElementById('mainGrid'); const html = data.map(m => createCardHtml(m)).join(''); if(append) grid.innerHTML += html; else grid.innerHTML = html; }
-      function createCardHtml(m) { const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : ''; const yearTag = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; const yearHtml = yearTag ? \`<div class="year-tag">\${yearTag}</div>\` : ''; return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'" oncontextmenu="return false;">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; }
+      
+      // 🔥 CARD HTML (FIXED)
+      function createCardHtml(m) { 
+          const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : ''; 
+          const yearTag = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; 
+          const yearHtml = yearTag ? \`<div class="year-tag">\${yearTag}</div>\` : ''; 
+          return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'" oncontextmenu="return false;">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; 
+      }
+      
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
       function updateProfileUI(){if(currentUser){document.getElementById('loginForm').style.display='none';document.getElementById('profileView').style.display='block';document.getElementById('u_name').innerText=currentUser.username;const exp=currentUser.vipExpiry;if(exp>Date.now()){const date=new Date(exp);const dStr=date.toLocaleString('en-GB',{timeZone:'Asia/Yangon',day:'2-digit',month:'2-digit',year:'numeric'});const daysLeft=Math.ceil((exp-Date.now())/(1000*60*60*24));document.getElementById('u_status').innerHTML=\`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Days Left)</span>\`;}else{document.getElementById('u_status').innerText='Free Plan';}}else{document.getElementById('loginForm').style.display='block';document.getElementById('profileView').style.display='none';}}
