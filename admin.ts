@@ -45,7 +45,7 @@ export function renderAdmin() {
           </div>
           <div style="display:flex; gap:10px;">
               <select id="category" style="flex:1;"><option value="movies">Movie</option><option value="series">Series</option><option value="18+">18+</option></select>
-              <input type="text" id="tags" placeholder="Tags" style="flex:2;">
+              <input type="text" id="tags" placeholder="Tags (e.g. 2025, Action)" style="flex:2;">
           </div>
           <div style="margin:10px 0; display:flex; align-items:center; gap:10px;">
               <input type="checkbox" id="isPremium" style="width:auto; margin:0;">
@@ -113,19 +113,12 @@ export function renderAdmin() {
             lines.forEach((l, i) => {
                 let label = "";
                 let link = l.trim();
-                
-                // 🔥 FIX: Prevent Group Separation & Double Season Name
                 if(l.includes('|')) { 
                     const parts = l.split('|');
                     const customName = parts[0].trim();
                     link = parts[1].trim(); 
-                    
-                    if(group.toLowerCase() !== 'movie') {
-                        // Combine Group + Custom Name (e.g. Season 1 End)
-                        label = \`\${group} \${customName}\`; 
-                    } else {
-                        label = customName;
-                    }
+                    if(group.toLowerCase() !== 'movie') label = \`\${group} \${customName}\`; 
+                    else label = customName;
                 } else {
                     if(group.toLowerCase() === 'movie') label = "Movie";
                     else label = \`\${group} Ep \${i+1}\`; 
@@ -133,6 +126,10 @@ export function renderAdmin() {
                 episodeList.push({ label, link });
             });
         });
+
+        // 🔥 FIX: Tags Trimming
+        const rawTags = document.getElementById('tags').value;
+        const cleanTags = rawTags.split(',').map(t => t.trim()).filter(t => t);
 
         const data = {
           id: document.getElementById('editId').value || null,
@@ -142,7 +139,7 @@ export function renderAdmin() {
           description: document.getElementById('desc').value,
           category: document.getElementById('category').value,
           downloadLink: document.getElementById('dl_link').value,
-          tags: document.getElementById('tags').value.split(',').filter(t=>t),
+          tags: cleanTags, // Use Clean Tags
           isPremium: document.getElementById('isPremium').checked,
           episodes: episodeList
         };
@@ -161,7 +158,7 @@ export function renderAdmin() {
           document.getElementById('desc').value = m.description;
           document.getElementById('category').value = m.category;
           document.getElementById('dl_link').value = m.downloadLink||"";
-          document.getElementById('tags').value = (m.tags||[]).join(',');
+          document.getElementById('tags').value = (m.tags||[]).join(', '); // Add space for readability
           document.getElementById('isPremium').checked = m.isPremium || false;
 
           const con = document.getElementById('seasonsContainer'); con.innerHTML = "";
@@ -169,29 +166,16 @@ export function renderAdmin() {
           
           (m.episodes||[]).forEach(ep => {
               let g = "Movie";
-              
-              // 🔥 FIX: Smarter Group Detection
-              // If label starts with "Season X", group it under "Season X"
               const match = ep.label.match(/^(Season \\d+|S\\d+)/i);
               if(match) {
-                  g = match[0].replace(/^S(\\d+)/i, 'Season $1'); // Normalize S1 -> Season 1
-                  if(g.startsWith("Season") && g.includes("Season Season")) {
-                      g = g.replace("Season Season", "Season"); // Fix double name
-                  }
-              } else if (ep.label === 'Movie') {
-                  g = "Movie";
-              } else {
-                  // If custom label (e.g. End), try to find group from previous item or use 'Extras'
-                  // Ideally we parse it from the label itself if we saved it correctly
-                  g = "Extras"; 
-              }
+                  g = match[0].replace(/^S(\\d+)/i, 'Season $1');
+                  if(g.match(/Season\s*Season/i)) g = g.replace(/Season\s*Season/i, 'Season');
+              } else if (ep.label === 'Movie') g = "Movie";
+              else g = "Extras"; 
 
               if(!groups[g]) groups[g] = [];
-              
-              // Clean label for textarea (Remove "Season 1" prefix if present)
               let clean = ep.label.replace(g, '').trim();
-              if(clean.startsWith('Ep ')) clean = ""; // If just Ep number, don't show
-              
+              if(clean.startsWith('Ep ')) clean = "";
               if(clean) groups[g].push(\`\${clean} | \${ep.link}\`);
               else groups[g].push(ep.link);
           });
