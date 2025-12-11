@@ -52,7 +52,7 @@ export function renderWebsite() {
       .player-overlay.hidden { opacity: 0; }
       .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.7); color: white; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(5px); }
       .top-controls { display: flex; justify-content: flex-end; }
-      .bottom-controls { display: flex; justify-content: flex-end; margin-bottom: 25px; }
+      .bottom-controls { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 25px; }
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
@@ -61,6 +61,10 @@ export function renderWebsite() {
       #error-msg p { color: #ddd; margin-bottom: 15px; font-size: 14px; font-weight:500; }
       .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; display:flex; align-items:center; gap:8px; transition:0.2s; }
       .retry-btn:hover { background: #e50914; border-color:#e50914; }
+
+      /* 🔥 QUALITY SELECTOR STYLE */
+      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
+      .quality-select option { background: #222; color: white; }
 
       .info-sec { padding: 15px; }
       h2 { margin: 0; color: #fff; font-size: 18px; }
@@ -132,7 +136,10 @@ export function renderWebsite() {
 
             <div class="player-overlay" id="playerOverlay">
                 <div class="top-controls"><button class="ctrl-btn" onclick="closePlayer()">❌ Close</button></div>
-                <div class="bottom-controls"><button class="ctrl-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button></div>
+                <div class="bottom-controls">
+                    <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
+                    <button class="ctrl-btn" onclick="toggleFullScreen()">⛶ Full</button>
+                </div>
             </div>
         </div>
         <div class="info-sec">
@@ -148,6 +155,8 @@ export function renderWebsite() {
       let currentPage = 1, currentCategory = 'all', allMoviesData = [];
       let currentVideoLink = "";
       let controlsTimeout;
+      // 🔥 Global HLS instance to control quality
+      window.hlsInstance = null;
 
       function getClientSkeleton(count) {
         return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
@@ -317,6 +326,7 @@ export function renderWebsite() {
         document.getElementById('video').pause();
         document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
         document.getElementById('error-msg').style.display = "none";
+        document.getElementById('qualitySelect').style.display = "none"; // Hide quality initially
         
         if (!movie.episodes || movie.episodes.length <= 1) {
              document.getElementById('ep_section').style.display = 'none';
@@ -385,12 +395,17 @@ export function renderWebsite() {
         else startPlayback();
       }
 
-      // 🔥 OPTIMIZED PLAYER LOGIC (Fast Seeking + Native Priority)
+      // 🔥 AUTO-QUALITY PLAYER LOGIC
       async function playViaSecureToken(realUrl) {
         const vid = document.getElementById('video');
         vid.style.display = 'block';
         document.getElementById('error-msg').style.display = "none"; 
         
+        // Reset quality selector
+        const qSelect = document.getElementById('qualitySelect');
+        qSelect.innerHTML = "";
+        qSelect.style.display = "none";
+
         const showFallback = () => {
             vid.style.display = 'none'; 
             const errDiv = document.getElementById('error-msg');
@@ -399,26 +414,26 @@ export function renderWebsite() {
             errDiv.style.display = "flex"; 
         };
 
+        // 1. M3U8 Direct Play with Quality Switching
         if (realUrl.includes('.m3u8')) {
             vid.src = ""; 
             
-            // 1. Native Player First (Best for Android/iOS)
+            // Priority 1: Native Player (Mobile) - Auto quality
             if (vid.canPlayType('application/vnd.apple.mpegurl')) {
                 vid.src = realUrl;
                 vid.addEventListener('loadedmetadata', () => {
                     vid.play().catch(e => console.log("Native Play prevented"));
                 });
-                // Fallback to HLS.js if Native fails (rare but possible on Desktop Safari)
                 vid.onerror = () => tryHlsJs(vid, realUrl, showFallback);
             } 
-            // 2. HLS.js for Desktop (Chrome/Edge/Firefox)
+            // Priority 2: HLS.js (PC/Desktop) - Manual quality
             else {
                 tryHlsJs(vid, realUrl, showFallback);
             }
             return;
         }
 
-        // MP4 Logic
+        // 2. MP4/Other
         try {
             const res = await fetch('/api/sign_url', { method: 'POST', body: JSON.stringify({ url: realUrl }) });
             const json = await res.json();
@@ -430,51 +445,63 @@ export function renderWebsite() {
         } catch(e) { showFallback(); }
       }
 
-      // 🔥 HLS Configuration for Smooth Seeking & Fast Start
       function tryHlsJs(vid, url, fallbackCb) {
           if (Hls.isSupported()) {
-                const config = {
-                    debug: false,
-                    enableWorker: true,
-                    lowLatencyMode: true,
-                    backBufferLength: 90, // Keep 90s in buffer for seek back
-                    maxBufferLength: 30,  // Preload 30s ahead
-                    startLevel: -1,       // Auto quality start
-                };
+                if(window.hlsInstance) window.hlsInstance.destroy(); // Clear old instance
+                
+                const config = { debug: false, enableWorker: true, lowLatencyMode: true };
                 const hls = new Hls(config);
+                window.hlsInstance = hls; // Store global
+                
                 hls.loadSource(url);
                 hls.attachMedia(vid);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
                     vid.play().catch(() => {});
+                    
+                    // 🔥 BUILD QUALITY MENU
+                    const levels = data.levels;
+                    const select = document.getElementById('qualitySelect');
+                    if(levels.length > 1) {
+                        select.innerHTML = "";
+                        // Auto Option
+                        const autoOpt = document.createElement('option');
+                        autoOpt.value = -1;
+                        autoOpt.text = "Auto";
+                        select.appendChild(autoOpt);
+                        
+                        // Quality Options (High to Low typically)
+                        levels.forEach((level, index) => {
+                            const opt = document.createElement('option');
+                            opt.value = index;
+                            opt.text = level.height + "p"; // e.g. 720p
+                            select.appendChild(opt);
+                        });
+                        select.style.display = "block";
+                    }
                 });
                 
-                // Auto Recover Logic
                 hls.on(Hls.Events.ERROR, function (event, data) {
                     if (data.fatal) {
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                // Try to recover network error
-                                console.log("Network error, recovering...");
-                                hls.startLoad();
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                console.log("Media error, recovering...");
-                                hls.recoverMediaError();
-                                break;
-                            default:
-                                hls.destroy();
-                                fallbackCb();
-                                break;
-                        }
+                        hls.destroy();
+                        fallbackCb();
                     }
                 });
           } else {
               fallbackCb();
           }
       }
+      
+      // 🔥 Called when Quality Select changes
+      window.changeQuality = function(sel) {
+          if(window.hlsInstance) {
+              window.hlsInstance.currentLevel = parseInt(sel.value);
+          }
+      }
 
       function closePlayerInternal() {
         const vid = document.getElementById('video'); vid.pause(); vid.src="";
+        if(window.hlsInstance) { window.hlsInstance.destroy(); window.hlsInstance = null; }
         document.getElementById('playerModal').style.display = 'none';
         document.body.style.overflow = 'auto';
         if (document.fullscreenElement) document.exitFullscreen();
