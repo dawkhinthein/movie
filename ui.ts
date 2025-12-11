@@ -472,7 +472,7 @@ export function renderWebsite() {
                   const date = new Date(exp);
                   const dStr = date.getDate().toString().padStart(2,'0') + '.' + (date.getMonth()+1).toString().padStart(2,'0') + '.' + date.getFullYear();
                   const daysLeft = Math.ceil((exp - Date.now()) / (1000*60*60*24));
-                  document.getElementById('u_status').innerHTML = \`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Days Left)</span>\`;
+                  document.getElementById('u_status').innerHTML = \`<span style="color:#ffd700"> \${dStr} (P-\${daysLeft} Days Left)</span>\`;
               } else {
                   document.getElementById('u_status').innerText = 'Free Plan';
               }
