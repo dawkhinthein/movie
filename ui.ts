@@ -1,6 +1,5 @@
 export function renderWebsite() {
   
-  // Server-Side Helper
   function getServerSkeleton() {
     return Array(5).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
   }
@@ -15,65 +14,45 @@ export function renderWebsite() {
     <style>
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; }
       
-      /* Header */
       header { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); padding: 10px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: bold; font-size: 20px; text-decoration: none; cursor:pointer;}
-      
       .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 20px; padding: 5px 10px; }
       .search-input { background: transparent; border: none; color: white; outline: none; width: 110px; transition: 0.3s; font-size: 14px;}
       .search-input:focus { width: 160px; }
       .search-btn { cursor: pointer; padding: 5px; font-size: 16px; border-radius: 50%; }
 
-      /* Skeleton Animation */
-      @keyframes shimmer {
-        0% { background-position: -1000px 0; }
-        100% { background-position: 1000px 0; }
-      }
-      .skeleton {
-        animation: shimmer 2s infinite linear;
-        background: linear-gradient(to right, #222 4%, #333 25%, #222 36%);
-        background-size: 1000px 100%;
-        border-radius: 6px;
-      }
+      @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+      .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
 
-      /* Home Layout */
       .home-section { padding: 15px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 10px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 600; border-left: 3px solid #e50914; padding-left: 10px; }
       .see-more { color: #aaa; font-size: 11px; cursor: pointer; font-weight: bold; }
-
       .scroll-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { height: 4px; }
       .scroll-row::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
       .scroll-row .card { min-width: 110px; max-width: 110px; }
 
-      /* Grid */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      
       .card { background: #1f1f1f; border-radius: 6px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; }
       .card:active { transform: scale(0.95); }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 6px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ccc; }
       .card-tag { position: absolute; top: 4px; right: 4px; background: rgba(229, 9, 20, 0.9); color: #fff; font-size: 8px; padding: 2px 4px; border-radius: 3px; }
-
       .back-nav { display: none; padding: 10px 15px; }
       .back-btn { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold;}
 
-      /* Modal */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
-      
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
       video { width: 100%; height: 100%; background: black; display: none; }
-      
       .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 10px; box-sizing: border-box; transition: opacity 0.4s ease; opacity: 1; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%, transparent 70%, rgba(0,0,0,0.6)); }
       .player-overlay.hidden { opacity: 0; }
       .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.7); color: white; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(5px); }
       .top-controls { display: flex; justify-content: flex-end; }
       .bottom-controls { display: flex; justify-content: flex-end; margin-bottom: 25px; }
-
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
@@ -83,12 +62,10 @@ export function renderWebsite() {
       p.desc { color: #aaa; font-size: 13px; margin-top: 10px; line-height: 1.5; }
       .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
 
-      /* Accordion */
       .accordion { background-color: #2a2a2a; color: #eee; cursor: pointer; padding: 12px; width: 100%; border: none; text-align: left; outline: none; font-size: 14px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 4px; }
       .accordion.active { background-color: #e50914; color: white; }
       .accordion:after { content: '+'; font-size: 18px; }
       .accordion.active:after { content: '-'; }
-      
       .panel { padding: 0 5px; background-color: #111; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 10px 5px; max-height: 300px; overflow-y: auto; }
       .ep-btn { background: #333; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 11px; text-align: center; }
@@ -111,33 +88,20 @@ export function renderWebsite() {
 
     <div id="homeView">
         <div class="home-section">
-            <div class="section-head">
-                <span class="section-title">Latest Movies</span>
-                <a class="see-more" onclick="openCategory('movies')">See More ></a>
-            </div>
+            <div class="section-head"><span class="section-title">Latest Movies</span><a class="see-more" onclick="openCategory('movies')">See More ></a></div>
             <div class="scroll-row" id="row_movies">${getServerSkeleton()}</div>
         </div>
-
         <div class="home-section">
-            <div class="section-head">
-                <span class="section-title">TV Series</span>
-                <a class="see-more" onclick="openCategory('series')">See More ></a>
-            </div>
+            <div class="section-head"><span class="section-title">TV Series</span><a class="see-more" onclick="openCategory('series')">See More ></a></div>
             <div class="scroll-row" id="row_series">${getServerSkeleton()}</div>
         </div>
-
         <div class="home-section">
-            <div class="section-head">
-                <span class="section-title">18+ Collections</span>
-                <a class="see-more" onclick="openCategory('18+')">See More ></a>
-            </div>
+            <div class="section-head"><span class="section-title">18+ Collections</span><a class="see-more" onclick="openCategory('18+')">See More ></a></div>
             <div class="scroll-row" id="row_18">${getServerSkeleton()}</div>
         </div>
     </div>
 
-    <div class="back-nav" id="backNav">
-        <button class="back-btn" onclick="goHome()">⬅ Back to Home</button>
-    </div>
+    <div class="back-nav" id="backNav"><button class="back-btn" onclick="goHome()">⬅ Back to Home</button></div>
     
     <div class="container" id="gridViewContainer">
       <div class="grid" id="mainGrid"></div>
@@ -156,19 +120,15 @@ export function renderWebsite() {
             </div>
             <video id="video" controls playsinline controlsList="nodownload"></video>
             <div class="player-overlay" id="playerOverlay">
-                <div class="top-controls">
-                    <button class="ctrl-btn" onclick="closePlayer()">❌ Close</button>
-                </div>
-                <div class="bottom-controls">
-                    <button class="ctrl-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button>
-                </div>
+                <div class="top-controls"><button class="ctrl-btn" onclick="closePlayer()">❌ Close</button></div>
+                <div class="bottom-controls"><button class="ctrl-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button></div>
             </div>
         </div>
         <div class="info-sec">
           <h2 id="m_title"></h2>
           <div style="margin:8px 0" id="m_tags"></div>
-          <div id="ep_section" style="margin-top:15px;"></div>
           <p id="m_desc" class="desc"></p>
+          <div id="ep_section" style="margin-top:15px;"></div>
         </div>
       </div>
     </div>
@@ -186,7 +146,6 @@ export function renderWebsite() {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
-
         if (!movieId) closePlayerInternal();
         if (view === 'grid') showGridInternal();
         else goHomeInternal();
@@ -195,11 +154,9 @@ export function renderWebsite() {
       window.onload = async () => {
         loadHomeData();
         setupPlayerIdle();
-        
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
-
         if (movieId) fetchSingleMovie(movieId);
         else if (view === 'grid') {
              const cat = urlParams.get('cat') || 'all';
@@ -210,7 +167,8 @@ export function renderWebsite() {
       async function loadHomeData() {
         fetchRow('movies', 'row_movies');
         fetchRow('series', 'row_series');
-        fetchRow('18+', 'row_18');
+        // 🔥 FIX: Encode 18+ to make sure it sends "18+" not "18 "
+        fetchRow(encodeURIComponent('18+'), 'row_18');
       }
 
       async function fetchRow(cat, elemId) {
@@ -241,14 +199,12 @@ export function renderWebsite() {
         window.history.pushState({path:newUrl},'',newUrl);
         goHomeInternal();
       }
-
       function goHomeInternal() {
         document.getElementById('homeView').style.display = 'block';
         document.getElementById('gridViewContainer').style.display = 'none';
         document.getElementById('backNav').style.display = 'none';
         document.getElementById('searchInput').value = '';
       }
-
       function showGridInternal() {
         document.getElementById('homeView').style.display = 'none';
         document.getElementById('gridViewContainer').style.display = 'block';
@@ -259,41 +215,40 @@ export function renderWebsite() {
         currentCategory = cat;
         showGridInternal();
         if(pushState) {
-            const newUrl = \`?view=grid&cat=\${cat}\`;
+            // 🔥 FIX: Encode here too
+            const encodedCat = encodeURIComponent(cat);
+            const newUrl = \`?view=grid&cat=\${encodedCat}\`;
             window.history.pushState({path:newUrl},'',newUrl);
         }
-        fetchMovies(1, cat);
+        fetchMovies(1, cat); // fetchMovies will handle encoding
       }
 
       async function executeSearch() {
         const query = document.getElementById('searchInput').value;
         if(!query) return goHome();
-        
         showGridInternal();
         const newUrl = \`?view=grid&q=\${encodeURIComponent(query)}\`;
         window.history.pushState({path:newUrl},'',newUrl);
-
         document.getElementById('mainGrid').innerHTML = getClientSkeleton(10);
         document.getElementById('pagControls').style.display = 'none';
-        
         const res = await fetch(\`/api/search?q=\${encodeURIComponent(query)}\`);
         const results = await res.json();
         allMoviesData = results;
         renderGrid(results);
       }
-
       function handleSearchKey(e) { if (e.key === 'Enter') executeSearch(); }
 
       async function fetchMovies(page, cat) {
         document.getElementById('mainGrid').innerHTML = getClientSkeleton(10);
-        const res = await fetch(\`/api/movies?page=\${page}&cat=\${cat}\`);
+        // 🔥 FIX: Ensure encoding
+        const encodedCat = (cat === 'all' || cat === 'movies' || cat === 'series') ? cat : encodeURIComponent(cat);
+        const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodedCat}\`);
         const json = await res.json();
         allMoviesData = json.data;
         renderGrid(json.data);
         updatePagination(json);
         currentPage = json.currentPage;
       }
-
       function renderGrid(data) {
         const grid = document.getElementById('mainGrid');
         if(data.length === 0) grid.innerHTML = '<p>No contents.</p>';
@@ -318,13 +273,11 @@ export function renderWebsite() {
 
       async function fetchSingleMovie(id) {
         document.getElementById('playerModal').style.display = 'block';
-        
-        // 🔥 RESET DATA IMMEDIATELY (Fix Flickering)
         document.getElementById('m_title').innerText = "Loading...";
         document.getElementById('m_desc').innerText = "";
         document.getElementById('m_tags').innerHTML = "";
         document.getElementById('ep_section').innerHTML = "";
-        document.getElementById('coverOverlay').style.backgroundImage = ""; // Clear Image
+        document.getElementById('coverOverlay').style.backgroundImage = "";
         
         const res = await fetch(\`/api/get_movie?id=\${id}\`);
         const movie = await res.json();
@@ -335,7 +288,6 @@ export function renderWebsite() {
         const movie = allMoviesData.find(m => m.id === id) || {id: id}; 
         if(!movie.title) { fetchSingleMovie(id); }
         else { setupModal(movie); }
-        
         const urlParams = new URLSearchParams(window.location.search);
         const view = urlParams.get('view');
         const viewParam = view ? \`&view=\${view}\` : '';
@@ -443,7 +395,6 @@ export function renderWebsite() {
         document.body.style.overflow = 'auto';
         if (document.fullscreenElement) document.exitFullscreen();
       }
-
       function closePlayer() {
         closePlayerInternal();
         const urlParams = new URLSearchParams(window.location.search);
@@ -452,7 +403,6 @@ export function renderWebsite() {
         if(view) newUrl += \`?view=\${view}\`; 
         window.history.pushState({path:newUrl},'',newUrl);
       }
-
       function toggleFullScreen() {
         const wrapper = document.getElementById('videoWrapper');
         if (!document.fullscreenElement) {
