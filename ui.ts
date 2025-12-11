@@ -1,8 +1,5 @@
 export function renderWebsite() {
-  
-  function getServerSkeleton() {
-    return Array(6).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
-  }
+  function getServerSkeleton() { return Array(6).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join(''); }
 
   return `
   <!DOCTYPE html>
@@ -12,34 +9,26 @@ export function renderWebsite() {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-      /* --- GLOBAL RESET --- */
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
       
-      /* HEADER */
       header { background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px); padding: 12px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-      .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; letter-spacing: 1px; }
-      .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; transition: 0.3s; }
+      .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; }
+      .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; }
       .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
-      /* LOADER & SKELETON */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
-      @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
-      .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
 
-      /* SIDEBAR */
-      .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
+      .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s ease; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
       .user-panel.open { transform: translateX(0); }
-      .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-      .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; outline: none; }
-      .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; transition: 0.2s; }
+      .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; outline: none; }
+      .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; }
       .auth-btn.secondary { background: #333; margin-top: 5px; }
 
-      /* HOME & GRID */
       .home-section { padding: 20px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 12px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 700; border-left: 4px solid #e50914; padding-left: 10px; }
@@ -47,59 +36,45 @@ export function renderWebsite() {
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
       .scroll-row .card { min-width: 115px; max-width: 115px; }
+
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      @media (min-width: 900px) { .grid { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
-      .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-      .card:active { transform: scale(0.96); }
-      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; -webkit-user-drag: none; pointer-events: none; }
+      .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; }
+      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
-      .year-tag { position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-left-radius: 6px; z-index: 2; }
+      
       .back-nav { display: none; padding: 10px 15px; align-items: center; gap: 10px; background: #121212; position: sticky; top: 59px; z-index: 40; border-bottom: 1px solid #222; }
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-      .grid-title { font-size: 14px; font-weight: bold; color: #ccc; margin-left: auto; margin-right: auto; }
 
-      /* PLAYER AREA */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:200; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
+      .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
       
-      /* 🔥 IMPORTANT: Video Container Height */
-      .video-area { 
-          position: sticky; top: 0; z-index: 10; 
-          background:black; width: 100%; 
-          /* Aspect ratio hack is good, but for controls to show we need space */
-          aspect-ratio: 16/9; 
-          position: relative; 
-      }
-      
-      /* 🔥 FORCE NATIVE CONTROLS VISIBILITY */
-      video { 
-          width: 100%; height: 100%; background: black; 
-          display: block; 
-      }
+      /* 🔥 NATIVE CONTROLS FIX */
+      video { width: 100%; height: 100%; background: black; display: block; }
+      /* Ensure native controls are clickable */
+      video::-webkit-media-controls { z-index: 2147483647; }
 
-      /* 🔥 UPDATED OVERLAY: Only top part, no bottom blocking */
+      /* 🔥 CONTROLS OVERLAY - MOVED TO TOP ONLY */
       .player-overlay { 
-          position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-          display: flex; flex-direction: column; 
-          /* Just align top, let bottom be free for native controls */
-          justify-content: flex-start; 
-          padding: 10px; 
-          pointer-events: none; 
-          transition: opacity 0.3s;
+          position: absolute; top: 0; left: 0; width: 100%; 
+          /* Remove height 100% to avoid covering bottom */
+          height: 60px; 
+          display: flex; justify-content: flex-end; align-items: center;
+          padding: 10px; box-sizing: border-box; 
+          transition: opacity 0.3s; 
+          pointer-events: none; /* Let clicks pass */
+          background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+          z-index: 20;
       }
       
       /* Buttons inside overlay */
-      .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight:bold; backdrop-filter: blur(4px); }
-      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; margin-right: 10px; }
+      .ctrl-group { display: flex; gap: 10px; pointer-events: auto; }
+      .ctrl-btn { background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(4px); }
+      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
       .quality-select option { background: #222; color: white; }
-
-      /* Controls Row (Top Right) */
-      .controls-row {
-          display: flex; justify-content: flex-end; align-items: center; width: 100%;
-      }
 
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
@@ -107,7 +82,7 @@ export function renderWebsite() {
 
       #vip-lock { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 25; }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
-      .lock-btn { background: #e50914; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 14px; width: auto; min-width: 150px; cursor: pointer; }
+      .lock-btn { background: #e50914; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 14px; width: auto; cursor: pointer; }
       #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
       .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
 
@@ -127,6 +102,8 @@ export function renderWebsite() {
       .alert-btn { background: #e50914; color: white; border: none; padding: 12px 0; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
       #scroll-sentinel { height: 50px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
       #bottom-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+      @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+      .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
     </style>
   </head>
   <body>
@@ -146,7 +123,7 @@ export function renderWebsite() {
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
             <div style="margin:10px 0; display:flex; align-items:center;"><input type="checkbox" id="rememberMe" style="width:auto; margin-right:8px;"><label for="rememberMe" style="color:#aaa; font-size:13px;">Remember me (15 Days)</label></div>
-            <button class="auth-btn" onclick="doLogin()">Login</button><button class="auth-btn secondary" onclick="doRegister()">Register New</button>
+            <button class="auth-btn" onclick="doLogin()">Login</button><button class="auth-btn secondary" onclick="doRegister()">Register</button>
         </div>
         <div id="profileView" style="display:none;">
             <p style="color:#aaa; font-size:13px;">Logged in as:</p><h3 id="u_name" style="color:#e50914; margin-top:0;">User</h3>
@@ -163,7 +140,7 @@ export function renderWebsite() {
         <div class="home-section"><div class="section-head"><span class="section-title">18+</span><a class="see-more" onclick="openCategory('18+')">More ></a></div><div class="scroll-row" id="row_18">${getServerSkeleton()}</div></div>
     </div>
 
-    <div class="back-nav" id="backNav"><button class="back-btn" onclick="goHome()">⬅ Back</button><span id="gridTitle" class="grid-title"></span></div>
+    <div class="back-nav" id="backNav"><button class="back-btn" onclick="goHome()">⬅ Back</button><span id="gridTitle" style="color:#ccc; font-weight:bold;"></span></div>
     <div class="container" id="gridViewContainer"><div class="grid" id="mainGrid"></div><div id="scroll-sentinel"><div id="bottom-spinner" class="spinner"></div><p id="end-msg" style="display:none; color:#555; font-size:12px;">No more contents.</p></div></div>
 
     <div id="playerModal">
@@ -177,8 +154,9 @@ export function renderWebsite() {
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
             
             <div class="player-overlay" id="playerOverlay">
-                <div class="controls-row">
+                <div class="ctrl-group">
                     <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
+                    <button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button>
                     <button class="ctrl-btn" onclick="closePlayer()">✕</button>
                 </div>
             </div>
@@ -229,7 +207,7 @@ export function renderWebsite() {
         vid.addEventListener('timeupdate', () => { if(vid.currentTime > 5 && currentMovieId) localStorage.setItem('watch_' + currentMovieId, vid.currentTime); });
       };
 
-      // 🔥 FIX: AUTO HIDE CONTROLS (CUSTOM ONLY)
+      // 🔥 AUTO HIDE TOP CONTROLS ONLY
       function setupPlayerIdle() {
           const w = document.getElementById('videoWrapper');
           const o = document.getElementById('playerOverlay');
@@ -243,7 +221,6 @@ export function renderWebsite() {
           v.addEventListener('play', show); v.addEventListener('pause', () => { o.style.opacity = "1"; clearTimeout(controlsTimeout); });
       }
 
-      // Rest of the functions (Keep exact logic)
       function renderAccordion(episodes, isPremium) { const container = document.getElementById('ep_section'); container.innerHTML = ""; const seasons = {}; episodes.forEach(ep => { let g = "Videos"; const match = ep.label.match(/^(Season \\d+|S\\d+)/i); if(match) { let s = match[0]; if(s.toUpperCase().startsWith('S') && !s.toUpperCase().startsWith('SEASON')) s = s.replace(/^S/i, 'Season '); g = s; if(g.match(/Season\s*Season/i)) g = g.replace(/Season\s*Season/i, 'Season'); } else if(ep.label === 'Movie') g = "Movie"; if(!seasons[g]) seasons[g] = []; seasons[g].push(ep); }); Object.keys(seasons).sort().forEach(key => { const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = key; const panel = document.createElement('div'); panel.className = "panel"; const grid = document.createElement('div'); grid.className = "episode-grid"; grid.innerHTML = seasons[key].map(ep => { let clean = ep.label.replace(key, '').trim(); if(!clean) clean = ep.label; return \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${clean}</button>\`; }).join(''); panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel); btn.onclick = () => { btn.classList.toggle("active"); if(panel.style.maxHeight) panel.style.maxHeight=null; else panel.style.maxHeight="400px"; }; }); }
       function setupInfiniteScroll() { const sentinel = document.getElementById('scroll-sentinel'); if(!sentinel) return; observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting && !isLoading && hasMore) { fetchMovies(currentPage + 1, currentCategory, true); } }, { rootMargin: '100px' }); observer.observe(sentinel); }
       async function fetchMovies(page, cat, append=false) { if(isLoading) return; isLoading = true; document.getElementById('bottom-spinner').style.display = 'block'; const encodedCat = (cat==='all'||cat==='movies'||cat==='series') ? cat : encodeURIComponent(cat); const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodedCat}\`); const json = await res.json(); isLoading = false; document.getElementById('bottom-spinner').style.display = 'none'; if(json.data.length === 0) { hasMore = false; if(append) document.getElementById('end-msg').style.display = 'block'; return; } allMoviesData = append ? allMoviesData.concat(json.data) : json.data; renderGrid(json.data, append); currentPage = page; }
@@ -279,6 +256,7 @@ export function renderWebsite() {
       window.changeQuality=function(s){if(window.hlsInstance)window.hlsInstance.currentLevel=parseInt(s.value);}
       function closePlayerInternal(){const v=document.getElementById('video');v.pause();v.src="";if(window.hlsInstance){window.hlsInstance.destroy();window.hlsInstance=null;}document.getElementById('playerModal').style.display='none';document.body.style.overflow='auto';if(document.fullscreenElement)document.exitFullscreen();}
       function closePlayer(){closePlayerInternal();const u=new URLSearchParams(window.location.search);let l=window.location.pathname;if(u.get('view'))l+='?view='+u.get('view');window.history.pushState({path:l},'',l);}
+      function toggleFullScreen(){const w=document.getElementById('videoWrapper');if(!document.fullscreenElement){if(w.requestFullscreen)w.requestFullscreen();if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(e=>{});}else{if(document.exitFullscreen)document.exitFullscreen();}}
     </script>
   </body>
   </html>
