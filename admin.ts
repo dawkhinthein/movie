@@ -1,4 +1,3 @@
-// admin.ts
 export function renderAdmin() {
   return `
   <!DOCTYPE html>
@@ -41,17 +40,19 @@ export function renderAdmin() {
         <input type="hidden" id="editId">
         
         <input type="text" id="title" placeholder="Movie Title">
-        
         <div style="display:flex; gap:10px;">
             <input type="text" id="image" placeholder="Poster URL (Vertical)">
             <input type="text" id="cover" placeholder="Cover URL (Horizontal)">
         </div>
-
         <input type="text" id="tags" placeholder="Tags (e.g., 2025, Horror)">
         
         <div style="background: #e9ecef; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            <label style="font-size:12px; font-weight:bold; color:#555;">Video Links</label>
-            <textarea id="links" style="height: 80px; font-family: monospace;" placeholder="S1 E1 | https://..."></textarea>
+            <label style="font-size:12px; font-weight:bold; color:#555;">Video Links (Smart Series Detection)</label>
+            <p style="font-size:11px; margin: 2px 0; color:#666;">
+              Movies: Just paste URL<br>
+              Series: "S1 E1 | URL" or "Season 2 Ep 5 | URL"
+            </p>
+            <textarea id="links" style="height: 120px; font-family: monospace;" placeholder="S1 E1 | https://link1...&#10;S1 E2 | https://link2...&#10;S2 E1 | https://link3..."></textarea>
         </div>
 
         <textarea id="desc" placeholder="Synopsis..." style="height:60px;"></textarea>
@@ -119,7 +120,7 @@ export function renderAdmin() {
         document.getElementById('editId').value = item.id;
         document.getElementById('title').value = item.title;
         document.getElementById('image').value = item.image;
-        document.getElementById('cover').value = item.cover || ""; // 🔥 Load Cover
+        document.getElementById('cover').value = item.cover || "";
         document.getElementById('desc').value = item.description || "";
         document.getElementById('category').value = item.category;
         document.getElementById('tags').value = item.tags ? item.tags.join(', ') : "";
@@ -136,7 +137,7 @@ export function renderAdmin() {
         document.getElementById('editId').value = "";
         document.getElementById('title').value = "";
         document.getElementById('image').value = "";
-        document.getElementById('cover').value = ""; // Clear Cover
+        document.getElementById('cover').value = "";
         document.getElementById('desc').value = "";
         document.getElementById('tags').value = "";
         document.getElementById('links').value = "";
@@ -154,7 +155,7 @@ export function renderAdmin() {
           id: document.getElementById('editId').value || null,
           title: document.getElementById('title').value,
           image: document.getElementById('image').value,
-          cover: document.getElementById('cover').value, // 🔥 Save Cover
+          cover: document.getElementById('cover').value,
           description: document.getElementById('desc').value,
           category: document.getElementById('category').value,
           tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
