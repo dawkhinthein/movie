@@ -192,6 +192,7 @@ export function renderAdmin() {
       }
 
       function editItem(item) {
+        // Safe edit for legacy data
         document.getElementById('editId').value = item.id;
         document.getElementById('title').value = item.title;
         document.getElementById('image').value = item.image;
@@ -203,36 +204,42 @@ export function renderAdmin() {
         const container = document.getElementById('seasonsContainer');
         container.innerHTML = "";
         
-        // Re-Group Episodes logic
         const groups = {};
-        if(item.episodes) {
-            item.episodes.forEach(ep => {
-                let groupName = "Movie";
-                let linkText = ep.link;
+        
+        // 🔥 FIX: Handle old data where episodes array might be missing
+        let episodesToProcess = item.episodes;
+        if (!episodesToProcess || episodesToProcess.length === 0) {
+            // Old data? Check if 'link' exists
+            if (item.link) {
+                 episodesToProcess = [{ label: "Movie", link: item.link }];
+            } else {
+                 episodesToProcess = [];
+            }
+        }
 
-                // Try to parse "Season X" from label
-                const match = ep.label.match(/^(Season \\d+|S\\d+|Movie)/i);
-                if(match) {
-                    groupName = match[0].replace('S', 'Season '); // Normalize
-                    if(!ep.label.includes('Ep ') && ep.label !== groupName) {
-                        linkText = \`\${ep.label} | \${ep.link}\`;
-                    }
-                } else {
-                    // Custom group fallback
-                    groupName = "Extras"; 
+        episodesToProcess.forEach(ep => {
+            let groupName = "Movie";
+            let linkText = ep.link;
+
+            const match = ep.label.match(/^(Season \\d+|S\\d+|Movie)/i);
+            if(match) {
+                groupName = match[0].replace('S', 'Season ');
+                if(!ep.label.includes('Ep ') && ep.label !== groupName) {
                     linkText = \`\${ep.label} | \${ep.link}\`;
                 }
+            } else {
+                groupName = "Extras"; 
+                linkText = \`\${ep.label} | \${ep.link}\`;
+            }
 
-                if(!groups[groupName]) groups[groupName] = [];
-                groups[groupName].push(linkText);
-            });
-        }
+            if(!groups[groupName]) groups[groupName] = [];
+            groups[groupName].push(linkText);
+        });
 
         Object.keys(groups).forEach(name => {
             addSeasonBox(name, groups[name].join('\\n'));
         });
         
-        // If empty (legacy data), add default
         if(Object.keys(groups).length === 0) addSeasonBox();
         window.scrollTo(0,0);
       }
@@ -261,7 +268,6 @@ export function renderAdmin() {
       }
 
       function renderList(data) {
-        // 🔥 FIXED: Added checks for missing episodes
         if(!data || data.length === 0) {
             document.getElementById('contentList').innerHTML = '<p style="text-align:center; padding:10px;">Empty</p>';
             return;
@@ -269,7 +275,7 @@ export function renderAdmin() {
         document.getElementById('contentList').innerHTML = data.map(m => \`
           <div class="item">
             <img src="\${m.image}" onerror="this.src='https://via.placeholder.com/50'">
-            <div style="flex:1"><b>\${m.title}</b><br><small>\${m.episodes ? m.episodes.length : 0} Videos</small></div>
+            <div style="flex:1"><b>\${m.title}</b><br><small>\${(m.episodes && m.episodes.length) || 1} Videos</small></div>
             <button class="btn-del" onclick="editItem(\${JSON.stringify(m).replace(/'/g, "&#39;")})">Edit</button>
             <button class="btn-del" onclick="del('\${m.id}')" style="margin-left:5px;">Del</button>
           </div>
