@@ -18,20 +18,17 @@ export function renderWebsite() {
       .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
-      /* Loader */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
-      /* Sidebar & Auth */
       .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s ease; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
       .user-panel.open { transform: translateX(0); }
       .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; outline: none; }
       .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; }
       .auth-btn.secondary { background: #333; margin-top: 5px; }
 
-      /* Home */
       .home-section { padding: 20px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 12px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 700; border-left: 4px solid #e50914; padding-left: 10px; }
@@ -40,7 +37,6 @@ export function renderWebsite() {
       .scroll-row::-webkit-scrollbar { display: none; } 
       .scroll-row .card { min-width: 115px; max-width: 115px; }
 
-      /* Grid */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
@@ -52,26 +48,21 @@ export function renderWebsite() {
       .back-nav { display: none; padding: 10px 15px; align-items: center; gap: 10px; background: #121212; position: sticky; top: 59px; z-index: 40; border-bottom: 1px solid #222; }
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
 
-      /* Player */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:200; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
       video { width: 100%; height: 100%; background: black; }
       
-      /* 🔥 FIX: VIP Lock Button Style */
       #vip-lock { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 25; }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
-      .lock-btn { 
-          background: #e50914; color: white; border: none; 
-          padding: 10px 20px; border-radius: 30px; 
-          font-weight: bold; font-size: 14px; cursor: pointer; 
-          width: auto; min-width: 150px;
-      }
+      .lock-btn { background: #e50914; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 14px; max-width: 200px; width: auto; cursor: pointer; }
 
       .info-sec { padding: 20px; }
       .action-row { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
       .fav-btn { background: #222; border: 1px solid #444; color: #ccc; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; }
       .fav-btn.active { color: #e50914; border-color: #e50914; }
+      
+      /* 🔥 IMPROVED EPISODE BAR */
       .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 6px; }
       .accordion.active { background-color: #333; color: #e50914; }
       .panel { padding: 0 5px; background-color: #151515; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
@@ -80,7 +71,7 @@ export function renderWebsite() {
       .ep-btn.active { background: #e50914; color: white; border-color: #e50914; font-weight: bold; }
       
       .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 15px; box-sizing: border-box; transition: opacity 0.3s; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%, transparent 70%, rgba(0,0,0,0.6)); }
-      .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(4px); }
+      .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; }
       .top-controls { display: flex; justify-content: flex-end; }
       .bottom-controls { display: flex; justify-content: flex-end; gap: 10px; }
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
@@ -88,67 +79,59 @@ export function renderWebsite() {
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
       
       #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
-      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; display:flex; align-items:center; gap:8px; }
+      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
       
       .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 20px;}
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
+      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
+      .quality-select option { background: #222; color: white; }
       @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
     </style>
   </head>
   <body>
 
-    <div id="custom-alert" style="display:none;"><div class="alert-box"><span id="alert-icon" class="alert-icon">✅</span><h3 id="alert-title" class="alert-title">Success</h3><p id="alert-msg" class="alert-msg">Done.</p><button class="alert-btn" onclick="closeCustomAlert()">OK</button></div></div>
     <div id="global-loader"><div class="spinner"></div></div>
 
     <header>
       <div class="brand" onclick="goHome()">MY APP</div>
-      <div class="search-box">
-        <input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeypress="handleSearchKey(event)">
-        <button class="icon-btn" onclick="executeSearch()">🔍</button>
-      </div>
+      <div class="search-box"><input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeypress="handleSearchKey(event)"><button class="icon-btn" onclick="executeSearch()">🔍</button></div>
       <button class="icon-btn" onclick="toggleUserPanel()">👤</button>
     </header>
 
     <div id="userPanel" class="user-panel">
-        <div class="panel-head"><h3 id="u_head" style="margin:0; color:#fff;">Account</h3><button class="icon-btn" onclick="toggleUserPanel()">✕</button></div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="margin:0; color:#fff;">Account</h3><button class="icon-btn" onclick="toggleUserPanel()">✕</button></div>
         <div id="loginForm">
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
             <div style="margin:10px 0; display:flex; align-items:center;"><input type="checkbox" id="rememberMe" style="width:auto; margin-right:8px;"><label for="rememberMe" style="color:#aaa; font-size:13px;">Remember me</label></div>
-            <button class="auth-btn" onclick="doLogin()">Login</button><button class="auth-btn secondary" onclick="doRegister()">Register New</button>
+            <button class="auth-btn" onclick="doLogin()">Login</button><button class="auth-btn secondary" onclick="doRegister()">Register</button>
         </div>
         <div id="profileView" style="display:none;">
-            <p style="color:#aaa; font-size:13px;">Logged in as:</p><h3 id="u_name" style="color:#e50914; margin-top:0;">User</h3>
-            <div style="background:#222; padding:10px; border-radius:6px; margin:10px 0;"><p style="margin:0; font-size:12px; color:#aaa;">Status</p><p id="u_status" style="margin:5px 0; font-weight:bold;">Free Plan</p></div>
-            <p style="margin-bottom:5px; font-size:13px;">Redeem Code:</p><div style="display:flex; gap:5px;"><input type="text" id="vip_code" class="auth-input" style="margin:0;" placeholder="Code"><button class="auth-btn" style="margin:0; width:auto;" onclick="doRedeem()">Go</button></div>
-            <button class="auth-btn secondary" style="margin-top:20px;" onclick="openFavorites(); toggleUserPanel();">❤️ My Favorites</button><button class="auth-btn secondary" onclick="doLogout()">Log Out</button>
+            <h3 id="u_name" style="color:#e50914;">User</h3>
+            <p id="u_status" style="margin:5px 0;">Free Plan</p>
+            <input type="text" id="vip_code" class="auth-input" placeholder="Redeem Code">
+            <button class="auth-btn" onclick="doRedeem()">Redeem</button>
+            <button class="auth-btn secondary" onclick="doLogout()">Log Out</button>
         </div>
         <div style="margin-top:auto; text-align:center; padding-top:20px;"><a href="https://t.me/iqowoq" target="_blank" style="color:#0088cc; text-decoration:none;">✈️ Contact Admin</a></div>
     </div>
 
     <div id="homeView">
-        <div class="home-section"><div class="section-head"><span class="section-title">Latest Movies</span><a class="see-more" onclick="openCategory('movies')">See More ></a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
-        <div class="home-section"><div class="section-head"><span class="section-title">TV Series</span><a class="see-more" onclick="openCategory('series')">See More ></a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
-        <div class="home-section"><div class="section-head"><span class="section-title">18+ Collections</span><a class="see-more" onclick="openCategory('18+')">See More ></a></div><div class="scroll-row" id="row_18">${getServerSkeleton()}</div></div>
+        <div class="home-section"><div class="section-head"><span class="section-title">Latest</span><a class="see-more" onclick="openCategory('movies')">More ></a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
+        <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">More ></a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
+        <div class="home-section"><div class="section-head"><span class="section-title">18+</span><a class="see-more" onclick="openCategory('18+')">More ></a></div><div class="scroll-row" id="row_18">${getServerSkeleton()}</div></div>
     </div>
 
-    <div class="back-nav" id="backNav"><button class="back-btn" onclick="goHome()">⬅ Back</button><span id="gridTitle" class="grid-title"></span></div>
-    <div class="container" id="gridViewContainer"><div class="grid" id="mainGrid"></div><div class="pagination" id="pagControls"><button class="page-btn" id="prevBtn" onclick="changePage(-1)">Prev</button><span id="pageInfo"></span><button class="page-btn" id="nextBtn" onclick="changePage(1)">Next</button></div></div>
+    <div class="back-nav" id="backNav"><button class="back-btn" onclick="goHome()">⬅ Back</button><span id="gridTitle" style="color:#ccc; font-weight:bold;"></span></div>
+    <div class="container" id="gridViewContainer"><div class="grid" id="mainGrid"></div><div id="scroll-sentinel" style="height:50px;"></div></div>
 
     <div id="playerModal">
       <div class="modal-content">
         <div class="video-area" id="videoWrapper">
             <div id="coverOverlay" class="cover-overlay" onclick="startPlayback()"><div class="play-btn-circle"></div></div>
             <video id="video" controls playsinline controlsList="nodownload"></video>
-            
-            <div id="vip-lock">
-                <div style="font-size:40px; margin-bottom:10px;">👑</div>
-                <h2 style="color:#ffd700;">Premium</h2>
-                <p style="color:#ccc;">VIP subscription required.</p>
-                <button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button>
-            </div>
-
+            <div id="vip-lock"><div style="font-size:40px; margin-bottom:10px;">👑</div><h2 style="color:#ffd700;">Premium</h2><p style="color:#ccc;">VIP required.</p><button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button></div>
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
             <div class="player-overlay" id="playerOverlay"><div class="top-controls"><button class="ctrl-btn" onclick="closePlayer()">✕</button></div><div class="bottom-controls"><select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select><button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button></div></div>
         </div>
@@ -175,8 +158,6 @@ export function renderWebsite() {
       function showLoader() { loader.classList.remove('hidden-loader'); }
       function hideLoader() { loader.classList.add('hidden-loader'); }
       function getClientSkeleton(count) { return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join(''); }
-      function showAlert(title, msg, isSuccess = true) { const el = document.getElementById('custom-alert'); document.getElementById('alert-icon').innerText = isSuccess ? '✅' : '⚠️'; document.getElementById('alert-title').innerText = title; document.getElementById('alert-msg').innerText = msg; el.style.display = 'flex'; }
-      function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
       window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -198,7 +179,7 @@ export function renderWebsite() {
         vid.addEventListener('timeupdate', () => { if(vid.currentTime > 5 && currentMovieId) localStorage.setItem('watch_' + currentMovieId, vid.currentTime); });
       };
 
-      // 🔥 FIX: Regex for Season Label
+      // 🔥 FIX: Regex for Season Name
       function renderAccordion(episodes, isPremium) {
         const container = document.getElementById('ep_section');
         container.innerHTML = "";
@@ -206,20 +187,14 @@ export function renderWebsite() {
         
         episodes.forEach(ep => {
             let g = "Videos";
-            // Check if label contains "Season" already or starts with "S"
-            const match = ep.label.match(/^(Season \\d+|S\\d+)/i); 
+            // Check if label contains "Season" or "S1"
+            const match = ep.label.match(/^(Season \\d+|S\\d+)/i);
             if(match) {
-                // If it starts with S and digit, replace S with Season. 
-                // If it already is "Season", leave it.
                 let s = match[0];
-                if(s.toUpperCase().startsWith('S') && !s.toUpperCase().startsWith('SEASON')) {
-                    s = s.replace(/^S/i, 'Season ');
-                }
+                if(s.toUpperCase().startsWith('S') && !s.toUpperCase().startsWith('SEASON')) s = s.replace(/^S/i, 'Season ');
                 g = s;
-            } else if(ep.label.toLowerCase().includes('season')) {
-                // Extract existing "Season X" group if present in custom label
-                const m2 = ep.label.match(/Season \\d+/i);
-                if(m2) g = m2[0];
+                // If double Season name (e.g. Season Season 1), fix it
+                if(g.match(/Season\s*Season/i)) g = g.replace(/Season\s*Season/i, 'Season');
             } else if(ep.label === 'Movie') g = "Movie";
             
             if(!seasons[g]) seasons[g] = [];
@@ -234,86 +209,55 @@ export function renderWebsite() {
             panel.className = "panel";
             const grid = document.createElement('div');
             grid.className = "episode-grid";
-            
             grid.innerHTML = seasons[key].map(ep => {
-                // Cleanup label: Remove the Group Name from the button label for cleaner UI
                 let clean = ep.label.replace(key, '').trim(); 
-                if(!clean) clean = ep.label; // Fallback
+                if(!clean) clean = ep.label; 
                 return \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${clean}</button>\`;
             }).join('');
-            
-            panel.appendChild(grid);
-            container.appendChild(btn);
-            container.appendChild(panel);
+            panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel);
             btn.onclick = () => { btn.classList.toggle("active"); if(panel.style.maxHeight) panel.style.maxHeight=null; else panel.style.maxHeight="400px"; };
         });
       }
 
-      // ... (Paste rest of your functions: fetchMovies, auth, player logic here) ...
-      // Ensure fetchMovies uses append mode for infinite scroll
+      // Rest of the functions (Paste exactly as before to ensure logic works)
       let isLoading = false;
-      function setupInfiniteScroll() {
-          const sentinel = document.getElementById('scroll-sentinel');
-          if(!sentinel) return; // Guard
-          new IntersectionObserver(e => {
-              if(e[0].isIntersecting && !isLoading) fetchMovies(currentPage+1, currentCategory, true);
-          }).observe(sentinel);
-      }
-      
-      async function fetchMovies(page, cat, append=false) {
-          if(isLoading) return; isLoading = true;
-          const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodeURIComponent(cat)}\`);
-          const json = await res.json();
-          isLoading = false;
-          if(json.data.length === 0) return;
-          
-          if(append) {
-              const html = json.data.map(m => createCardHtml(m)).join('');
-              document.getElementById('mainGrid').innerHTML += html;
-          } else {
-              // ... normal load ...
-          }
-          currentPage = page;
-      }
-      
-      function createCardHtml(m) {
-          const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : '';
-          return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy">\${tag}<div class="title">\${m.title}</div></div>\`;
-      }
-      
-      // Function Placeholders to complete the code structure
+      function setupInfiniteScroll() { const sentinel = document.getElementById('scroll-sentinel'); new IntersectionObserver(e => { if(e[0].isIntersecting && !isLoading) fetchMovies(currentPage+1, currentCategory, true); }).observe(sentinel); }
+      async function fetchMovies(page, cat, append=false) { if(isLoading) return; isLoading = true; const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodeURIComponent(cat)}\`); const json = await res.json(); isLoading = false; if(json.data.length === 0) return; if(append) { const html = json.data.map(m => createCardHtml(m)).join(''); document.getElementById('mainGrid').innerHTML += html; } else { /* normal */ } currentPage = page; }
+      function createCardHtml(m) { const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : ''; return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy">\${tag}<div class="title">\${m.title}</div></div>\`; }
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
-      function updateProfileUI(){/* Same as before */}
-      async function doRegister(){/* Same as before */}
-      async function doLogin(){/* Same as before */}
-      function doLogout(){/* Same as before */}
-      async function doRedeem(){/* Same as before */}
+      function updateProfileUI(){if(currentUser){document.getElementById('loginForm').style.display='none';document.getElementById('profileView').style.display='block';document.getElementById('u_name').innerText=currentUser.username;const exp=currentUser.vipExpiry;if(exp>Date.now()){const date=new Date(exp);const dStr=date.getDate().toString().padStart(2,'0')+'.'+(date.getMonth()+1).toString().padStart(2,'0')+'.'+date.getFullYear();const daysLeft=Math.ceil((exp-Date.now())/(1000*60*60*24));document.getElementById('u_status').innerHTML=\`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Days)</span>\`;}else{document.getElementById('u_status').innerText='Free Plan';}}else{document.getElementById('loginForm').style.display='block';document.getElementById('profileView').style.display='none';}}
+      async function doRegister(){const u=document.getElementById('reg_user').value;const p=document.getElementById('reg_pass').value;if(!u||!p)return alert("Missing fields");showLoader();const res=await fetch('/api/auth/register',{method:'POST',body:JSON.stringify({username:u,password:p})});hideLoader();if(res.ok)alert("Registered!");else alert("Taken");}
+      async function doLogin(){const u=document.getElementById('reg_user').value;const p=document.getElementById('reg_pass').value;const remember=document.getElementById('rememberMe').checked;showLoader();const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})});hideLoader();if(res.ok){const user=await res.json();user.sessionExpiry=Date.now()+(remember?15:1)*24*60*60*1000;currentUser=user;localStorage.setItem('user_session',JSON.stringify(currentUser));updateProfileUI();}else alert("Invalid");}
+      function doLogout(){localStorage.removeItem('user_session');currentUser=null;updateProfileUI();}
+      async function doRedeem(){const code=document.getElementById('vip_code').value;showLoader();const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code})});hideLoader();if(res.ok){const updatedUser=await res.json();updatedUser.sessionExpiry=currentUser.sessionExpiry;currentUser=updatedUser;localStorage.setItem('user_session',JSON.stringify(currentUser));alert("VIP Active!");updateProfileUI();}else alert("Invalid Code");}
       async function loadHomeData(){await Promise.all([fetchRow('movies','row_movies'),fetchRow('series','row_series'),fetchRow('18+','row_18')]);}
-      async function fetchRow(c,id){/* Same as before */}
-      function goHome(){/* Same as before */}
-      function goHomeInternal(){/* Same as before */}
-      function showGridInternal(){/* Same as before */}
-      function openCategory(c,p){/* Same as before */}
-      async function openFavorites(){/* Same as before */}
-      async function executeSearch(){/* Same as before */}
-      function handleSearchKey(e){if(e.key==='Enter') executeSearch();}
-      async function fetchSingleMovie(id){/* Same as before */}
-      function openModalById(id){/* Same as before */}
-      function resetPlayerUI(){/* Same as before */}
-      function setupModal(m){/* Same as before - Ensure you call renderAccordion here */}
-      function updateFavBtnState(){/* Same as before */}
-      function toggleFavorite(){/* Same as before */}
-      function setupPlayButton(l,p){activeVideoLink=l; activeIsPremium=p;}
-      function startPlayback(){/* Same as before */}
-      function switchEpisode(b,l,p){/* Same as before */}
-      async function playViaSecureToken(u){/* Same as before */}
-      function tryHlsJs(u,c){/* Same as before */}
-      function closePlayerInternal(){/* Same as before */}
-      function closePlayer(){/* Same as before */}
-      function toggleFullScreen(){/* Same as before */}
-      function setupPlayerIdle(){/* Same as before */}
-      function changePage(d){/* Same as before */}
+      async function fetchRow(c,id){try{const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);const json=await res.json();document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');}catch(e){}}
+      function goHome(){showLoader();setTimeout(()=>{const u=window.location.protocol+"//"+window.location.host+window.location.pathname;window.history.pushState({path:u},'',u);goHomeInternal();hideLoader();},300);}
+      function goHomeInternal(){document.getElementById('homeView').style.display='block';document.getElementById('gridViewContainer').style.display='none';document.getElementById('backNav').style.display='none';document.getElementById('searchInput').value='';}
+      function showGridInternal(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex';}
+      function openCategory(c,p=true){showLoader();currentCategory=c;showGridInternal();document.getElementById('gridTitle').innerText=decodeURIComponent(c).toUpperCase();if(p){const u=\`?view=grid&cat=\${encodeURIComponent(c)}\`;window.history.pushState({path:u},'',u);}currentPage=1;isLoading=false;document.getElementById('mainGrid').innerHTML="";fetchMovies(1,c,true).then(hideLoader);}
+      async function openFavorites(){showLoader();showGridInternal();document.getElementById('gridTitle').innerText="FAVORITES";document.getElementById('mainGrid').innerHTML=getClientSkeleton(6);const favs=JSON.parse(localStorage.getItem('my_favs')||'[]');let html='';for(const id of favs){try{const res=await fetch(\`/api/get_movie?id=\${id}\`);const m=await res.json();if(m&&m.title){html+=createCardHtml(m);if(!allMoviesData.find(x=>x.id===m.id))allMoviesData.push(m);}}catch(e){}}document.getElementById('mainGrid').innerHTML=html;hideLoader();}
+      async function executeSearch(){const q=document.getElementById('searchInput').value;if(!q)return goHome();showLoader();showGridInternal();document.getElementById('gridTitle').innerText="SEARCH: "+q;window.history.pushState({},'','?view=grid&q='+encodeURIComponent(q));document.getElementById('mainGrid').innerHTML=getClientSkeleton(10);const res=await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);const results=await res.json();allMoviesData=results;renderGrid(results,false);hideLoader();}
+      function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
+      function renderGrid(d,a){const g=document.getElementById('mainGrid');const h=d.map(m=>createCardHtml(m)).join('');if(a)g.innerHTML+=h;else g.innerHTML=h;}
+      async function fetchSingleMovie(id){showLoader();resetPlayerUI();document.getElementById('playerModal').style.display='block';const res=await fetch(\`/api/get_movie?id=\${id}\`);const movie=await res.json();if(movie&&movie.title)setupModal(movie);hideLoader();}
+      function openModalById(id){const m=allMoviesData.find(x=>x.id===id);if(m){setupModal(m);}else{fetchSingleMovie(id);}const urlP=new URLSearchParams(window.location.search);const v=urlP.get('view')?\`&view=\${urlP.get('view')}\`:'';const u=window.location.pathname+'?id='+id+v;window.history.pushState({path:u},'',u);}
+      function resetPlayerUI(){document.getElementById('m_title').innerText="Loading...";document.getElementById('m_desc').innerText="";document.getElementById('m_tags').innerHTML="";document.getElementById('ep_section').innerHTML="";document.getElementById('dl_area').innerHTML="";document.getElementById('coverOverlay').style.backgroundImage="";document.getElementById('vip-lock').style.display="none";document.getElementById('error-msg').style.display="none";document.getElementById('video').style.display="block";}
+      function setupModal(m){currentMovieId=m.id;document.getElementById('playerModal').style.display='block';document.body.style.overflow='hidden';document.getElementById('m_title').innerText=m.title;document.getElementById('m_desc').innerText=m.description||"";document.getElementById('coverOverlay').style.backgroundImage=\`url('\${m.cover||m.image}')\`;document.getElementById('coverOverlay').style.display='flex';document.getElementById('video').style.display='none';document.getElementById('video').pause();if(m.tags)document.getElementById('m_tags').innerHTML=m.tags.map(t=>\`<span class="tag-pill">\${t}</span>\`).join('');updateFavBtnState();const dl=document.getElementById('dl_area');dl.innerHTML="";if(m.downloadLink)dl.innerHTML=\`<a href="\${m.downloadLink}" target="_blank" class="dl-btn">📥 DL</a>\`;if(!m.episodes||m.episodes.length<=1){document.getElementById('ep_section').style.display='none';const l=(m.episodes&&m.episodes[0])?m.episodes[0].link:m.link;setupPlayButton(l,m.isPremium);}else{document.getElementById('ep_section').style.display='block';renderAccordion(m.episodes,m.isPremium);const f=m.episodes[0].link;setupPlayButton(f,m.isPremium);}}
+      function updateFavBtnState(){const f=JSON.parse(localStorage.getItem('my_favs')||'[]');const b=document.getElementById('favBtn');if(f.includes(currentMovieId)){b.innerHTML="❤️ Saved";b.classList.add('active');}else{b.innerHTML="🤍 Fav";b.classList.remove('active');}}
+      window.toggleFavorite=function(){if(!currentMovieId)return;let f=JSON.parse(localStorage.getItem('my_favs')||'[]');if(f.includes(currentMovieId))f=f.filter(i=>i!==currentMovieId);else f.push(currentMovieId);localStorage.setItem('my_favs',JSON.stringify(f));updateFavBtnState();}
+      function setupPlayButton(l,p){activeVideoLink=l;activeIsPremium=p;}
+      window.switchEpisode=function(b,l,p){document.querySelectorAll('.ep-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');setupPlayButton(l,p);if(document.getElementById('video').style.display!=='none')startPlayback();else startPlayback();}
+      window.startPlayback=function(){if(activeIsPremium){if(!currentUser||currentUser.vipExpiry<Date.now()){document.getElementById('vip-lock').style.display='flex';document.getElementById('video').style.display='none';return;}}document.getElementById('coverOverlay').style.display='none';const v=document.getElementById('video');playViaSecureToken(activeVideoLink).then(()=>{const t=localStorage.getItem('watch_'+currentMovieId);if(t)v.currentTime=parseFloat(t);});}
+      async function playViaSecureToken(u){const v=document.getElementById('video');v.style.display='block';document.getElementById('error-msg').style.display='none';const sf=()=>{v.style.display='none';document.getElementById('error-msg').style.display='flex';document.getElementById('fallback-btn').href=u;};if(u.includes('.m3u8')){v.src="";if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=u;v.addEventListener('loadedmetadata',()=>{v.play().catch(e=>{});});v.onerror=()=>tryHlsJs(v,u,sf);}else{tryHlsJs(v,u,sf);}return;}try{const res=await fetch('/api/sign_url',{method:'POST',body:JSON.stringify({url:u,movieId:currentMovieId,username:currentUser?currentUser.username:null})});if(res.status===403){document.getElementById('vip-lock').style.display='flex';v.style.display='none';return;}const j=await res.json();if(j.token){v.src="/api/play?t="+j.token;v.play().catch(sf);v.onerror=sf;}else sf();}catch(e){sf();}}
+      function tryHlsJs(v,u,cb){if(Hls.isSupported()){if(window.hlsInstance)window.hlsInstance.destroy();const h=new Hls();window.hlsInstance=h;h.loadSource(u);h.attachMedia(v);h.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});const l=h.levels;const s=document.getElementById('qualitySelect');if(l.length>1){s.innerHTML="";const a=document.createElement('option');a.value=-1;a.text="Auto";s.appendChild(a);l.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.text=x.height+"p";s.appendChild(o);});s.style.display="block";}});h.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal){h.destroy();cb();}});}else{cb();}}
+      window.changeQuality=function(s){if(window.hlsInstance)window.hlsInstance.currentLevel=parseInt(s.value);}
+      function closePlayerInternal(){const v=document.getElementById('video');v.pause();v.src="";if(window.hlsInstance){window.hlsInstance.destroy();window.hlsInstance=null;}document.getElementById('playerModal').style.display='none';document.body.style.overflow='auto';if(document.fullscreenElement)document.exitFullscreen();}
+      function closePlayer(){closePlayerInternal();const u=new URLSearchParams(window.location.search);let l=window.location.pathname;if(u.get('view'))l+='?view='+u.get('view');window.history.pushState({path:l},'',l);}
+      function toggleFullScreen(){const w=document.getElementById('videoWrapper');if(!document.fullscreenElement){if(w.requestFullscreen)w.requestFullscreen();if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(e=>{});}else{if(document.exitFullscreen)document.exitFullscreen();}}
+      function setupPlayerIdle(){const w=document.getElementById('videoWrapper');const o=document.getElementById('playerOverlay');let t;const r=()=>{o.classList.remove('hidden');clearTimeout(t);t=setTimeout(()=>o.classList.add('hidden'),3000);};w.onmousemove=r;w.ontouchstart=r;w.onclick=r;}
+      function changePage(d){fetchMovies(currentPage+d,currentCategory);}
     </script>
   </body>
   </html>
