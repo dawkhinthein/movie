@@ -40,33 +40,11 @@ export function renderWebsite() {
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      
-      /* --- 🔥 CARD DESIGN (Updated) --- */
-      .card { 
-          background: #1f1f1f; border-radius: 8px; overflow: hidden; 
-          cursor: pointer; position: relative; transition: transform 0.2s; 
-      }
-      .card img { 
-          width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; 
-          pointer-events: none; /* Block long press */
-      }
+      .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; }
+      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
-      
-      /* 🔥 TAGS FIXED */
-      .prem-tag { 
-          position: absolute; top: 5px; left: 5px; 
-          background: #ffd700; color: #000; 
-          font-size: 9px; font-weight: bold; 
-          padding: 2px 6px; border-radius: 4px; z-index: 2; 
-      }
-      
-      .year-tag { 
-          position: absolute; top: 5px; right: 5px; 
-          background: rgba(0,0,0,0.85); color: #fff; 
-          font-size: 10px; font-weight: bold; 
-          padding: 2px 6px; border-radius: 4px; z-index: 2; 
-          border: 1px solid rgba(255,255,255,0.2);
-      }
+      .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
+      .year-tag { position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-left-radius: 6px; z-index: 2; }
       
       .back-nav { display: none; padding: 10px 15px; align-items: center; gap: 10px; background: #121212; position: sticky; top: 59px; z-index: 40; border-bottom: 1px solid #222; }
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
@@ -162,7 +140,14 @@ export function renderWebsite() {
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
             <div class="player-overlay" id="playerOverlay"><div class="top-controls"><button class="ctrl-btn" onclick="closePlayer()">✕</button></div><div class="bottom-controls"><select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select><button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button></div></div>
         </div>
-        <div class="info-sec"><div id="ep_section" style="margin-bottom:20px;"></div><h2 id="m_title" style="margin:0;">Loading...</h2><div style="margin:10px 0" id="m_tags"></div><div class="action-row"><button id="favBtn" class="fav-btn" onclick="toggleFavorite()">🤍 Fav</button><div id="dl_area"></div></div><p id="m_desc" style="color:#bbb; font-size:14px; line-height:1.6;"></p></div>
+        
+        <div class="info-sec">
+          <div id="ep_section" style="margin-bottom:20px;"></div>
+          <h2 id="m_title" style="margin:0;">Loading...</h2>
+          <div id="m_tags" style="margin:10px 0; display:flex; gap:8px; flex-wrap:wrap;"></div>
+          <div class="action-row"><button id="favBtn" class="fav-btn" onclick="toggleFavorite()">🤍 Fav</button><div id="dl_area"></div></div>
+          <p id="m_desc" style="color:#bbb; font-size:14px; line-height:1.6;"></p>
+        </div>
       </div>
     </div>
 
@@ -218,15 +203,7 @@ export function renderWebsite() {
       function setupInfiniteScroll() { const sentinel = document.getElementById('scroll-sentinel'); if(!sentinel) return; observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting && !isLoading && hasMore) { fetchMovies(currentPage + 1, currentCategory, true); } }, { rootMargin: '100px' }); observer.observe(sentinel); }
       async function fetchMovies(page, cat, append=false) { if(isLoading) return; isLoading = true; document.getElementById('bottom-spinner').style.display = 'block'; const encodedCat = (cat==='all'||cat==='movies'||cat==='series') ? cat : encodeURIComponent(cat); const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodedCat}\`); const json = await res.json(); isLoading = false; document.getElementById('bottom-spinner').style.display = 'none'; if(json.data.length === 0) { hasMore = false; if(append) document.getElementById('end-msg').style.display = 'block'; return; } allMoviesData = append ? allMoviesData.concat(json.data) : json.data; renderGrid(json.data, append); currentPage = page; }
       function renderGrid(data, append) { const grid = document.getElementById('mainGrid'); const html = data.map(m => createCardHtml(m)).join(''); if(append) grid.innerHTML += html; else grid.innerHTML = html; }
-      
-      // 🔥 CARD HTML (FIXED)
-      function createCardHtml(m) { 
-          const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : ''; 
-          const yearTag = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; 
-          const yearHtml = yearTag ? \`<div class="year-tag">\${yearTag}</div>\` : ''; 
-          return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'" oncontextmenu="return false;">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; 
-      }
-      
+      function createCardHtml(m) { const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : ''; const yearTag = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; const yearHtml = yearTag ? \`<div class="year-tag">\${yearTag}</div>\` : ''; return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'" oncontextmenu="return false;">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; }
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
       function updateProfileUI(){if(currentUser){document.getElementById('loginForm').style.display='none';document.getElementById('profileView').style.display='block';document.getElementById('u_name').innerText=currentUser.username;const exp=currentUser.vipExpiry;if(exp>Date.now()){const date=new Date(exp);const dStr=date.toLocaleString('en-GB',{timeZone:'Asia/Yangon',day:'2-digit',month:'2-digit',year:'numeric'});const daysLeft=Math.ceil((exp-Date.now())/(1000*60*60*24));document.getElementById('u_status').innerHTML=\`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Days Left)</span>\`;}else{document.getElementById('u_status').innerText='Free Plan';}}else{document.getElementById('loginForm').style.display='block';document.getElementById('profileView').style.display='none';}}
