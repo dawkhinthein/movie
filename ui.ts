@@ -1,6 +1,6 @@
 export function renderWebsite() {
   
-  // 🔥 Server-Side Helper (Deno က သုံးဖို့)
+  // Server-Side Helper
   function getServerSkeleton() {
     return Array(5).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
   }
@@ -24,7 +24,7 @@ export function renderWebsite() {
       .search-input:focus { width: 160px; }
       .search-btn { cursor: pointer; padding: 5px; font-size: 16px; border-radius: 50%; }
 
-      /* 🔥 Skeleton Animation */
+      /* Skeleton Animation */
       @keyframes shimmer {
         0% { background-position: -1000px 0; }
         100% { background-position: 1000px 0; }
@@ -178,7 +178,6 @@ export function renderWebsite() {
       let currentVideoLink = "";
       let controlsTimeout;
 
-      // 🔥 Client-Side Skeleton Generator
       function getClientSkeleton(count) {
         return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
       }
@@ -319,6 +318,14 @@ export function renderWebsite() {
 
       async function fetchSingleMovie(id) {
         document.getElementById('playerModal').style.display = 'block';
+        
+        // 🔥 RESET DATA IMMEDIATELY (Fix Flickering)
+        document.getElementById('m_title').innerText = "Loading...";
+        document.getElementById('m_desc').innerText = "";
+        document.getElementById('m_tags').innerHTML = "";
+        document.getElementById('ep_section').innerHTML = "";
+        document.getElementById('coverOverlay').style.backgroundImage = ""; // Clear Image
+        
         const res = await fetch(\`/api/get_movie?id=\${id}\`);
         const movie = await res.json();
         if(movie && movie.title) setupModal(movie);
