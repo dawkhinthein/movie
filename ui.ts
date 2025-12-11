@@ -9,7 +9,7 @@ export function renderWebsite() {
     <style>
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; }
       
-      /* --- Header --- */
+      /* Header */
       header { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); padding: 10px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: bold; font-size: 20px; text-decoration: none; cursor:pointer;}
       
@@ -18,7 +18,7 @@ export function renderWebsite() {
       .search-input:focus { width: 160px; }
       .search-btn { cursor: pointer; padding: 5px; font-size: 16px; border-radius: 50%; }
 
-      /* --- Home Layout --- */
+      /* Home Layout */
       .home-section { padding: 15px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 10px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 600; border-left: 3px solid #e50914; padding-left: 10px; }
@@ -29,7 +29,7 @@ export function renderWebsite() {
       .scroll-row::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
       .scroll-row .card { min-width: 110px; max-width: 110px; }
 
-      /* --- Grid & Cards --- */
+      /* Grid & Cards */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
@@ -43,7 +43,7 @@ export function renderWebsite() {
       .back-nav { display: none; padding: 10px 15px; }
       .back-btn { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold;}
 
-      /* --- Modal & Player --- */
+      /* Modal & Player */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       
@@ -299,14 +299,11 @@ export function renderWebsite() {
         document.getElementById('video').pause();
         document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
         
-        // 🔥 FIX: Check if Single Movie
+        // 🔥 FIX: Hide Ep Section if Single Movie
         if (!movie.episodes || movie.episodes.length <= 1) {
-             // Only 1 episode (Movie) -> Hide Accordion List
              document.getElementById('ep_section').style.display = 'none';
-             // Play the only link
-             currentVideoLink = (movie.episodes && movie.episodes[0]) ? movie.episodes[0].link : movie.link; // Fallback for old data
+             currentVideoLink = (movie.episodes && movie.episodes[0]) ? movie.episodes[0].link : movie.link; 
         } else {
-             // Series -> Show Accordion
              document.getElementById('ep_section').style.display = 'block';
              renderAccordion(movie.episodes);
              currentVideoLink = movie.episodes[0].link;
@@ -320,6 +317,7 @@ export function renderWebsite() {
         playViaSecureToken(currentVideoLink);
       }
       
+      // 🔥 FIX: Correct Regex and Auto-Open
       function renderAccordion(episodes) {
         const container = document.getElementById('ep_section');
         container.innerHTML = "";
@@ -327,8 +325,19 @@ export function renderWebsite() {
         const seasons = {};
         episodes.forEach(ep => {
             let group = "Videos"; 
+            
+            // Check if label starts with "Season X" or "S1"
             const match = ep.label.match(/^(Season \\d+|S\\d+)/i);
-            if(match) group = match[0].replace('S', 'Season ');
+            
+            if(match) {
+                // Only replace S with Season if it starts with S followed by digit (e.g., S1)
+                // If it is already "Season 1", leave it alone to avoid "Season eason 1"
+                let g = match[0];
+                if(g.toUpperCase().startsWith('S') && !g.toUpperCase().startsWith('SEASON')) {
+                    g = g.replace(/^S/i, 'Season ');
+                }
+                group = g;
+            }
             if(ep.label === 'Movie') group = "Movie";
 
             if(!seasons[group]) seasons[group] = [];
@@ -356,10 +365,15 @@ export function renderWebsite() {
 
             btn.addEventListener("click", function() {
                 this.classList.toggle("active");
-                if (panel.style.maxHeight) { panel.style.maxHeight = null; } 
-                else { panel.style.maxHeight = "400px"; }
+                if (panel.style.maxHeight) { 
+                    panel.style.maxHeight = null; 
+                } else { 
+                    panel.style.maxHeight = "400px"; 
+                }
             });
-            if(idx === 0) btn.click();
+            
+            // 🔥 REMOVED: Auto click to open first season
+            // if(idx === 0) btn.click(); 
         });
       }
 
