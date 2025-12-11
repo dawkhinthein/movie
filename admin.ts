@@ -8,33 +8,26 @@ export function renderAdmin() {
     <style>
       body { font-family: 'Segoe UI', sans-serif; padding: 15px; max-width: 900px; margin: 0 auto; background: #121212; color: #ddd; }
       
-      /* Inputs & UI */
       input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 4px; box-sizing: border-box; outline: none; }
       input:focus, textarea:focus { border-color: #e50914; }
       label { font-size: 12px; color: #aaa; font-weight: bold; margin-top: 8px; display: block; }
       
-      /* Buttons */
       button { padding: 10px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; width:100%; margin-top:5px; }
       .btn-green { background: #e50914; color: white; }
       .btn-blue { background: #007bff; color: white; }
       .btn-gray { background: #333; color: #ccc; }
       .btn-del { background: #dc3545; color: white; width: auto; padding: 5px 10px; font-size: 12px; }
 
-      /* Season Box Style */
       .season-box { background: #1e1e1e; border: 1px solid #333; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; border-left: 4px solid #e50914; }
       .remove-season { position: absolute; top: 10px; right: 10px; background: transparent; color: #666; font-size: 18px; cursor: pointer; width: auto; padding: 0; }
-      .remove-season:hover { color: #dc3545; }
-
-      /* Layout */
+      
       .main-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
       @media (min-width: 768px) { .main-grid { grid-template-columns: 1.3fr 0.7fr; } }
       .card-box { background: #181818; padding: 20px; border-radius: 8px; border: 1px solid #333; }
       
-      /* List */
       .item { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #333; background: #222; margin-bottom: 4px; }
       .item img { width: 35px; height: 50px; object-fit: cover; margin-right: 10px; }
       
-      /* Tabs */
       .tabs { display: flex; border-bottom: 2px solid #333; margin-bottom: 10px; }
       .tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; color: #777; }
       .tab.active { color: #e50914; border-bottom: 2px solid #e50914; }
@@ -86,16 +79,9 @@ export function renderAdmin() {
           <label>Description</label>
           <textarea id="desc" rows="2"></textarea>
 
-          <div id="seasonsContainer" style="margin-top:20px;">
-             </div>
+          <div id="seasonsContainer" style="margin-top:20px;"></div>
 
           <button onclick="addSeasonBox()" class="btn-blue" style="margin-bottom:10px;">+ Add Season / Group</button>
-          
-          <div style="background:#222; padding:10px; font-size:11px; color:#888; border-radius:4px;">
-             <b>Tip:</b> Paste links separated by comma (,) or new lines.<br>
-             Type <code>End | https://...</code> to name it "End".
-          </div>
-
           <button onclick="submitData()" id="submitBtn" class="btn-green" style="margin-top:15px;">Upload Content</button>
         </div>
 
@@ -129,11 +115,9 @@ export function renderAdmin() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         loadList('all');
-        // Add default season box
         addSeasonBox();
       }
 
-      // 🔥 DYNAMIC SEASON BOX LOGIC
       function addSeasonBox(name = "", links = "") {
         const container = document.getElementById('seasonsContainer');
         const count = container.children.length + 1;
@@ -162,51 +146,30 @@ export function renderAdmin() {
         const title = document.getElementById('title').value;
         if(!title) return showToast("Title required!");
 
-        // 🔥 GATHER DATA FROM BOXES
         const episodeList = [];
         const seasonBoxes = document.querySelectorAll('.season-box');
         
         seasonBoxes.forEach(box => {
             const groupName = box.querySelector('.s-name').value;
             const rawText = box.querySelector('.s-links').value;
-            
-            // Split by newline OR comma
             const links = rawText.split(/[\\n,]+/).map(l => l.trim()).filter(l => l);
             
             links.forEach((link, index) => {
                 let label = "";
                 let finalLink = link;
 
-                // Check for custom label like "End | https..."
                 if(link.includes('|')) {
                     const parts = link.split('|');
                     label = parts[0].trim();
                     finalLink = parts[1].trim();
                 } else {
-                    // Auto Gen Label
                     if(groupName.toLowerCase() === 'movie') {
                         label = "Movie";
                     } else {
-                        // "Season 1" -> "S1 E1" styling or just "Ep 1" inside the Accordion
-                        // We will store just the raw Season Name + Ep number, UI handles display
-                        label = \`\${groupName} - Ep \${index + 1}\`; 
-                        // Note: We use a special separator " - " to help UI grouping if needed, 
-                        // but actually better to store structural data. 
-                        // For simplicity in this DB, we'll store specific label.
+                        // Create structured label "Season 1 Ep 1"
+                        label = \`\${groupName} Ep \${index + 1}\`; 
                     }
                 }
-                
-                // We will add a hidden property to help reconstruction later? 
-                // actually we can just store linear, and the grouping logic handles it.
-                // To make the UI perfect, we need to ensure the label contains the group name for grouping.
-                
-                // Let's refine: The UI groups by parsing "S1" etc. 
-                // Let's just create labels like "Season 1 Ep 1".
-                
-                if(!label.includes('|') && groupName.toLowerCase() !== 'movie') {
-                     label = \`\${groupName} Ep \${index + 1}\`;
-                }
-
                 episodeList.push({ label: label, link: finalLink });
             });
         });
@@ -220,7 +183,7 @@ export function renderAdmin() {
           cover: document.getElementById('cover').value,
           description: document.getElementById('desc').value,
           category: document.getElementById('category').value,
-          tags: document.getElementById('tags').value.split(','),
+          tags: document.getElementById('tags').value.split(',').filter(t=>t),
           episodes: episodeList
         };
 
@@ -237,43 +200,40 @@ export function renderAdmin() {
         document.getElementById('category').value = item.category;
         document.getElementById('tags').value = item.tags ? item.tags.join(',') : "";
 
-        // 🔥 RECONSTRUCT SEASON BOXES
         const container = document.getElementById('seasonsContainer');
-        container.innerHTML = ""; // Clear existing
-
-        // Group episodes by Season Name regex
+        container.innerHTML = "";
+        
+        // Re-Group Episodes logic
         const groups = {};
-        item.episodes.forEach(ep => {
-            // Try to extract "Season X" or "S1" from label
-            // Example label: "Season 1 Ep 1"
-            let groupName = "Movie";
-            let linkText = ep.link;
+        if(item.episodes) {
+            item.episodes.forEach(ep => {
+                let groupName = "Movie";
+                let linkText = ep.link;
 
-            const match = ep.label.match(/^(Season \d+|S\d+|Movie)/i);
-            if(match) {
-                groupName = match[0]; // "Season 1"
-                // Check if label has custom text e.g. "End"
-                // If label is "Season 1 Ep 5", we just put link
-                // If label is "End", we put "End | link"
-                // This logic is tricky, so simplified:
-                if(!ep.label.includes('Ep ') && ep.label !== groupName) {
-                     linkText = \`\${ep.label} | \${ep.link}\`;
+                // Try to parse "Season X" from label
+                const match = ep.label.match(/^(Season \\d+|S\\d+|Movie)/i);
+                if(match) {
+                    groupName = match[0].replace('S', 'Season '); // Normalize
+                    if(!ep.label.includes('Ep ') && ep.label !== groupName) {
+                        linkText = \`\${ep.label} | \${ep.link}\`;
+                    }
+                } else {
+                    // Custom group fallback
+                    groupName = "Extras"; 
+                    linkText = \`\${ep.label} | \${ep.link}\`;
                 }
-            } else {
-                 // Fallback for custom labels not starting with Season
-                 groupName = "Extras"; 
-                 linkText = \`\${ep.label} | \${ep.link}\`;
-            }
 
-            if(!groups[groupName]) groups[groupName] = [];
-            groups[groupName].push(linkText);
-        });
+                if(!groups[groupName]) groups[groupName] = [];
+                groups[groupName].push(linkText);
+            });
+        }
 
-        // Create boxes
         Object.keys(groups).forEach(name => {
             addSeasonBox(name, groups[name].join('\\n'));
         });
         
+        // If empty (legacy data), add default
+        if(Object.keys(groups).length === 0) addSeasonBox();
         window.scrollTo(0,0);
       }
 
@@ -281,23 +241,35 @@ export function renderAdmin() {
         document.getElementById('editId').value = "";
         document.getElementById('title').value = "";
         document.getElementById('image').value = "";
+        document.getElementById('cover').value = "";
+        document.getElementById('desc').value = "";
+        document.getElementById('tags').value = "";
         document.getElementById('seasonsContainer').innerHTML = "";
-        addSeasonBox(); // Add 1 empty
+        addSeasonBox();
       }
       
       async function loadList(cat) {
-        document.getElementById('contentList').innerHTML = 'Loading...';
-        const res = await fetch(\`/api/movies?page=1&cat=\${cat}\`);
-        const json = await res.json();
-        currentList = json.data;
-        renderList(currentList);
+        document.getElementById('contentList').innerHTML = '<p style="text-align:center; padding:10px;">Loading...</p>';
+        try {
+            const res = await fetch(\`/api/movies?page=1&cat=\${cat}\`);
+            const json = await res.json();
+            currentList = json.data;
+            renderList(currentList);
+        } catch(e) {
+            document.getElementById('contentList').innerHTML = '<p style="color:red; text-align:center;">Error loading list</p>';
+        }
       }
 
       function renderList(data) {
+        // 🔥 FIXED: Added checks for missing episodes
+        if(!data || data.length === 0) {
+            document.getElementById('contentList').innerHTML = '<p style="text-align:center; padding:10px;">Empty</p>';
+            return;
+        }
         document.getElementById('contentList').innerHTML = data.map(m => \`
           <div class="item">
-            <img src="\${m.image}">
-            <div style="flex:1"><b>\${m.title}</b><br><small>\${m.episodes.length} Videos</small></div>
+            <img src="\${m.image}" onerror="this.src='https://via.placeholder.com/50'">
+            <div style="flex:1"><b>\${m.title}</b><br><small>\${m.episodes ? m.episodes.length : 0} Videos</small></div>
             <button class="btn-del" onclick="editItem(\${JSON.stringify(m).replace(/'/g, "&#39;")})">Edit</button>
             <button class="btn-del" onclick="del('\${m.id}')" style="margin-left:5px;">Del</button>
           </div>
