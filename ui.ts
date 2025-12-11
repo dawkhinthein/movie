@@ -25,7 +25,6 @@ export function renderWebsite() {
       .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
       
-      /* Modal */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 900px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
       
@@ -45,11 +44,13 @@ export function renderWebsite() {
       .tag-pill { background: #333; color: #aaa; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
       p.desc { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; margin-top: 10px;}
       
-      /* 🔥 SEASON DROPDOWN STYLE */
-      .season-select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #444; border-radius: 5px; margin-bottom: 10px; font-size: 14px; font-weight: bold; }
-      .episode-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
-      .ep-btn { background: #222; border: 1px solid #444; color: white; padding: 10px; cursor: pointer; border-radius: 4px; text-align: center; font-size: 12px; }
-      .ep-btn:hover, .ep-btn.active { background: #e50914; border-color: #e50914; font-weight: bold; }
+      .season-wrapper { margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; }
+      .season-header { font-size: 16px; color: #e50914; font-weight: bold; margin-bottom: 10px; }
+      .season-select { width: 100%; padding: 12px; background: #222; color: white; border: 1px solid #444; border-radius: 6px; font-size: 15px; outline: none; }
+      .episode-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 15px; }
+      .ep-btn { background: #222; border: 1px solid #444; color: #ddd; padding: 12px 5px; cursor: pointer; border-radius: 4px; text-align: center; font-size: 13px; transition: 0.2s; }
+      .ep-btn:hover { background: #333; }
+      .ep-btn.active { background: #e50914; border-color: #e50914; color: white; font-weight: bold; box-shadow: 0 0 10px rgba(229,9,20,0.4); }
     </style>
   </head>
   <body>
@@ -75,7 +76,8 @@ export function renderWebsite() {
             <div id="coverOverlay" class="cover-overlay" onclick="startPlayback()">
                 <div class="play-btn-circle"></div>
             </div>
-            <video id="video" controls playsinline controlsList="nodownload"></video> </div>
+            <video id="video" controls playsinline controlsList="nodownload"></video>
+        </div>
         
         <div class="controls">
             <button class="btn-icon" onclick="closePlayer()">❌ Close</button>
@@ -86,7 +88,8 @@ export function renderWebsite() {
           <h2 id="m_title"></h2>
           <div class="tags-row" id="m_tags"></div>
           
-          <div id="ep_section" style="display:none; margin-top:20px;">
+          <div id="ep_section" class="season-wrapper" style="display:none;">
+            <div class="season-header">Select Season:</div>
             <select id="season_select" class="season-select" onchange="loadEpisodes(this.value)"></select>
             <div class="episode-list" id="ep_list"></div>
           </div>
@@ -98,7 +101,7 @@ export function renderWebsite() {
 
     <script>
       let currentPage = 1, currentCategory = 'all', allMoviesData = [];
-      let currentVideoLink = "", currentEpisodes = [];
+      let currentVideoLink = "";
 
       fetchMovies(1, 'all');
 
@@ -107,19 +110,12 @@ export function renderWebsite() {
         const res = await fetch(\`/api/movies?page=\${page}&cat=\${cat}\`);
         const json = await res.json();
         allMoviesData = json.data;
-
         const grid = document.getElementById('grid');
         if(json.data.length === 0) grid.innerHTML = '<p>No contents.</p>';
         else grid.innerHTML = json.data.map((m, i) => {
           const tagHtml = m.tags && m.tags.length > 0 ? \`<div class="card-tag">\${m.tags[0]}</div>\` : '';
-          return \`
-          <div class="card" onclick="openModal(\${i})">
-            <img src="\${m.image}" onerror="this.src='https://via.placeholder.com/200x300'">
-            \${tagHtml}
-            <div class="title">\${m.title}</div>
-          </div>\`;
+          return \`<div class="card" onclick="openModal(\${i})"><img src="\${m.image}" onerror="this.src='https://via.placeholder.com/200x300'">\${tagHtml}<div class="title">\${m.title}</div></div>\`;
         }).join('');
-
         updatePagination(json);
         currentPage = json.currentPage;
         currentCategory = cat;
@@ -148,22 +144,19 @@ export function renderWebsite() {
         const modal = document.getElementById('playerModal');
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-
         document.getElementById('m_title').innerText = movie.title;
         document.getElementById('m_desc').innerText = movie.description || "";
-        
         const coverDiv = document.getElementById('coverOverlay');
         const coverUrl = movie.cover || movie.image;
         coverDiv.style.backgroundImage = \`url('\${coverUrl}')\`;
         coverDiv.style.display = 'flex';
         document.getElementById('video').style.display = 'none';
         document.getElementById('video').pause();
-        
         document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
-
         const epSection = document.getElementById('ep_section');
-        currentEpisodes = movie.episodes;
-
+        const epList = document.getElementById('ep_list');
+        epList.innerHTML = "";
+        
         if (movie.episodes.length === 1) {
             epSection.style.display = 'none';
             currentVideoLink = movie.episodes[0].link;
@@ -173,99 +166,61 @@ export function renderWebsite() {
         }
       }
 
-      // 🔥 Season Organization Logic
       function organizeSeasons(episodes) {
         const seasonSelect = document.getElementById('season_select');
         const seasons = {};
-        
-        // Group by Season (e.g., S1, Season 1)
         episodes.forEach(ep => {
             const match = ep.label.match(/(S\d+|Season \d+)/i);
-            const seasonName = match ? match[0].toUpperCase() : "SEASON 1"; // Default
+            const seasonName = match ? match[0].toUpperCase() : "Other";
             if(!seasons[seasonName]) seasons[seasonName] = [];
             seasons[seasonName].push(ep);
         });
-
-        // Populate Dropdown
-        seasonSelect.innerHTML = Object.keys(seasons).map(s => \`<option value="\${s}">\${s}</option>\`).join('');
-        
-        // Load First Season
-        loadEpisodes(Object.keys(seasons)[0], seasons);
-        
-        // Store map for change event
+        const sortedKeys = Object.keys(seasons).sort();
+        seasonSelect.innerHTML = sortedKeys.map(s => \`<option value="\${s}">\${s}</option>\`).join('');
         seasonSelect.seasonMap = seasons;
-        seasonSelect.onchange = (e) => loadEpisodes(e.target.value, seasons);
+        if(sortedKeys.length > 0) loadEpisodes(sortedKeys[0]);
       }
 
-      function loadEpisodes(seasonKey, seasonMap) {
-        // If triggered by onchange, seasonMap needs to be retrieved
-        const map = seasonMap || document.getElementById('season_select').seasonMap;
-        const eps = map[seasonKey];
-        
+      function loadEpisodes(seasonKey) {
+        const seasonMap = document.getElementById('season_select').seasonMap;
+        const eps = seasonMap[seasonKey];
         const epList = document.getElementById('ep_list');
-        epList.innerHTML = eps.map(ep => \`
-            <button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}')">\${ep.label.replace(seasonKey, '').trim() || ep.label}</button>
-        \`).join('');
-        
-        // Auto select first ep of season
-        if(epList.firstChild) {
-            currentVideoLink = eps[0].link;
-        }
+        epList.innerHTML = eps.map(ep => \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}')">\${ep.label.replace(seasonKey, '').trim() || ep.label}</button>\`).join('');
+        if(eps.length > 0) currentVideoLink = eps[0].link;
       }
 
       function startPlayback() {
         document.getElementById('coverOverlay').style.display = 'none';
         const vid = document.getElementById('video');
         vid.style.display = 'block';
-        
-        loadAndPlayProtected(currentVideoLink); // 🔥 Use Protected Load
+        playViaGatekeeper(currentVideoLink);
       }
 
       function switchEpisode(btn, link) {
         document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentVideoLink = link;
-        
-        if(document.getElementById('video').style.display !== 'none') {
-            loadAndPlayProtected(link);
-        } else {
-            startPlayback();
-        }
+        if(document.getElementById('video').style.display !== 'none') playViaGatekeeper(link);
+        else startPlayback();
       }
 
-      // 🔥 BLOB URL PROTECTION (Hides Real Link)
-      async function loadAndPlayProtected(url) {
+      // 🔥 GATEKEEPER PLAY (No Bandwidth on Deno)
+      function playViaGatekeeper(realUrl) {
         const vid = document.getElementById('video');
-        
-        // M3U8 (Cannot blob easily, but HLS hides fragments)
-        if(Hls.isSupported() && url.includes('.m3u8')) {
-          const hls = new Hls(); hls.loadSource(url); hls.attachMedia(vid);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
-          return;
-        }
 
-        // MP4: Fetch as Blob -> Create Object URL -> Play
-        // Note: Cross-Origin (CORS) must be allowed on the video server for this to work perfectly.
-        // If CORS fails, it falls back to normal src (protection disabled).
-        try {
-            // Check if we can fetch (CORS check)
-            const response = await fetch(url, { method: 'HEAD' }); 
-            if(response.ok) {
-                // Stream response as blob
-                const blobRes = await fetch(url);
-                const blob = await blobRes.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                vid.src = blobUrl;
-                vid.play();
-                console.log("Protected Blob URL created");
-            } else {
-                throw new Error("CORS or Network Error");
-            }
-        } catch (err) {
-            console.warn("Blob protection failed (CORS?), falling back to direct link.");
-            vid.src = url;
-            vid.play();
+        // M3U8 (Use HLS)
+        if(Hls.isSupported() && realUrl.includes('.m3u8')) {
+           const hls = new Hls(); hls.loadSource(realUrl); hls.attachMedia(vid);
+           hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
+           return;
         }
+        
+        // MP4: Use Redirect Gatekeeper
+        // The link looks like: /api/play?v=ENCRYPTED_URL
+        // The browser calls this, Deno checks headers, then redirects to Real URL.
+        const gatekeeperUrl = "/api/play?v=" + btoa(realUrl);
+        vid.src = gatekeeperUrl;
+        vid.play();
       }
 
       function closePlayer() {
