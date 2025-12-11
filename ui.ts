@@ -1,5 +1,6 @@
 export function renderWebsite() {
   
+  // Server-Side Skeleton Helper
   function getServerSkeleton() {
     return Array(6).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
   }
@@ -12,49 +13,92 @@ export function renderWebsite() {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-      /* ... (Keep previous CSS exactly same until #vip-lock) ... */
-      /* --- Paste previous CSS here --- */
+      /* --- GLOBAL RESET --- */
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
+      
+      /* --- HEADER --- */
       header { background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px); padding: 12px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; letter-spacing: 1px; }
+      
       .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; transition: 0.3s; }
+      .search-box:focus-within { border-color: #e50914; background: #2a2a2a; width: 60%; }
       .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
-      #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
-      .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+      /* --- LOADER --- */
+      #global-loader {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: #121212; z-index: 9999;
+          display: flex; justify-content: center; align-items: center;
+          transition: opacity 0.3s;
+      }
+      .spinner {
+          width: 40px; height: 40px; border: 4px solid #333;
+          border-top: 4px solid #e50914; border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+      }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
+
+      /* --- USER SIDEBAR --- */
       .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
       .user-panel.open { transform: translateX(0); }
       .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+      
       .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; outline: none; }
       .auth-input:focus { border-color: #e50914; }
+      
       .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; transition: 0.2s; }
+      .auth-btn:active { transform: scale(0.98); }
       .auth-btn.secondary { background: #333; margin-top: 5px; }
+
+      /* --- HOME LAYOUT --- */
       .home-section { padding: 20px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 12px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 700; border-left: 4px solid #e50914; padding-left: 10px; }
       .see-more { color: #aaa; font-size: 12px; cursor: pointer; font-weight: 600; text-decoration: none; }
+      
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
       .scroll-row .card { min-width: 115px; max-width: 115px; }
+
+      /* --- GRID SYSTEM --- */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
+      @media (min-width: 900px) { .grid { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
+
+      /* --- CARD DESIGN --- */
       .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+      .card:active { transform: scale(0.96); }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
+      
+      /* --- NAVIGATION BAR --- */
       .back-nav { display: none; padding: 10px 15px; align-items: center; gap: 10px; background: #121212; position: sticky; top: 59px; z-index: 40; border-bottom: 1px solid #222; }
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+      .grid-title { font-size: 14px; font-weight: bold; color: #ccc; margin-left: auto; margin-right: auto; }
+
+      /* --- PLAYER MODAL --- */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:200; overflow-y: auto; animation: slideUp 0.3s ease-out; }
       @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
       video { width: 100%; height: 100%; background: black; }
       
-      /* 🔥 FIX: BUTTON OVERFLOW & CENTERED LOCK */
+      /* Player Overlays */
+      .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 15px; box-sizing: border-box; transition: opacity 0.3s; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%, transparent 70%, rgba(0,0,0,0.6)); }
+      .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(4px); }
+      .top-controls { display: flex; justify-content: flex-end; }
+      .bottom-controls { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
+      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
+
+      /* VIP Lock Screen */
       #vip-lock { 
           display: none; position: absolute; top:0; left:0; width:100%; height:100%; 
           background: #000; /* Solid Black */
@@ -64,13 +108,17 @@ export function renderWebsite() {
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
       #vip-lock p { color: #ccc; font-size: 14px; margin-bottom: 20px; max-width: 80%; line-height: 1.5; }
       
-      /* New style for the button to prevent overflow */
       .lock-btn {
           background: #e50914; color: white; border: none; padding: 12px 30px; 
           border-radius: 30px; font-weight: bold; font-size: 14px; 
           max-width: 200px; width: 100%; cursor: pointer;
       }
 
+      /* Error / Fallback */
+      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
+      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; display:flex; align-items:center; gap:8px; }
+
+      /* Info Section */
       .info-sec { padding: 20px; }
       h2#m_title { margin: 0; color: #fff; font-size: 18px; line-height: 1.3; }
       .action-row { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
@@ -79,23 +127,23 @@ export function renderWebsite() {
       .dl-btn { background: #4db8ff; color: #000; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: bold; }
       .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
       p.desc { color: #bbb; font-size: 14px; line-height: 1.6; margin-top: 15px; }
+
+      /* Episodes */
       .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 6px; }
       .accordion.active { background-color: #333; color: #e50914; }
       .panel { padding: 0 5px; background-color: #151515; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 15px 5px; max-height: 350px; overflow-y: auto; }
       .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 12px; text-align: center; }
       .ep-btn.active { background: #e50914; color: white; border-color: #e50914; font-weight: bold; }
-      .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 15px; box-sizing: border-box; transition: opacity 0.3s; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%, transparent 70%, rgba(0,0,0,0.6)); }
-      .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(4px); }
-      .top-controls { display: flex; justify-content: flex-end; }
-      .bottom-controls { display: flex; justify-content: flex-end; gap: 10px; }
-      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
-      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
-      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
-      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; display:flex; align-items:center; gap:8px; }
+
       .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 20px;}
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
+      
+      /* Quality Select */
+      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
+      .quality-select option { background: #222; color: white; }
+
+      /* Skeleton */
       @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
     </style>
@@ -122,6 +170,12 @@ export function renderWebsite() {
         <div id="loginForm">
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
+            
+            <div style="margin:10px 0; display:flex; align-items:center;">
+                <input type="checkbox" id="rememberMe" style="width:auto; margin-right:8px;">
+                <label for="rememberMe" style="color:#aaa; font-size:13px;">Remember me (15 Days)</label>
+            </div>
+
             <button class="auth-btn" onclick="doLogin()">Login</button>
             <button class="auth-btn secondary" onclick="doRegister()">Register New</button>
         </div>
@@ -160,7 +214,7 @@ export function renderWebsite() {
 
     <div class="back-nav" id="backNav">
         <button class="back-btn" onclick="goHome()">⬅ Back</button>
-        <span id="gridTitle" class="grid-title" style="margin-left:auto; margin-right:auto;"></span>
+        <span id="gridTitle" class="grid-title"></span>
     </div>
     
     <div class="container" id="gridViewContainer">
@@ -195,7 +249,10 @@ export function renderWebsite() {
 
             <div class="player-overlay" id="playerOverlay">
                 <div class="top-controls"><button class="ctrl-btn" onclick="closePlayer()">✕</button></div>
-                <div class="bottom-controls"><button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button></div>
+                <div class="bottom-controls">
+                    <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
+                    <button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button>
+                </div>
             </div>
         </div>
         
@@ -216,15 +273,16 @@ export function renderWebsite() {
 
     <script>
       let currentPage = 1, currentCategory = 'all', allMoviesData = [];
-      let currentUser = JSON.parse(localStorage.getItem('user_session') || 'null');
+      let currentUser = null;
       let currentMovieId = "";
-      
+      window.hlsInstance = null;
+
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
       function hideLoader() { loader.classList.add('hidden-loader'); }
-
       function getClientSkeleton(count) { return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join(''); }
 
+      // --- INIT ---
       window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
@@ -235,6 +293,7 @@ export function renderWebsite() {
       });
 
       window.onload = async () => {
+        loadSession();
         updateProfileUI();
         await loadHomeData();
         setupPlayerIdle();
@@ -249,12 +308,24 @@ export function renderWebsite() {
              const cat = urlParams.get('cat') || 'all';
              openCategory(cat, false);
         }
-
+        
         const vid = document.getElementById('video');
         vid.addEventListener('timeupdate', () => {
             if(vid.currentTime > 5 && currentMovieId) localStorage.setItem('watch_' + currentMovieId, vid.currentTime);
         });
       };
+
+      // --- SESSION & AUTH ---
+      function loadSession() {
+          const stored = localStorage.getItem('user_session');
+          if (!stored) return;
+          const session = JSON.parse(stored);
+          if (session.sessionExpiry && Date.now() > session.sessionExpiry) {
+              localStorage.removeItem('user_session');
+              return;
+          }
+          currentUser = session;
+      }
 
       function toggleUserPanel() { document.getElementById('userPanel').classList.toggle('open'); }
 
@@ -265,7 +336,7 @@ export function renderWebsite() {
               document.getElementById('u_name').innerText = currentUser.username;
               const exp = currentUser.vipExpiry;
               if(exp > Date.now()) {
-                  // 🔥 DATE LOGIC: DD.MM.YYYY (P-XX Left)
+                  // Date Format: DD.MM.YYYY
                   const date = new Date(exp);
                   const dStr = date.getDate().toString().padStart(2,'0') + '.' + (date.getMonth()+1).toString().padStart(2,'0') + '.' + date.getFullYear();
                   const daysLeft = Math.ceil((exp - Date.now()) / (1000*60*60*24));
@@ -293,11 +364,16 @@ export function renderWebsite() {
       async function doLogin() {
           const u = document.getElementById('reg_user').value;
           const p = document.getElementById('reg_pass').value;
+          const remember = document.getElementById('rememberMe').checked;
+          
           showLoader();
           const res = await fetch('/api/auth/login', { method:'POST', body:JSON.stringify({username:u, password:p}) });
           hideLoader();
           if(res.ok) {
-              currentUser = await res.json();
+              const user = await res.json();
+              if (remember) user.sessionExpiry = Date.now() + (15 * 24 * 60 * 60 * 1000); // 15 Days
+              else user.sessionExpiry = Date.now() + (24 * 60 * 60 * 1000); // 1 Day
+              currentUser = user;
               localStorage.setItem('user_session', JSON.stringify(currentUser));
               updateProfileUI();
           } else alert("Invalid login");
@@ -315,13 +391,16 @@ export function renderWebsite() {
           const res = await fetch('/api/auth/redeem', { method:'POST', body:JSON.stringify({username:currentUser.username, code}) });
           hideLoader();
           if(res.ok) {
-              currentUser = await res.json();
+              const updatedUser = await res.json();
+              updatedUser.sessionExpiry = currentUser.sessionExpiry;
+              currentUser = updatedUser;
               localStorage.setItem('user_session', JSON.stringify(currentUser));
               alert("VIP Activated!");
               updateProfileUI();
           } else alert("Invalid Code");
       }
 
+      // --- DATA LOADING ---
       async function loadHomeData() {
         await Promise.all([
             fetchRow('movies', 'row_movies'),
@@ -349,6 +428,7 @@ export function renderWebsite() {
         </div>\`;
       }
 
+      // --- NAVIGATION ---
       function goHome() {
         showLoader();
         setTimeout(() => {
@@ -457,6 +537,7 @@ export function renderWebsite() {
         else grid.innerHTML = data.map(m => createCardHtml(m)).join('');
       }
 
+      // --- PLAYER ---
       async function fetchSingleMovie(id) {
         showLoader();
         resetPlayerUI();
@@ -485,6 +566,7 @@ export function renderWebsite() {
           document.getElementById('dl_area').innerHTML = "";
           document.getElementById('coverOverlay').style.backgroundImage = "";
           document.getElementById('vip-lock').style.display = "none";
+          document.getElementById('error-msg').style.display = "none";
           document.getElementById('video').style.display = "block";
       }
 
@@ -670,25 +752,54 @@ export function renderWebsite() {
             const json = await res.json();
             if(json.token) { 
                 vid.src = "/api/play?t=" + json.token; 
-                vid.play(); 
+                vid.play().catch(showFallback);
+                vid.onerror = showFallback;
             } else showFallback();
         } catch(e) { showFallback(); }
       }
 
       function tryHlsJs(vid, url, fallbackCb) {
           if (Hls.isSupported()) {
-                const hls = new Hls({ debug: false });
+                if(window.hlsInstance) window.hlsInstance.destroy();
+                const config = { debug: false, enableWorker: true, lowLatencyMode: true };
+                const hls = new Hls(config);
+                window.hlsInstance = hls;
                 hls.loadSource(url);
                 hls.attachMedia(vid);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play().catch(()=>{}));
+                hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => { 
+                    vid.play().catch(() => {}); 
+                    const levels = data.levels;
+                    const select = document.getElementById('qualitySelect');
+                    if(levels.length > 1) {
+                        select.innerHTML = "";
+                        const autoOpt = document.createElement('option');
+                        autoOpt.value = -1;
+                        autoOpt.text = "Auto";
+                        select.appendChild(autoOpt);
+                        levels.forEach((level, index) => {
+                            const opt = document.createElement('option');
+                            opt.value = index;
+                            opt.text = level.height + "p";
+                            select.appendChild(opt);
+                        });
+                        select.style.display = "block";
+                    }
+                });
                 hls.on(Hls.Events.ERROR, function (event, data) {
                     if (data.fatal) { hls.destroy(); fallbackCb(); }
                 });
           } else { fallbackCb(); }
       }
+      
+      window.changeQuality = function(sel) {
+          if(window.hlsInstance) {
+              window.hlsInstance.currentLevel = parseInt(sel.value);
+          }
+      }
 
       function closePlayerInternal() {
         const vid = document.getElementById('video'); vid.pause(); vid.src="";
+        if(window.hlsInstance) { window.hlsInstance.destroy(); window.hlsInstance = null; }
         document.getElementById('playerModal').style.display = 'none';
         document.body.style.overflow = 'auto';
         if (document.fullscreenElement) document.exitFullscreen();
