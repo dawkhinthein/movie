@@ -1,8 +1,5 @@
 export function renderWebsite() {
-  
-  function getServerSkeleton() {
-    return Array(6).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
-  }
+  function getServerSkeleton() { return Array(6).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join(''); }
 
   return `
   <!DOCTYPE html>
@@ -12,7 +9,6 @@ export function renderWebsite() {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-      /* --- GLOBAL RESET --- */
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
       
@@ -57,36 +53,44 @@ export function renderWebsite() {
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:200; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
-      video { width: 100%; height: 100%; background: black; }
+      video { width: 100%; height: 100%; background: black; display: block; }
       
+      .player-overlay { 
+          position: absolute; top: 0; left: 0; width: 100%; height: 60px; 
+          display: none; justify-content: flex-end; align-items: center;
+          padding: 10px; box-sizing: border-box; 
+          transition: opacity 0.3s; pointer-events: none; 
+          background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+          z-index: 20;
+      }
+      .ctrl-group { display: flex; gap: 10px; pointer-events: auto; }
+      .ctrl-btn { background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight:bold; backdrop-filter: blur(4px); }
+      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; margin-right: 10px; }
+      .quality-select option { background: #222; color: white; }
+
+      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
+      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
+
       #vip-lock { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 25; }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
       .lock-btn { background: #e50914; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 14px; width: auto; cursor: pointer; }
+      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
+      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
 
       .info-sec { padding: 20px; }
       .action-row { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
       .fav-btn { background: #222; border: 1px solid #444; color: #ccc; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; }
       .fav-btn.active { color: #e50914; border-color: #e50914; }
+      .dl-btn { background: #4db8ff; color: #000; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: bold; }
+      .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
+
       .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 6px; }
       .accordion.active { background-color: #333; color: #e50914; }
       .panel { padding: 0 5px; background-color: #151515; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 15px 5px; max-height: 350px; overflow-y: auto; }
       .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 12px; text-align: center; }
       .ep-btn.active { background: #e50914; color: white; border-color: #e50914; font-weight: bold; }
-      
-      .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 60px; display: none; justify-content: flex-end; align-items: center; padding: 10px; box-sizing: border-box; transition: opacity 0.3s; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); z-index: 20; }
-      .ctrl-btn { background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; }
-      .top-controls { display: flex; justify-content: flex-end; }
-      .bottom-controls { display: flex; justify-content: flex-end; gap: 10px; }
-      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
-      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
-      
-      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
-      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
-      
-      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
-      .quality-select option { background: #222; color: white; }
 
       #scroll-sentinel { height: 50px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
       #bottom-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
@@ -143,8 +147,9 @@ export function renderWebsite() {
             <video id="video" controls playsinline controlsList="nodownload"></video>
             <div id="vip-lock"><div style="font-size:40px; margin-bottom:10px;">👑</div><h2 style="color:#ffd700;">Premium</h2><p style="color:#ccc;">VIP required.</p><button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button></div>
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
+            
             <div class="player-overlay" id="playerOverlay">
-                <div class="ctrl-group" style="display:flex; gap:10px; pointer-events:auto;">
+                <div class="ctrl-group">
                     <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
                     <button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button>
                     <button class="ctrl-btn" onclick="closePlayer()">✕</button>
@@ -178,19 +183,18 @@ export function renderWebsite() {
       function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
       window.addEventListener('popstate', function(event) {
-        // 🔥 FIX: HANDLE NAVIGATION
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
+        const cat = urlParams.get('cat');
         
+        // 🔥 FIX: ROBUST NAVIGATION LOGIC
         if (movieId) {
-             openModalById(movieId, false); // Don't push state again
+             openModalById(movieId, false); // Don't push history again
         } else if (view === 'grid') {
              closePlayerInternal();
-             const cat = urlParams.get('cat') || 'all';
-             // If grid empty, reload
-             if(document.getElementById('mainGrid').innerHTML === "") {
-                 openCategory(cat, false);
+             if(document.getElementById('mainGrid').innerHTML === "" || currentCategory !== cat) {
+                 openCategory(cat || 'all', false); // Reload grid if empty or cat changed
              } else {
                  showGridInternal();
              }
@@ -206,7 +210,6 @@ export function renderWebsite() {
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
         
-        // Fix for 18+ space encoding
         let catParam = urlParams.get('cat');
         if (catParam && catParam.trim() === '18') catParam = '18+'; 
         
@@ -217,22 +220,22 @@ export function renderWebsite() {
         vid.addEventListener('timeupdate', () => { if(vid.currentTime > 5 && currentMovieId) localStorage.setItem('watch_' + currentMovieId, vid.currentTime); });
       };
 
-      // 🔥 FIX: AUTO HIDE CONTROLS (TOP ONLY)
-      function setupPlayerIdle() {
-          const w = document.getElementById('videoWrapper');
-          const o = document.getElementById('playerOverlay');
-          const v = document.getElementById('video');
-          const show = () => {
-              o.style.display = "flex"; // Ensure flex
-              o.style.opacity = "1";
-              clearTimeout(controlsTimeout);
-              if(!v.paused) controlsTimeout = setTimeout(() => { o.style.opacity = "0"; }, 3000);
-          };
-          w.addEventListener('mousemove', show); w.addEventListener('touchstart', show); w.addEventListener('click', show);
-          v.addEventListener('play', show); v.addEventListener('pause', () => { o.style.opacity = "1"; clearTimeout(controlsTimeout); });
+      // 🔥 FIX: CLOSE BUTTON LOGIC (PRESERVES PARAMS)
+      function closePlayer() {
+          closePlayerInternal();
+          const currentParams = new URLSearchParams(window.location.search);
+          currentParams.delete('id'); // Only remove ID
+          
+          let newUrl = window.location.pathname;
+          if(currentParams.toString()) newUrl += '?' + currentParams.toString();
+          
+          window.history.pushState({path:newUrl},'',newUrl);
+          
+          // Determine View
+          if(currentParams.get('view') === 'grid') showGridInternal();
+          else goHomeInternal();
       }
 
-      // 🔥 FIX: OPEN MODAL (PRESERVE URL PARAMS)
       function openModalById(id, pushState = true) {
         const m = allMoviesData.find(x => x.id === id);
         if(m) { setupModal(m); } else { fetchSingleMovie(id); }
@@ -245,20 +248,20 @@ export function renderWebsite() {
         }
       }
 
-      function closePlayer() {
-          closePlayerInternal();
-          // Remove ID but keep other params
-          const currentParams = new URLSearchParams(window.location.search);
-          currentParams.delete('id');
-          const newUrl = window.location.pathname + (currentParams.toString() ? '?' + currentParams.toString() : '');
-          window.history.pushState({path:newUrl},'',newUrl);
-          
-          // Determine where to go
-          if(currentParams.get('view') === 'grid') showGridInternal();
-          else goHomeInternal();
+      function setupPlayerIdle() {
+          const w = document.getElementById('videoWrapper');
+          const o = document.getElementById('playerOverlay');
+          const v = document.getElementById('video');
+          const show = () => {
+              o.style.display = "flex"; o.style.opacity = "1";
+              clearTimeout(controlsTimeout);
+              if(!v.paused) controlsTimeout = setTimeout(() => { o.style.opacity = "0"; }, 3000);
+          };
+          w.addEventListener('mousemove', show); w.addEventListener('touchstart', show); w.addEventListener('click', show);
+          v.addEventListener('play', show); v.addEventListener('pause', () => { o.style.opacity = "1"; clearTimeout(controlsTimeout); });
       }
 
-      // ... (Existing Functions) ...
+      // ... (Same Logic) ...
       function renderAccordion(episodes, isPremium) { const container = document.getElementById('ep_section'); container.innerHTML = ""; const seasons = {}; episodes.forEach(ep => { let g = "Videos"; const match = ep.label.match(/^(Season \\d+|S\\d+)/i); if(match) { let s = match[0]; if(s.toUpperCase().startsWith('S') && !s.toUpperCase().startsWith('SEASON')) s = s.replace(/^S/i, 'Season '); g = s; if(g.match(/Season\s*Season/i)) g = g.replace(/Season\s*Season/i, 'Season'); } else if(ep.label === 'Movie') g = "Movie"; if(!seasons[g]) seasons[g] = []; seasons[g].push(ep); }); Object.keys(seasons).sort().forEach(key => { const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = key; const panel = document.createElement('div'); panel.className = "panel"; const grid = document.createElement('div'); grid.className = "episode-grid"; grid.innerHTML = seasons[key].map(ep => { let clean = ep.label.replace(key, '').trim(); if(!clean) clean = ep.label; return \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${clean}</button>\`; }).join(''); panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel); btn.onclick = () => { btn.classList.toggle("active"); if(panel.style.maxHeight) panel.style.maxHeight=null; else panel.style.maxHeight="400px"; }; }); }
       function setupInfiniteScroll() { const sentinel = document.getElementById('scroll-sentinel'); if(!sentinel) return; observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting && !isLoading && hasMore) { fetchMovies(currentPage + 1, currentCategory, true); } }, { rootMargin: '100px' }); observer.observe(sentinel); }
       async function fetchMovies(page, cat, append=false) { if(isLoading) return; isLoading = true; document.getElementById('bottom-spinner').style.display = 'block'; const encodedCat = (cat==='all'||cat==='movies'||cat==='series') ? cat : encodeURIComponent(cat); const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodedCat}\`); const json = await res.json(); isLoading = false; document.getElementById('bottom-spinner').style.display = 'none'; if(json.data.length === 0) { hasMore = false; if(append) document.getElementById('end-msg').style.display = 'block'; return; } allMoviesData = append ? allMoviesData.concat(json.data) : json.data; renderGrid(json.data, append); currentPage = page; }
@@ -276,9 +279,9 @@ export function renderWebsite() {
       function goHome(){showLoader();setTimeout(()=>{const u=window.location.protocol+"//"+window.location.host+window.location.pathname;window.history.pushState({path:u},'',u);goHomeInternal();hideLoader();},300);}
       function goHomeInternal(){document.getElementById('homeView').style.display='block';document.getElementById('gridViewContainer').style.display='none';document.getElementById('backNav').style.display='none';document.getElementById('searchInput').value='';}
       function showGridInternal(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex';}
-      function openCategory(c,p=true){showLoader();currentCategory=c;showGridInternal();document.getElementById('gridTitle').innerText=decodeURIComponent(c).toUpperCase();if(p){const u=\`?view=grid&cat=\${encodeURIComponent(c)}\`;window.history.pushState({path:u},'',u);}resetGridState();fetchMovies(1,c,true).then(hideLoader);}
-      async function openFavorites(){showLoader();showGridInternal();document.getElementById('gridTitle').innerText="FAVORITES";resetGridState();document.getElementById('mainGrid').innerHTML=getClientSkeleton(6);window.history.pushState({},'','?view=grid&cat=fav');const favs=JSON.parse(localStorage.getItem('my_favs')||'[]');if(favs.length===0){document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center;">No favorites.</p>';hideLoader();return;}let html='';for(const id of favs){try{const res=await fetch(\`/api/get_movie?id=\${id}\`);const m=await res.json();if(m&&m.title){html+=createCardHtml(m);if(!allMoviesData.find(x=>x.id===m.id))allMoviesData.push(m);}}catch(e){}}document.getElementById('mainGrid').innerHTML=html;hideLoader();}
-      async function executeSearch(){const q=document.getElementById('searchInput').value;if(!q)return goHome();showLoader();showGridInternal();document.getElementById('gridTitle').innerText="SEARCH: "+q;window.history.pushState({},'','?view=grid&q='+encodeURIComponent(q));resetGridState();document.getElementById('mainGrid').innerHTML=getClientSkeleton(10);try{const res=await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);const results=await res.json();allMoviesData=results;if(results.length===0)document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1;text-align:center;padding:20px;">No results found.</p>';else renderGrid(results,false);}catch(e){document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1;text-align:center;">Error.</p>';}finally{hideLoader();}}
+      function openCategory(c,p=true){showLoader();currentCategory=c;showGridInternal();document.getElementById('gridTitle').innerText=decodeURIComponent(c).toUpperCase();if(p){const u=\`?view=grid&cat=\${encodeURIComponent(c)}\`;window.history.pushState({path:u},'',u);}currentPage=1;isLoading=false;hasMore=true;document.getElementById('mainGrid').innerHTML="";document.getElementById('end-msg').style.display="none";fetchMovies(1,c,true).then(hideLoader);}
+      async function openFavorites(){showLoader();showGridInternal();document.getElementById('gridTitle').innerText="FAVORITES";document.getElementById('mainGrid').innerHTML=getClientSkeleton(6);window.history.pushState({},'','?view=grid&cat=fav');const favs=JSON.parse(localStorage.getItem('my_favs')||'[]');if(favs.length===0){document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center;">No favorites.</p>';hideLoader();return;}let html='';for(const id of favs){try{const res=await fetch(\`/api/get_movie?id=\${id}\`);const m=await res.json();if(m&&m.title){html+=createCardHtml(m);if(!allMoviesData.find(x=>x.id===m.id))allMoviesData.push(m);}}catch(e){}}document.getElementById('mainGrid').innerHTML=html;hideLoader();}
+      async function executeSearch(){const q=document.getElementById('searchInput').value;if(!q)return goHome();showLoader();showGridInternal();document.getElementById('gridTitle').innerText="SEARCH: "+q;window.history.pushState({},'','?view=grid&q='+encodeURIComponent(q));document.getElementById('mainGrid').innerHTML=getClientSkeleton(10);try{const res=await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);const results=await res.json();allMoviesData=results;if(results.length===0)document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1;text-align:center;padding:20px;">No results found.</p>';else renderGrid(results,false);}catch(e){document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1;text-align:center;">Error.</p>';}finally{hideLoader();}}
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
       async function fetchSingleMovie(id){showLoader();resetPlayerUI();document.getElementById('playerModal').style.display='block';const res=await fetch(\`/api/get_movie?id=\${id}\`);const movie=await res.json();if(movie&&movie.title)setupModal(movie);hideLoader();}
       function resetPlayerUI(){document.getElementById('m_title').innerText="Loading...";document.getElementById('m_desc').innerText="";document.getElementById('m_tags').innerHTML="";document.getElementById('ep_section').innerHTML="";document.getElementById('dl_area').innerHTML="";document.getElementById('coverOverlay').style.backgroundImage="";document.getElementById('vip-lock').style.display="none";document.getElementById('error-msg').style.display="none";document.getElementById('video').style.display="block";document.getElementById('playerOverlay').style.display='none';}
@@ -293,7 +296,6 @@ export function renderWebsite() {
       window.changeQuality=function(s){if(window.hlsInstance)window.hlsInstance.currentLevel=parseInt(s.value);}
       function closePlayerInternal(){const v=document.getElementById('video');v.pause();v.src="";if(window.hlsInstance){window.hlsInstance.destroy();window.hlsInstance=null;}document.getElementById('playerModal').style.display='none';document.body.style.overflow='auto';if(document.fullscreenElement)document.exitFullscreen();}
       function toggleFullScreen(){const w=document.getElementById('videoWrapper');if(!document.fullscreenElement){if(w.requestFullscreen)w.requestFullscreen();if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(e=>{});}else{if(document.exitFullscreen)document.exitFullscreen();}}
-      function resetGridState(){currentPage=1;isLoading=false;hasMore=true;allMoviesData=[];document.getElementById('mainGrid').innerHTML="";document.getElementById('end-msg').style.display="none";document.getElementById('bottom-spinner').style.display="none";}
     </script>
   </body>
   </html>
