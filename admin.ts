@@ -114,19 +114,19 @@ export function renderAdmin() {
                 let label = "";
                 let link = l.trim();
                 
-                // 🔥 FIX: Check pipe logic
+                // 🔥 FIX: Prevent Group Separation & Double Season Name
                 if(l.includes('|')) { 
                     const parts = l.split('|');
-                    // If custom label (e.g. "End"), PREPEND Group Name so it stays in group
-                    // Result: "Season 1 End" -> UI renders as "End" inside "Season 1"
-                    if(group.toLowerCase() !== 'movie') {
-                        label = \`\${group} \${parts[0].trim()}\`; 
-                    } else {
-                        label = parts[0].trim();
-                    }
+                    const customName = parts[0].trim();
                     link = parts[1].trim(); 
+                    
+                    if(group.toLowerCase() !== 'movie') {
+                        // Combine Group + Custom Name (e.g. Season 1 End)
+                        label = \`\${group} \${customName}\`; 
+                    } else {
+                        label = customName;
+                    }
                 } else {
-                    // Auto Label
                     if(group.toLowerCase() === 'movie') label = "Movie";
                     else label = \`\${group} Ep \${i+1}\`; 
                 }
@@ -166,20 +166,33 @@ export function renderAdmin() {
 
           const con = document.getElementById('seasonsContainer'); con.innerHTML = "";
           const groups = {};
+          
           (m.episodes||[]).forEach(ep => {
               let g = "Movie";
-              // Regex to group by Season X
-              const match = ep.label.match(/^(Season \\d+|S\\d+|Movie)/i);
-              if(match) g = match[0].replace(/^S(\\d+)/i, 'Season $1'); // Normalize S1 -> Season 1
               
+              // 🔥 FIX: Smarter Group Detection
+              // If label starts with "Season X", group it under "Season X"
+              const match = ep.label.match(/^(Season \\d+|S\\d+)/i);
+              if(match) {
+                  g = match[0].replace(/^S(\\d+)/i, 'Season $1'); // Normalize S1 -> Season 1
+                  if(g.startsWith("Season") && g.includes("Season Season")) {
+                      g = g.replace("Season Season", "Season"); // Fix double name
+                  }
+              } else if (ep.label === 'Movie') {
+                  g = "Movie";
+              } else {
+                  // If custom label (e.g. End), try to find group from previous item or use 'Extras'
+                  // Ideally we parse it from the label itself if we saved it correctly
+                  g = "Extras"; 
+              }
+
               if(!groups[g]) groups[g] = [];
               
-              // Restore Clean Link for Textarea
-              // Remove Group Name from Label for display
-              let cleanLabel = ep.label.replace(g, '').trim();
-              if(cleanLabel.startsWith('Ep ')) cleanLabel = ""; // Standard Ep, no need to show
+              // Clean label for textarea (Remove "Season 1" prefix if present)
+              let clean = ep.label.replace(g, '').trim();
+              if(clean.startsWith('Ep ')) clean = ""; // If just Ep number, don't show
               
-              if(cleanLabel) groups[g].push(\`\${cleanLabel} | \${ep.link}\`);
+              if(clean) groups[g].push(\`\${clean} | \${ep.link}\`);
               else groups[g].push(ep.link);
           });
           
