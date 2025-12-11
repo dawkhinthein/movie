@@ -1,3 +1,4 @@
+// ui.ts
 export function renderWebsite() {
   return `
   <!DOCTYPE html>
@@ -21,20 +22,25 @@ export function renderWebsite() {
       .card { background: #222; border-radius: 6px; overflow: hidden; cursor: pointer; transition: 0.2s; position: relative; }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; }
       .title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-      
-      /* Tags on Card */
       .card-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #ffd700; font-size: 10px; padding: 2px 5px; border-radius: 3px; }
 
       .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
-      .page-btn:disabled { opacity: 0.3; }
-
+      
       /* Modal */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 900px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
       
-      .video-wrapper { position: sticky; top: 0; z-index: 10; background:black;}
-      video { width: 100%; max-height: 60vh; background: black; display: block; }
+      /* 🔥 VIDEO AREA (COVER + PLAY BUTTON) */
+      .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
+      
+      /* Cover Overlay */
+      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
+      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: 0.2s; }
+      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
+      .cover-overlay:hover .play-btn-circle { transform: scale(1.1); background: #f00; }
+
+      video { width: 100%; height: 100%; background: black; display: none; } /* Initially Hidden */
       
       .controls { padding: 10px; background: #1a1a1a; display: flex; justify-content: space-between; }
       .btn-icon { background: #333; color: white; border:none; padding: 5px 12px; border-radius: 4px; cursor: pointer; }
@@ -44,12 +50,10 @@ export function renderWebsite() {
       .tags-row { margin: 10px 0; display: flex; gap: 5px; flex-wrap: wrap; }
       .tag-pill { background: #333; color: #aaa; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
       p.desc { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; margin-top: 10px;}
-
-      /* Series Episode Buttons */
+      
       .episode-list { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
       .ep-btn { background: #222; border: 1px solid #444; color: white; padding: 10px; cursor: pointer; border-radius: 4px; text-align: center; font-size: 12px; }
       .ep-btn:hover, .ep-btn.active { background: #e50914; border-color: #e50914; font-weight: bold; }
-
     </style>
   </head>
   <body>
@@ -71,12 +75,17 @@ export function renderWebsite() {
 
     <div id="playerModal">
       <div class="modal-content">
-        <div class="video-wrapper">
-            <video id="video" controls playsinline poster="https://via.placeholder.com/800x450/000000/FFFFFF?text=Select+Episode"></video>
-            <div class="controls">
-                <button class="btn-icon" onclick="closePlayer()">❌ Close</button>
-                <button class="btn-icon" onclick="toggleFullScreen()">⛶ Full</button>
+        <div class="video-area">
+            <div id="coverOverlay" class="cover-overlay" onclick="startPlayback()">
+                <div class="play-btn-circle"></div>
             </div>
+            
+            <video id="video" controls playsinline></video>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-icon" onclick="closePlayer()">❌ Close</button>
+            <button class="btn-icon" onclick="toggleFullScreen()">⛶ Full</button>
         </div>
         
         <div class="info-sec">
@@ -95,6 +104,8 @@ export function renderWebsite() {
 
     <script>
       let currentPage = 1, currentCategory = 'all', allMoviesData = [];
+      let currentVideoLink = ""; // To store link for play click
+
       fetchMovies(1, 'all');
 
       async function fetchMovies(page, cat) {
@@ -106,7 +117,6 @@ export function renderWebsite() {
         const grid = document.getElementById('grid');
         if(json.data.length === 0) grid.innerHTML = '<p>No contents.</p>';
         else grid.innerHTML = json.data.map((m, i) => {
-          // Show first tag on card if available
           const tagHtml = m.tags && m.tags.length > 0 ? \`<div class="card-tag">\${m.tags[0]}</div>\` : '';
           return \`
           <div class="card" onclick="openModal(\${i})">
@@ -149,46 +159,70 @@ export function renderWebsite() {
         document.getElementById('m_title').innerText = movie.title;
         document.getElementById('m_desc').innerText = movie.description || "";
         
-        // Render Tags
-        const tagsDiv = document.getElementById('m_tags');
-        tagsDiv.innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
+        // Setup Cover Image
+        const coverDiv = document.getElementById('coverOverlay');
+        const coverUrl = movie.cover || movie.image; // Use cover if exists, else poster
+        coverDiv.style.backgroundImage = \`url('\${coverUrl}')\`;
+        
+        // Reset View: Show Cover, Hide Video
+        coverDiv.style.display = 'flex';
+        document.getElementById('video').style.display = 'none';
+        document.getElementById('video').pause();
+        
+        // Tags
+        document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
 
-        // Render Episodes / Play Video
-        const vid = document.getElementById('video');
+        // Episodes setup
         const epSection = document.getElementById('ep_section');
         const epList = document.getElementById('ep_list');
+        
+        // Determine first link
+        const firstLink = movie.episodes[0].link;
+        currentVideoLink = firstLink; // Store for Play Click
 
         if (movie.episodes.length === 1) {
-            // Single Movie
             epSection.style.display = 'none';
-            playVideo(movie.episodes[0].link);
         } else {
-            // Series
             epSection.style.display = 'block';
             epList.innerHTML = movie.episodes.map((ep, idx) => \`
-                <button class="ep-btn" onclick="playSeriesVideo(this, '\${ep.link}')">\${ep.label}</button>
+                <button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}')">\${ep.label}</button>
             \`).join('');
-            
-            // Auto play first episode
-            playVideo(movie.episodes[0].link);
-            // Highlight first button
             if(epList.firstChild) epList.firstChild.classList.add('active');
         }
       }
 
-      function playSeriesVideo(btn, link) {
-        // Highlight active button
-        document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        playVideo(link);
+      // 🔥 Called when User clicks the Cover Image
+      function startPlayback() {
+        document.getElementById('coverOverlay').style.display = 'none'; // Hide Cover
+        const vid = document.getElementById('video');
+        vid.style.display = 'block'; // Show Video
+        
+        loadAndPlay(currentVideoLink);
       }
 
-      function playVideo(url) {
+      function switchEpisode(btn, link) {
+        document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentVideoLink = link;
+        
+        // If video is already visible, play immediately. Else, wait for cover click.
+        if(document.getElementById('video').style.display !== 'none') {
+            loadAndPlay(link);
+        } else {
+            // User hasn't clicked play yet, just update the link
+            startPlayback(); // Auto start if switching episodes
+        }
+      }
+
+      function loadAndPlay(url) {
         const vid = document.getElementById('video');
         if(Hls.isSupported() && url.includes('.m3u8')) {
           const hls = new Hls(); hls.loadSource(url); hls.attachMedia(vid);
           hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
-        } else { vid.src = url; vid.play(); }
+        } else { 
+            vid.src = url; 
+            vid.play(); 
+        }
       }
 
       function closePlayer() {
@@ -199,7 +233,7 @@ export function renderWebsite() {
       }
 
       function toggleFullScreen() {
-        const wrapper = document.querySelector('.video-wrapper');
+        const wrapper = document.querySelector('.video-area');
         if (!document.fullscreenElement) {
             if(wrapper.requestFullscreen) wrapper.requestFullscreen();
             if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
