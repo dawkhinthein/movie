@@ -65,7 +65,7 @@ export function renderWebsite() {
       p.desc { color: #aaa; font-size: 13px; margin-top: 10px; line-height: 1.5; }
       .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
 
-      /* 🔥 NEW ACCORDION GRID STYLES */
+      /* Accordion Styles */
       .accordion { background-color: #2a2a2a; color: #eee; cursor: pointer; padding: 12px; width: 100%; border: none; text-align: left; outline: none; font-size: 14px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 4px; }
       .accordion.active { background-color: #e50914; color: white; }
       .accordion:after { content: '+'; font-size: 18px; }
@@ -73,7 +73,6 @@ export function renderWebsite() {
       
       .panel { padding: 0 5px; background-color: #111; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       
-      /* Scrollable Grid inside Panel */
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 10px 5px; max-height: 300px; overflow-y: auto; }
       .ep-btn { background: #333; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 11px; text-align: center; }
       .ep-btn:hover { background: #444; }
@@ -300,8 +299,18 @@ export function renderWebsite() {
         document.getElementById('video').pause();
         document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
         
-        renderAccordion(movie.episodes);
-        currentVideoLink = movie.episodes[0].link;
+        // 🔥 FIX: Check if Single Movie
+        if (!movie.episodes || movie.episodes.length <= 1) {
+             // Only 1 episode (Movie) -> Hide Accordion List
+             document.getElementById('ep_section').style.display = 'none';
+             // Play the only link
+             currentVideoLink = (movie.episodes && movie.episodes[0]) ? movie.episodes[0].link : movie.link; // Fallback for old data
+        } else {
+             // Series -> Show Accordion
+             document.getElementById('ep_section').style.display = 'block';
+             renderAccordion(movie.episodes);
+             currentVideoLink = movie.episodes[0].link;
+        }
       }
 
       function startPlayback() {
@@ -311,7 +320,6 @@ export function renderWebsite() {
         playViaSecureToken(currentVideoLink);
       }
       
-      // 🔥 NEW ACCORDION LOGIC
       function renderAccordion(episodes) {
         const container = document.getElementById('ep_section');
         container.innerHTML = "";
@@ -319,9 +327,8 @@ export function renderWebsite() {
         const seasons = {};
         episodes.forEach(ep => {
             let group = "Videos"; 
-            // Try to detect "Season X" or "S1"
             const match = ep.label.match(/^(Season \\d+|S\\d+)/i);
-            if(match) group = match[0].replace('S', 'Season '); // Normalize
+            if(match) group = match[0].replace('S', 'Season ');
             if(ep.label === 'Movie') group = "Movie";
 
             if(!seasons[group]) seasons[group] = [];
@@ -339,7 +346,6 @@ export function renderWebsite() {
             const grid = document.createElement('div');
             grid.className = "episode-grid";
             grid.innerHTML = seasons[key].map(ep => {
-                // Remove redundant season name from button text
                 const cleanLabel = ep.label.replace(key, '').trim() || ep.label;
                 return \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}')">\${cleanLabel}</button>\`;
             }).join('');
@@ -351,7 +357,7 @@ export function renderWebsite() {
             btn.addEventListener("click", function() {
                 this.classList.toggle("active");
                 if (panel.style.maxHeight) { panel.style.maxHeight = null; } 
-                else { panel.style.maxHeight = "400px"; } // Approximate height for scroll
+                else { panel.style.maxHeight = "400px"; }
             });
             if(idx === 0) btn.click();
         });
