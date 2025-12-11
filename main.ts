@@ -1,14 +1,29 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { crypto } from "https://deno.land/std@0.177.0/crypto/mod.ts";
 
-// ✅ Link အသစ် (Working Import)
-import CryptoJS from "https://esm.sh/crypto-js@4.2.0";
-
 import { getMovies, addOrUpdateMovie, deleteMovie } from "./db.ts";
 import { renderWebsite } from "./ui.ts";
 import { renderAdmin } from "./admin.ts";
 
 const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD") || "12345";
+
+// 🔥 CUSTOM ENCRYPTION (No Library Needed)
+// ဒါက Library မလိုဘဲ စာတွေကို အမှိုက်စာ (Hex) ဖြစ်အောင် ပြောင်းပေးမယ့် ကုဒ်ပါ
+function xorCipher(text: string, key: string): string {
+  let result = "";
+  for (let i = 0; i < text.length; i++) {
+    result += (text.charCodeAt(i) ^ key.charCodeAt(i % key.length)).toString(16).padStart(2, "0");
+  }
+  return result;
+}
+
+function xorDecrypt(hex: string, key: string): string {
+  let result = "";
+  for (let i = 0; i < hex.length; i += 2) {
+    result += String.fromCharCode(parseInt(hex.substr(i, 2), 16) ^ key.charCodeAt((i / 2) % key.length));
+  }
+  return result;
+}
 
 // Signature Helper
 async function createSignature(text: string): Promise<string> {
@@ -50,7 +65,7 @@ serve(async (req) => {
     return new Response("Deleted");
   }
 
-  // 🔥 4. SECURE LINK GENERATOR (AES ENCRYPTED)
+  // 🔥 4. SECURE LINK GENERATOR (Custom Encrypted)
   if (path === "/api/sign_url" && req.method === "POST") {
     try {
         const body = await req.json();
@@ -60,22 +75,21 @@ serve(async (req) => {
         // 4 Hours Expiry
         const expiry = Date.now() + (4 * 60 * 60 * 1000); 
         
-        // 🔐 AES ENCRYPTION (Corrected Syntax)
-        const encryptedUrl = CryptoJS.AES.encrypt(realUrl, ADMIN_PASSWORD).toString();
+        // 🔐 ENCRYPTION: XOR Cipher သုံးလိုက်ပါမယ် (Library မလိုတော့ပါ)
+        // URL အစစ်ကို Admin Password နဲ့ ပေါင်းပြီး ဝှက်ပါမယ်
+        const encryptedUrl = xorCipher(realUrl, ADMIN_PASSWORD);
         
-        // URL Safe
-        const safeUrl = encodeURIComponent(encryptedUrl);
-
-        const signature = await createSignature(safeUrl + expiry);
-        const token = `${safeUrl}.${expiry}.${signature}`;
+        // Generate Token
+        const signature = await createSignature(encryptedUrl + expiry);
+        const token = `${encryptedUrl}.${expiry}.${signature}`;
         
         return new Response(JSON.stringify({ token }), { headers: { "content-type": "application/json" } });
     } catch (e) {
-        return new Response("Error: " + e.message, { status: 500 });
+        return new Response("Error generating token", { status: 500 });
     }
   }
 
-  // 🔥 5. GATEKEEPER (AES DECRYPT)
+  // 🔥 5. GATEKEEPER (Custom Decrypt)
   if (path === "/api/play") {
     const token = url.searchParams.get("t");
     if (!token) return new Response("Access Denied", { status: 403 });
@@ -84,7 +98,7 @@ serve(async (req) => {
         const parts = token.split('.');
         if(parts.length !== 3) return new Response("Invalid Token", { status: 403 });
 
-        const [safeUrl, expiryStr, receivedSig] = parts;
+        const [encryptedUrl, expiryStr, receivedSig] = parts;
         const expiry = parseInt(expiryStr);
 
         // 1. Check Expiry
@@ -93,7 +107,7 @@ serve(async (req) => {
         }
 
         // 2. Check Signature
-        const expectedSig = await createSignature(safeUrl + expiry);
+        const expectedSig = await createSignature(encryptedUrl + expiry);
         if (receivedSig !== expectedSig) {
             return new Response("⚠️ Invalid Signature!", { status: 403 });
         }
@@ -104,18 +118,16 @@ serve(async (req) => {
              return new Response("⚠️ Watch in App only!", { status: 403 });
         }
 
-        // 🔐 AES DECRYPTION (Corrected Syntax)
-        const encryptedUrl = decodeURIComponent(safeUrl);
-        const bytes = CryptoJS.AES.decrypt(encryptedUrl, ADMIN_PASSWORD);
-        const realUrl = bytes.toString(CryptoJS.enc.Utf8);
+        // 🔐 DECRYPTION: ပြန်ဖော်ခြင်း
+        const realUrl = xorDecrypt(encryptedUrl, ADMIN_PASSWORD);
 
-        if(!realUrl || !realUrl.startsWith("http")) throw new Error("Decryption Failed");
+        if(!realUrl.startsWith("http")) return new Response("Decryption Failed", { status: 400 });
 
         // ✅ Redirect to Real URL
         return Response.redirect(realUrl, 302);
 
     } catch (e) {
-        return new Response("Server Error or Invalid Token", { status: 500 });
+        return new Response("Server Error", { status: 500 });
     }
   }
 
