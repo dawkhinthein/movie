@@ -14,6 +14,7 @@ export function renderWebsite() {
     <style>
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; }
       
+      /* Header */
       header { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); padding: 10px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: bold; font-size: 20px; text-decoration: none; cursor:pointer;}
       .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 20px; padding: 5px 10px; }
@@ -21,9 +22,11 @@ export function renderWebsite() {
       .search-input:focus { width: 160px; }
       .search-btn { cursor: pointer; padding: 5px; font-size: 16px; border-radius: 50%; }
 
+      /* Skeleton Animation */
       @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
 
+      /* Layouts */
       .home-section { padding: 15px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 10px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 600; border-left: 3px solid #e50914; padding-left: 10px; }
@@ -41,9 +44,11 @@ export function renderWebsite() {
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 6px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ccc; }
       .card-tag { position: absolute; top: 4px; right: 4px; background: rgba(229, 9, 20, 0.9); color: #fff; font-size: 8px; padding: 2px 4px; border-radius: 3px; }
+      
       .back-nav { display: none; padding: 10px 15px; }
       .back-btn { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold;}
 
+      /* Player */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
@@ -167,7 +172,6 @@ export function renderWebsite() {
       async function loadHomeData() {
         fetchRow('movies', 'row_movies');
         fetchRow('series', 'row_series');
-        // 🔥 FIX: Encode 18+ to make sure it sends "18+" not "18 "
         fetchRow(encodeURIComponent('18+'), 'row_18');
       }
 
@@ -215,12 +219,11 @@ export function renderWebsite() {
         currentCategory = cat;
         showGridInternal();
         if(pushState) {
-            // 🔥 FIX: Encode here too
             const encodedCat = encodeURIComponent(cat);
             const newUrl = \`?view=grid&cat=\${encodedCat}\`;
             window.history.pushState({path:newUrl},'',newUrl);
         }
-        fetchMovies(1, cat); // fetchMovies will handle encoding
+        fetchMovies(1, cat);
       }
 
       async function executeSearch() {
@@ -240,7 +243,6 @@ export function renderWebsite() {
 
       async function fetchMovies(page, cat) {
         document.getElementById('mainGrid').innerHTML = getClientSkeleton(10);
-        // 🔥 FIX: Ensure encoding
         const encodedCat = (cat === 'all' || cat === 'movies' || cat === 'series') ? cat : encodeURIComponent(cat);
         const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodedCat}\`);
         const json = await res.json();
@@ -375,18 +377,31 @@ export function renderWebsite() {
         else startPlayback();
       }
 
+      // 🔥 MODIFIED: Direct Play for M3U8, Token for others
       async function playViaSecureToken(realUrl) {
         const vid = document.getElementById('video');
-        if(Hls.isSupported() && realUrl.includes('.m3u8')) {
-           const hls = new Hls(); hls.loadSource(realUrl); hls.attachMedia(vid);
-           hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
-           return;
+        
+        // --- 1. DIRECT PLAY FOR M3U8 (No Token) ---
+        if (realUrl.includes('.m3u8')) {
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(realUrl);
+                hls.attachMedia(vid);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
+            } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari/iOS
+                vid.src = realUrl;
+                vid.addEventListener('loadedmetadata', () => vid.play());
+            }
+            return;
         }
+
+        // --- 2. TOKEN PLAY FOR MP4 / OTHERS ---
         try {
             const res = await fetch('/api/sign_url', { method: 'POST', body: JSON.stringify({ url: realUrl }) });
             const json = await res.json();
             if(json.token) { vid.src = "/api/play?t=" + json.token; vid.play(); }
-        } catch(e) {}
+        } catch(e) { console.error("Play error:", e); }
       }
 
       function closePlayerInternal() {
