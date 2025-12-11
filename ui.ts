@@ -57,7 +57,6 @@ export function renderWebsite() {
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
 
-      /* 🔥 IMPROVED ERROR MESSAGE STYLE (Glassmorphism) */
       #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); flex-direction: column; align-items: center; justify-content: center; z-index: 5; backdrop-filter: blur(5px); }
       #error-msg p { color: #ddd; margin-bottom: 15px; font-size: 14px; font-weight:500; }
       .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; display:flex; align-items:center; gap:8px; transition:0.2s; }
@@ -386,44 +385,40 @@ export function renderWebsite() {
         else startPlayback();
       }
 
-      // 🔥 🔥 🔥 REVISED PLAYER LOGIC: NATIVE FIRST FOR MOBILE 🔥 🔥 🔥
+      // 🔥 OPTIMIZED PLAYER LOGIC (Fast Seeking + Native Priority)
       async function playViaSecureToken(realUrl) {
         const vid = document.getElementById('video');
         vid.style.display = 'block';
         document.getElementById('error-msg').style.display = "none"; 
         
-        // Helper to show fallback button
         const showFallback = () => {
             vid.style.display = 'none'; 
             const errDiv = document.getElementById('error-msg');
             const btn = document.getElementById('fallback-btn');
             btn.href = realUrl;
-            errDiv.style.display = "flex"; // Show flex to center
+            errDiv.style.display = "flex"; 
         };
 
-        // 1. M3U8 Handling
         if (realUrl.includes('.m3u8')) {
-            vid.src = ""; // Clear src first
+            vid.src = ""; 
             
-            // 🔥 Priority 1: Native Player (Best for Android/iOS/Mobile)
+            // 1. Native Player First (Best for Android/iOS)
             if (vid.canPlayType('application/vnd.apple.mpegurl')) {
                 vid.src = realUrl;
                 vid.addEventListener('loadedmetadata', () => {
                     vid.play().catch(e => console.log("Native Play prevented"));
                 });
-                vid.onerror = () => {
-                    // If native fails, try HLS.js as backup
-                    tryHlsJs(vid, realUrl, showFallback);
-                };
+                // Fallback to HLS.js if Native fails (rare but possible on Desktop Safari)
+                vid.onerror = () => tryHlsJs(vid, realUrl, showFallback);
             } 
-            // 🔥 Priority 2: HLS.js (For Desktop Chrome/Firefox)
+            // 2. HLS.js for Desktop (Chrome/Edge/Firefox)
             else {
                 tryHlsJs(vid, realUrl, showFallback);
             }
             return;
         }
 
-        // 2. MP4/Other Handling (Secure Token)
+        // MP4 Logic
         try {
             const res = await fetch('/api/sign_url', { method: 'POST', body: JSON.stringify({ url: realUrl }) });
             const json = await res.json();
@@ -435,23 +430,46 @@ export function renderWebsite() {
         } catch(e) { showFallback(); }
       }
 
-      // Helper for HLS.js
+      // 🔥 HLS Configuration for Smooth Seeking & Fast Start
       function tryHlsJs(vid, url, fallbackCb) {
           if (Hls.isSupported()) {
-                const hls = new Hls({ debug: false });
+                const config = {
+                    debug: false,
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    backBufferLength: 90, // Keep 90s in buffer for seek back
+                    maxBufferLength: 30,  // Preload 30s ahead
+                    startLevel: -1,       // Auto quality start
+                };
+                const hls = new Hls(config);
                 hls.loadSource(url);
                 hls.attachMedia(vid);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
                     vid.play().catch(() => {});
                 });
+                
+                // Auto Recover Logic
                 hls.on(Hls.Events.ERROR, function (event, data) {
                     if (data.fatal) {
-                        hls.destroy();
-                        fallbackCb(); // Show nice button
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                // Try to recover network error
+                                console.log("Network error, recovering...");
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.log("Media error, recovering...");
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                hls.destroy();
+                                fallbackCb();
+                                break;
+                        }
                     }
                 });
           } else {
-              fallbackCb(); // Nothing works, show button
+              fallbackCb();
           }
       }
 
