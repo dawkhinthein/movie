@@ -1,6 +1,6 @@
 export function renderWebsite() {
   
-  // Server-Side Skeleton Helper
+  // Deno Server-Side Skeleton Helper
   function getServerSkeleton() {
     return Array(6).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
   }
@@ -14,17 +14,81 @@ export function renderWebsite() {
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
       /* --- GLOBAL RESET --- */
-      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-      body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
+      * { 
+        box-sizing: border-box; 
+        -webkit-tap-highlight-color: transparent; 
+      }
+      
+      body { 
+        background: #121212; 
+        color: #e0e0e0; 
+        font-family: 'Segoe UI', sans-serif; 
+        margin: 0; 
+        padding-bottom: 60px; 
+        user-select: none; 
+        -webkit-user-select: none;
+        overflow-x: hidden; 
+      }
       
       /* --- HEADER --- */
-      header { background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px); padding: 12px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-      .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; letter-spacing: 1px; }
+      header { 
+        background: rgba(18, 18, 18, 0.98); 
+        backdrop-filter: blur(10px); 
+        padding: 12px 15px; 
+        position: sticky; 
+        top: 0; 
+        z-index: 50; 
+        border-bottom: 1px solid #333; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
+      }
       
-      .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; transition: 0.3s; }
-      .search-box:focus-within { border-color: #e50914; background: #2a2a2a; width: 60%; }
-      .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
-      .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
+      .brand { 
+        color: #e50914; 
+        font-weight: 900; 
+        font-size: 22px; 
+        text-decoration: none; 
+        cursor: pointer; 
+        letter-spacing: 1px; 
+      }
+      
+      .search-box { 
+        display: flex; 
+        align-items: center; 
+        background: #222; 
+        border: 1px solid #444; 
+        border-radius: 25px; 
+        padding: 5px 12px; 
+        width: 50%; 
+        max-width: 200px; 
+        transition: 0.3s; 
+      }
+      
+      .search-box:focus-within { 
+        border-color: #e50914; 
+        background: #2a2a2a; 
+        width: 60%; 
+      }
+      
+      .search-input { 
+        background: transparent; 
+        border: none; 
+        color: white; 
+        outline: none; 
+        width: 100%; 
+        font-size: 14px; 
+      }
+      
+      .icon-btn { 
+        background: none; 
+        border: none; 
+        color: white; 
+        font-size: 22px; 
+        cursor: pointer; 
+        padding: 5px; 
+      }
 
       /* --- LOADER --- */
       #global-loader {
@@ -41,9 +105,40 @@ export function renderWebsite() {
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
+      /* --- CUSTOM ALERT --- */
+      #custom-alert { 
+          display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(0,0,0,0.85); z-index: 10000; 
+          align-items: center; justify-content: center; backdrop-filter: blur(5px);
+          animation: fadeIn 0.2s;
+      }
+      .alert-box { 
+          background: #1e1e1e; width: 85%; max-width: 320px; 
+          border-radius: 12px; padding: 25px 20px; text-align: center; 
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333;
+          transform: scale(0.9); animation: popIn 0.3s forwards;
+      }
+      @keyframes popIn { to { transform: scale(1); } }
+      .alert-icon { font-size: 40px; margin-bottom: 15px; display: block; }
+      .alert-title { font-size: 18px; font-weight: bold; margin: 0 0 10px; color: white; }
+      .alert-msg { font-size: 14px; color: #aaa; margin-bottom: 20px; line-height: 1.5; }
+      .alert-btn { 
+          background: #e50914; color: white; border: none; padding: 12px 0; 
+          width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;
+      }
+
       /* --- USER SIDEBAR --- */
-      .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
+      .user-panel { 
+        position: fixed; top: 0; right: 0; width: 280px; height: 100%; 
+        background: #1a1a1a; z-index: 100; 
+        transform: translateX(100%); 
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        padding: 20px; 
+        box-shadow: -5px 0 20px rgba(0,0,0,0.7); 
+        display: flex; flex-direction: column; 
+      }
       .user-panel.open { transform: translateX(0); }
+      
       .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
       
       .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; outline: none; }
@@ -70,9 +165,29 @@ export function renderWebsite() {
       @media (min-width: 900px) { .grid { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
 
       /* --- CARD DESIGN --- */
-      .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+      .card { 
+        background: #1f1f1f; 
+        border-radius: 8px; 
+        overflow: hidden; 
+        cursor: pointer; 
+        position: relative; 
+        transition: transform 0.2s; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
+      }
       .card:active { transform: scale(0.96); }
-      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
+      
+      /* 🔥 IMAGE PROTECTION (User can't save/long-press) */
+      .card img { 
+        width: 100%; 
+        height: auto; 
+        aspect-ratio: 2/3; 
+        object-fit: cover; 
+        display: block; 
+        -webkit-user-drag: none; 
+        -webkit-touch-callout: none; /* Disable iOS Callout */
+        pointer-events: none; /* Prevent interaction except click on parent */
+      }
+      
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
       
@@ -93,16 +208,15 @@ export function renderWebsite() {
       .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 15px; box-sizing: border-box; transition: opacity 0.3s; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%, transparent 70%, rgba(0,0,0,0.6)); }
       .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight:bold; backdrop-filter: blur(4px); }
       .top-controls { display: flex; justify-content: flex-end; }
-      .bottom-controls { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+      .bottom-controls { display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
 
-      /* VIP Lock Screen */
+      /* VIP LOCK SCREEN */
       #vip-lock { 
           display: none; position: absolute; top:0; left:0; width:100%; height:100%; 
-          background: #000; /* Solid Black */
-          flex-direction: column; align-items: center; justify-content: center; 
+          background: #000; flex-direction: column; align-items: center; justify-content: center; 
           text-align: center; padding: 20px; z-index: 25; 
       }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
@@ -139,7 +253,6 @@ export function renderWebsite() {
       .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 20px;}
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
       
-      /* Quality Select */
       .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
       .quality-select option { background: #222; color: white; }
 
@@ -149,6 +262,15 @@ export function renderWebsite() {
     </style>
   </head>
   <body>
+
+    <div id="custom-alert" style="display:none;">
+        <div class="alert-box">
+            <span id="alert-icon" class="alert-icon">✅</span>
+            <h3 id="alert-title" class="alert-title">Success</h3>
+            <p id="alert-msg" class="alert-msg">Operation completed successfully.</p>
+            <button class="alert-btn" onclick="closeCustomAlert()">OK</button>
+        </div>
+    </div>
 
     <div id="global-loader"><div class="spinner"></div></div>
 
@@ -214,7 +336,7 @@ export function renderWebsite() {
 
     <div class="back-nav" id="backNav">
         <button class="back-btn" onclick="goHome()">⬅ Back</button>
-        <span id="gridTitle" class="grid-title"></span>
+        <span id="gridTitle" class="grid-title" style="margin-left:auto; margin-right:auto;"></span>
     </div>
     
     <div class="container" id="gridViewContainer">
@@ -273,7 +395,7 @@ export function renderWebsite() {
 
     <script>
       let currentPage = 1, currentCategory = 'all', allMoviesData = [];
-      let currentUser = null;
+      let currentUser = JSON.parse(localStorage.getItem('user_session') || 'null');
       let currentMovieId = "";
       window.hlsInstance = null;
 
@@ -282,7 +404,18 @@ export function renderWebsite() {
       function hideLoader() { loader.classList.add('hidden-loader'); }
       function getClientSkeleton(count) { return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join(''); }
 
-      // --- INIT ---
+      // 🔥 CUSTOM ALERT FUNCTION
+      function showAlert(title, msg, isSuccess = true) {
+          const el = document.getElementById('custom-alert');
+          document.getElementById('alert-icon').innerText = isSuccess ? '✅' : '⚠️';
+          document.getElementById('alert-title').innerText = title;
+          document.getElementById('alert-msg').innerText = msg;
+          el.style.display = 'flex';
+      }
+      function closeCustomAlert() {
+          document.getElementById('custom-alert').style.display = 'none';
+      }
+
       window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
@@ -315,7 +448,6 @@ export function renderWebsite() {
         });
       };
 
-      // --- SESSION & AUTH ---
       function loadSession() {
           const stored = localStorage.getItem('user_session');
           if (!stored) return;
@@ -336,11 +468,11 @@ export function renderWebsite() {
               document.getElementById('u_name').innerText = currentUser.username;
               const exp = currentUser.vipExpiry;
               if(exp > Date.now()) {
-                  // Date Format: DD.MM.YYYY
+                  // 🔥 FIX: P-XX Days Left
                   const date = new Date(exp);
                   const dStr = date.getDate().toString().padStart(2,'0') + '.' + (date.getMonth()+1).toString().padStart(2,'0') + '.' + date.getFullYear();
                   const daysLeft = Math.ceil((exp - Date.now()) / (1000*60*60*24));
-                  document.getElementById('u_status').innerHTML = \`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Left)</span>\`;
+                  document.getElementById('u_status').innerHTML = \`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Days Left)</span>\`;
               } else {
                   document.getElementById('u_status').innerText = 'Free Plan';
               }
@@ -353,12 +485,12 @@ export function renderWebsite() {
       async function doRegister() {
           const u = document.getElementById('reg_user').value;
           const p = document.getElementById('reg_pass').value;
-          if(!u || !p) return alert("Missing fields");
+          if(!u || !p) return showAlert("Error", "Please fill all fields", false);
           showLoader();
           const res = await fetch('/api/auth/register', { method:'POST', body:JSON.stringify({username:u, password:p}) });
           hideLoader();
-          if(res.ok) alert("Registered! Please Login.");
-          else alert("Username taken");
+          if(res.ok) showAlert("Success", "Account created! Please Login.");
+          else showAlert("Error", "Username already taken", false);
       }
 
       async function doLogin() {
@@ -371,18 +503,20 @@ export function renderWebsite() {
           hideLoader();
           if(res.ok) {
               const user = await res.json();
-              if (remember) user.sessionExpiry = Date.now() + (15 * 24 * 60 * 60 * 1000); // 15 Days
-              else user.sessionExpiry = Date.now() + (24 * 60 * 60 * 1000); // 1 Day
+              if (remember) user.sessionExpiry = Date.now() + (15 * 24 * 60 * 60 * 1000); 
+              else user.sessionExpiry = Date.now() + (24 * 60 * 60 * 1000); 
               currentUser = user;
               localStorage.setItem('user_session', JSON.stringify(currentUser));
               updateProfileUI();
-          } else alert("Invalid login");
+              showAlert("Welcome", "Login successful!");
+          } else showAlert("Error", "Invalid username or password", false);
       }
 
       function doLogout() {
           localStorage.removeItem('user_session');
           currentUser = null;
           updateProfileUI();
+          showAlert("Logged Out", "See you again!");
       }
 
       async function doRedeem() {
@@ -395,9 +529,9 @@ export function renderWebsite() {
               updatedUser.sessionExpiry = currentUser.sessionExpiry;
               currentUser = updatedUser;
               localStorage.setItem('user_session', JSON.stringify(currentUser));
-              alert("VIP Activated!");
+              showAlert("Success!", "VIP Activated successfully.");
               updateProfileUI();
-          } else alert("Invalid Code");
+          } else showAlert("Error", "Invalid or Expired Code", false);
       }
 
       // --- DATA LOADING ---
@@ -421,8 +555,9 @@ export function renderWebsite() {
 
       function createCardHtml(m) {
         const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : '';
+        // 🔥 PREVENT IMAGE CLICK/SAVE
         return \`<div class="card" onclick="openModalById('\${m.id}')">
-            <img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'">
+            <img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'" oncontextmenu="return false;">
             \${tag}
             <div class="title">\${m.title}</div>
         </div>\`;
