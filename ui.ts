@@ -18,6 +18,18 @@ export function renderWebsite() {
       .search-input:focus { width: 160px; }
       .search-btn { cursor: pointer; padding: 5px; font-size: 16px; border-radius: 50%; }
 
+      /* --- Shimmer / Skeleton Animation (🔥 Added) --- */
+      @keyframes shimmer {
+        0% { background-position: -1000px 0; }
+        100% { background-position: 1000px 0; }
+      }
+      .skeleton {
+        animation: shimmer 2s infinite linear;
+        background: linear-gradient(to right, #222 4%, #333 25%, #222 36%);
+        background-size: 1000px 100%;
+        border-radius: 6px;
+      }
+
       /* --- Home Layout --- */
       .home-section { padding: 15px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 10px; }
@@ -163,41 +175,28 @@ export function renderWebsite() {
       let currentVideoLink = "";
       let controlsTimeout;
 
-      // 🔥 FIX: Improved Back Button Logic (Handling Grid & Modal)
       window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
-        const view = urlParams.get('view'); // Check if we are in 'grid' view
+        const view = urlParams.get('view'); 
 
-        // 1. If Movie ID is missing but player is open -> Close Player
-        if (!movieId) {
-            closePlayerInternal();
-        }
-
-        // 2. Handle View Switching (Home vs Grid)
-        if (view === 'grid') {
-            // Stay in Grid View (e.g., coming back from a movie)
-            showGridInternal();
-        } else {
-            // No 'view' param means we should be at Home
-            goHomeInternal();
-        }
+        if (!movieId) closePlayerInternal();
+        if (view === 'grid') showGridInternal();
+        else goHomeInternal();
       });
 
       window.onload = async () => {
         loadHomeData();
         setupPlayerIdle();
         
-        // Initial URL Check
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
 
         if (movieId) fetchSingleMovie(movieId);
         else if (view === 'grid') {
-             // If refreshed on grid page
              const cat = urlParams.get('cat') || 'all';
-             openCategory(cat, false); // false = don't push state again
+             openCategory(cat, false);
         }
       };
 
@@ -230,10 +229,7 @@ export function renderWebsite() {
         </div>\`;
       }
 
-      // --- Navigation Functions ---
-
       function goHome() {
-        // Push state to root to ensure history is clean
         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
         window.history.pushState({path:newUrl},'',newUrl);
         goHomeInternal();
@@ -255,13 +251,10 @@ export function renderWebsite() {
       function openCategory(cat, pushState = true) {
         currentCategory = cat;
         showGridInternal();
-        
-        // 🔥 FIX: Push State for History (Enables Back Button)
         if(pushState) {
             const newUrl = \`?view=grid&cat=\${cat}\`;
             window.history.pushState({path:newUrl},'',newUrl);
         }
-        
         fetchMovies(1, cat);
       }
 
@@ -270,12 +263,11 @@ export function renderWebsite() {
         if(!query) return goHome();
         
         showGridInternal();
-        
-        // 🔥 FIX: Push State for Search
         const newUrl = \`?view=grid&q=\${encodeURIComponent(query)}\`;
         window.history.pushState({path:newUrl},'',newUrl);
 
-        document.getElementById('mainGrid').innerHTML = '<p>Searching...</p>';
+        // 🔥 Skeleton Loading for Search
+        document.getElementById('mainGrid').innerHTML = getSkeletonRow(10);
         document.getElementById('pagControls').style.display = 'none';
         
         const res = await fetch(\`/api/search?q=\${encodeURIComponent(query)}\`);
@@ -287,7 +279,9 @@ export function renderWebsite() {
       function handleSearchKey(e) { if (e.key === 'Enter') executeSearch(); }
 
       async function fetchMovies(page, cat) {
-        document.getElementById('mainGrid').innerHTML = '<p>Loading...</p>';
+        // 🔥 Skeleton Loading for Grid
+        document.getElementById('mainGrid').innerHTML = getSkeletonRow(10);
+        
         const res = await fetch(\`/api/movies?page=\${page}&cat=\${cat}\`);
         const json = await res.json();
         allMoviesData = json.data;
@@ -330,7 +324,6 @@ export function renderWebsite() {
         if(!movie.title) { fetchSingleMovie(id); }
         else { setupModal(movie); }
         
-        // Preserve current view param if exists
         const urlParams = new URLSearchParams(window.location.search);
         const view = urlParams.get('view');
         const viewParam = view ? \`&view=\${view}\` : '';
@@ -379,7 +372,6 @@ export function renderWebsite() {
             const match = ep.label.match(/^(Season \\d+|S\\d+)/i);
             
             if(match) {
-                // Fix for "Season eason 1" bug
                 let g = match[0];
                 if(g.toUpperCase().startsWith('S') && !g.toUpperCase().startsWith('SEASON')) {
                     g = g.replace(/^S/i, 'Season ');
@@ -453,12 +445,11 @@ export function renderWebsite() {
 
       function closePlayer() {
         closePlayerInternal();
-        // Return to Grid if we were in Grid
         const urlParams = new URLSearchParams(window.location.search);
         const view = urlParams.get('view');
         
         let newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-        if(view) newUrl += \`?view=\${view}\`; // Keep grid state
+        if(view) newUrl += \`?view=\${view}\`; 
         
         window.history.pushState({path:newUrl},'',newUrl);
       }
@@ -480,12 +471,14 @@ export function renderWebsite() {
         } else div.style.display = 'none';
       }
       function changePage(d) { fetchMovies(currentPage + d, currentCategory); }
+      
+      // 🔥 Helper function for repeating skeleton
+      function getSkeletonRow(count = 5) {
+        // Returns the skeleton HTML repeated 'count' times
+        return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
+      }
     </script>
   </body>
   </html>
   `;
-}
-
-function getSkeletonRow() {
-    return Array(5).fill('<div class="card" style="min-width:110px; max-width:110px; background:#222;"></div>').join('');
 }
