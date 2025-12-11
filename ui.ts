@@ -1,6 +1,5 @@
 export function renderWebsite() {
   
-  // Server-Side Skeleton Helper
   function getServerSkeleton() {
     return Array(6).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join('');
   }
@@ -17,31 +16,30 @@ export function renderWebsite() {
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
       
-      /* --- HEADER --- */
+      /* HEADER */
       header { background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px); padding: 12px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; letter-spacing: 1px; }
-      
       .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; transition: 0.3s; }
-      .search-box:focus-within { border-color: #e50914; background: #2a2a2a; width: 60%; }
       .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
-      /* --- LOADER --- */
+      /* LOADER & SKELETON */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
+      @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+      .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
 
-      /* --- SIDEBAR --- */
+      /* SIDEBAR */
       .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
       .user-panel.open { transform: translateX(0); }
       .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
       .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; outline: none; }
-      .auth-input:focus { border-color: #e50914; }
       .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; transition: 0.2s; }
       .auth-btn.secondary { background: #333; margin-top: 5px; }
 
-      /* --- HOME LAYOUT --- */
+      /* HOME & GRID */
       .home-section { padding: 20px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 12px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 700; border-left: 4px solid #e50914; padding-left: 10px; }
@@ -49,8 +47,6 @@ export function renderWebsite() {
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
       .scroll-row .card { min-width: 115px; max-width: 115px; }
-
-      /* --- GRID --- */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
@@ -61,29 +57,50 @@ export function renderWebsite() {
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
       .year-tag { position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-left-radius: 6px; z-index: 2; }
-      
       .back-nav { display: none; padding: 10px 15px; align-items: center; gap: 10px; background: #121212; position: sticky; top: 59px; z-index: 40; border-bottom: 1px solid #222; }
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
       .grid-title { font-size: 14px; font-weight: bold; color: #ccc; margin-left: auto; margin-right: auto; }
 
-      /* --- PLAYER --- */
+      /* PLAYER AREA */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:200; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
-      .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
-      video { width: 100%; height: 100%; background: black; }
       
-      /* 🔥 IMPROVED CONTROLS OVERLAY */
-      .player-overlay { 
-          position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-          display: flex; flex-direction: column; justify-content: space-between; 
-          padding: 15px; box-sizing: border-box; 
-          transition: opacity 0.4s ease; 
-          background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.7) 100%); 
+      /* 🔥 IMPORTANT: Video Container Height */
+      .video-area { 
+          position: sticky; top: 0; z-index: 10; 
+          background:black; width: 100%; 
+          /* Aspect ratio hack is good, but for controls to show we need space */
+          aspect-ratio: 16/9; 
+          position: relative; 
       }
       
-      .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight:bold; backdrop-filter: blur(4px); }
-      .top-controls { display: flex; justify-content: flex-end; }
-      .bottom-controls { display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+      /* 🔥 FORCE NATIVE CONTROLS VISIBILITY */
+      video { 
+          width: 100%; height: 100%; background: black; 
+          display: block; 
+      }
+
+      /* 🔥 UPDATED OVERLAY: Only top part, no bottom blocking */
+      .player-overlay { 
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+          display: flex; flex-direction: column; 
+          /* Just align top, let bottom be free for native controls */
+          justify-content: flex-start; 
+          padding: 10px; 
+          pointer-events: none; 
+          transition: opacity 0.3s;
+      }
+      
+      /* Buttons inside overlay */
+      .ctrl-btn { pointer-events: auto; background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight:bold; backdrop-filter: blur(4px); }
+      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; margin-right: 10px; }
+      .quality-select option { background: #222; color: white; }
+
+      /* Controls Row (Top Right) */
+      .controls-row {
+          display: flex; justify-content: flex-end; align-items: center; width: 100%;
+      }
+
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
@@ -91,48 +108,30 @@ export function renderWebsite() {
       #vip-lock { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 25; }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
       .lock-btn { background: #e50914; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 14px; width: auto; min-width: 150px; cursor: pointer; }
-      
       #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
       .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
 
       .info-sec { padding: 20px; }
-      h2#m_title { margin: 0; color: #fff; font-size: 18px; line-height: 1.3; }
       .action-row { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
       .fav-btn { background: #222; border: 1px solid #444; color: #ccc; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; }
       .fav-btn.active { color: #e50914; border-color: #e50914; }
-      .dl-btn { background: #4db8ff; color: #000; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: bold; }
-      .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
-      p.desc { color: #bbb; font-size: 14px; line-height: 1.6; margin-top: 15px; }
-
       .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 6px; }
       .accordion.active { background-color: #333; color: #e50914; }
       .panel { padding: 0 5px; background-color: #151515; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 15px 5px; max-height: 350px; overflow-y: auto; }
       .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 12px; text-align: center; }
       .ep-btn.active { background: #e50914; color: white; border-color: #e50914; font-weight: bold; }
-      
-      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; }
-      .quality-select option { background: #222; color: white; }
 
-      #scroll-sentinel { height: 50px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
-      #bottom-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-
-      /* Custom Alert */
       #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px); animation: fadeIn 0.2s; }
       .alert-box { background: #1e1e1e; width: 85%; max-width: 320px; border-radius: 12px; padding: 25px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; transform: scale(0.9); animation: popIn 0.3s forwards; }
-      @keyframes popIn { to { transform: scale(1); } }
-      .alert-icon { font-size: 40px; margin-bottom: 15px; display: block; }
-      .alert-title { font-size: 18px; font-weight: bold; margin: 0 0 10px; color: white; }
-      .alert-msg { font-size: 14px; color: #aaa; margin-bottom: 20px; line-height: 1.5; }
       .alert-btn { background: #e50914; color: white; border: none; padding: 12px 0; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-      
-      @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
-      .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
+      #scroll-sentinel { height: 50px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
+      #bottom-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
     </style>
   </head>
   <body>
 
-    <div id="custom-alert" style="display:none;"><div class="alert-box"><span id="alert-icon" class="alert-icon">✅</span><h3 id="alert-title" class="alert-title">Success</h3><p id="alert-msg" class="alert-msg">Done.</p><button class="alert-btn" onclick="closeCustomAlert()">OK</button></div></div>
+    <div id="custom-alert" style="display:none;"><div class="alert-box"><span id="alert-icon" style="font-size:40px; display:block; margin-bottom:10px;">✅</span><h3 id="alert-title" style="color:white; margin:0 0 10px;">Success</h3><p id="alert-msg" style="color:#aaa; font-size:14px; margin-bottom:20px;">Done.</p><button class="alert-btn" onclick="closeCustomAlert()">OK</button></div></div>
     <div id="global-loader"><div class="spinner"></div></div>
 
     <header>
@@ -171,13 +170,17 @@ export function renderWebsite() {
       <div class="modal-content">
         <div class="video-area" id="videoWrapper">
             <div id="coverOverlay" class="cover-overlay" onclick="startPlayback()"><div class="play-btn-circle"></div></div>
+            
             <video id="video" controls playsinline controlsList="nodownload"></video>
+            
             <div id="vip-lock"><div style="font-size:40px; margin-bottom:10px;">👑</div><h2 style="color:#ffd700;">Premium</h2><p style="color:#ccc;">VIP required.</p><button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button></div>
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
             
             <div class="player-overlay" id="playerOverlay">
-                <div class="top-controls"><button class="ctrl-btn" onclick="closePlayer()">✕</button></div>
-                <div class="bottom-controls"><select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select><button class="ctrl-btn" onclick="toggleFullScreen()">⛶</button></div>
+                <div class="controls-row">
+                    <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
+                    <button class="ctrl-btn" onclick="closePlayer()">✕</button>
+                </div>
             </div>
         </div>
         
@@ -216,9 +219,7 @@ export function renderWebsite() {
       });
 
       window.onload = async () => {
-        loadSession(); updateProfileUI(); await loadHomeData(); hideLoader(); setupInfiniteScroll();
-        setupPlayerIdle();
-        
+        loadSession(); updateProfileUI(); await loadHomeData(); setupPlayerIdle(); hideLoader(); setupInfiniteScroll();
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
@@ -228,87 +229,29 @@ export function renderWebsite() {
         vid.addEventListener('timeupdate', () => { if(vid.currentTime > 5 && currentMovieId) localStorage.setItem('watch_' + currentMovieId, vid.currentTime); });
       };
 
-      // 🔥 FIX: SEARCH FETCH ERROR HANDLER
-      async function executeSearch() { 
-        const q = document.getElementById('searchInput').value; 
-        if(!q) return goHome(); 
-        showLoader(); 
-        showGridInternal(); 
-        document.getElementById('gridTitle').innerText = "SEARCH: " + q; 
-        window.history.pushState({},'','?view=grid&q='+encodeURIComponent(q)); 
-        document.getElementById('mainGrid').innerHTML = getClientSkeleton(10); 
-        
-        try {
-            const res = await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`); 
-            const results = await res.json(); 
-            allMoviesData = results; 
-            
-            if(results.length === 0) {
-                document.getElementById('mainGrid').innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:20px;">No results found.</p>';
-            } else {
-                renderGrid(results, false); 
-            }
-        } catch(e) {
-            document.getElementById('mainGrid').innerHTML = '<p style="grid-column:1/-1; text-align:center;">Search Error.</p>';
-        } finally {
-            hideLoader(); 
-        }
-      }
-
-      function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
-
-      // 🔥 FIX: MYANMAR TIMEZONE
-      function updateProfileUI() { 
-          if (currentUser) { 
-              document.getElementById('loginForm').style.display = 'none'; 
-              document.getElementById('profileView').style.display = 'block'; 
-              document.getElementById('u_name').innerText = currentUser.username; 
-              const exp = currentUser.vipExpiry; 
-              if(exp > Date.now()) { 
-                  // Myanmar Time (Asia/Yangon)
-                  const dateStr = new Date(exp).toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day:'2-digit', month:'2-digit', year:'numeric' });
-                  const daysLeft = Math.ceil((exp - Date.now()) / (1000*60*60*24)); 
-                  document.getElementById('u_status').innerHTML = \`<span style="color:#ffd700">👑 \${dateStr} (P-\${daysLeft} Days Left)</span>\`; 
-              } else { 
-                  document.getElementById('u_status').innerText = 'Free Plan'; 
-              } 
-          } else { 
-              document.getElementById('loginForm').style.display = 'block'; 
-              document.getElementById('profileView').style.display = 'none'; 
-          } 
-      }
-
-      // 🔥 FIX: AUTO HIDE CONTROLS LOGIC
+      // 🔥 FIX: AUTO HIDE CONTROLS (CUSTOM ONLY)
       function setupPlayerIdle() {
           const w = document.getElementById('videoWrapper');
           const o = document.getElementById('playerOverlay');
           const v = document.getElementById('video');
-          
           const show = () => {
               o.style.opacity = "1";
               clearTimeout(controlsTimeout);
-              if(!v.paused) {
-                  controlsTimeout = setTimeout(() => { o.style.opacity = "0"; }, 3000);
-              }
+              if(!v.paused) controlsTimeout = setTimeout(() => { o.style.opacity = "0"; }, 3000);
           };
-          
-          w.addEventListener('mousemove', show);
-          w.addEventListener('touchstart', show);
-          w.addEventListener('click', show);
-          
-          v.addEventListener('play', show);
-          v.addEventListener('pause', () => { o.style.opacity = "1"; clearTimeout(controlsTimeout); });
+          w.addEventListener('mousemove', show); w.addEventListener('touchstart', show); w.addEventListener('click', show);
+          v.addEventListener('play', show); v.addEventListener('pause', () => { o.style.opacity = "1"; clearTimeout(controlsTimeout); });
       }
 
-      // ... (Rest of existing functions) ...
-      function setupInfiniteScroll() { const sentinel = document.getElementById('scroll-sentinel'); if(!sentinel)return; observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting && !isLoading && hasMore) { fetchMovies(currentPage + 1, currentCategory, true); } }, { rootMargin: '100px' }); observer.observe(sentinel); }
+      // Rest of the functions (Keep exact logic)
+      function renderAccordion(episodes, isPremium) { const container = document.getElementById('ep_section'); container.innerHTML = ""; const seasons = {}; episodes.forEach(ep => { let g = "Videos"; const match = ep.label.match(/^(Season \\d+|S\\d+)/i); if(match) { let s = match[0]; if(s.toUpperCase().startsWith('S') && !s.toUpperCase().startsWith('SEASON')) s = s.replace(/^S/i, 'Season '); g = s; if(g.match(/Season\s*Season/i)) g = g.replace(/Season\s*Season/i, 'Season'); } else if(ep.label === 'Movie') g = "Movie"; if(!seasons[g]) seasons[g] = []; seasons[g].push(ep); }); Object.keys(seasons).sort().forEach(key => { const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = key; const panel = document.createElement('div'); panel.className = "panel"; const grid = document.createElement('div'); grid.className = "episode-grid"; grid.innerHTML = seasons[key].map(ep => { let clean = ep.label.replace(key, '').trim(); if(!clean) clean = ep.label; return \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${clean}</button>\`; }).join(''); panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel); btn.onclick = () => { btn.classList.toggle("active"); if(panel.style.maxHeight) panel.style.maxHeight=null; else panel.style.maxHeight="400px"; }; }); }
+      function setupInfiniteScroll() { const sentinel = document.getElementById('scroll-sentinel'); if(!sentinel) return; observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting && !isLoading && hasMore) { fetchMovies(currentPage + 1, currentCategory, true); } }, { rootMargin: '100px' }); observer.observe(sentinel); }
       async function fetchMovies(page, cat, append=false) { if(isLoading) return; isLoading = true; document.getElementById('bottom-spinner').style.display = 'block'; const encodedCat = (cat==='all'||cat==='movies'||cat==='series') ? cat : encodeURIComponent(cat); const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodedCat}\`); const json = await res.json(); isLoading = false; document.getElementById('bottom-spinner').style.display = 'none'; if(json.data.length === 0) { hasMore = false; if(append) document.getElementById('end-msg').style.display = 'block'; return; } allMoviesData = append ? allMoviesData.concat(json.data) : json.data; renderGrid(json.data, append); currentPage = page; }
       function renderGrid(data, append) { const grid = document.getElementById('mainGrid'); const html = data.map(m => createCardHtml(m)).join(''); if(append) grid.innerHTML += html; else grid.innerHTML = html; }
-      function renderAccordion(episodes, isPremium) { const container = document.getElementById('ep_section'); container.innerHTML = ""; const seasons = {}; episodes.forEach(ep => { let g = "Videos"; const match = ep.label.match(/^(Season \\d+|S\\d+)/i); if(match) { let s = match[0]; if(s.toUpperCase().startsWith('S') && !s.toUpperCase().startsWith('SEASON')) s = s.replace(/^S/i, 'Season '); g = s; if(g.match(/Season\s*Season/i)) g = g.replace(/Season\s*Season/i, 'Season'); } else if(ep.label === 'Movie') g = "Movie"; if(!seasons[g]) seasons[g] = []; seasons[g].push(ep); }); Object.keys(seasons).sort().forEach(key => { const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = key; const panel = document.createElement('div'); panel.className = "panel"; const grid = document.createElement('div'); grid.className = "episode-grid"; grid.innerHTML = seasons[key].map(ep => { let clean = ep.label.replace(key, '').trim(); if(!clean) clean = ep.label; return \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${clean}</button>\`; }).join(''); panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel); btn.onclick = () => { btn.classList.toggle("active"); if(panel.style.maxHeight) panel.style.maxHeight=null; else panel.style.maxHeight="400px"; }; }); }
-      
       function createCardHtml(m) { const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : ''; const yearTag = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; const yearHtml = yearTag ? \`<div class="year-tag">\${yearTag}</div>\` : ''; return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'" oncontextmenu="return false;">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; }
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
+      function updateProfileUI(){if(currentUser){document.getElementById('loginForm').style.display='none';document.getElementById('profileView').style.display='block';document.getElementById('u_name').innerText=currentUser.username;const exp=currentUser.vipExpiry;if(exp>Date.now()){const date=new Date(exp);const dStr=date.toLocaleString('en-GB',{timeZone:'Asia/Yangon',day:'2-digit',month:'2-digit',year:'numeric'});const daysLeft=Math.ceil((exp-Date.now())/(1000*60*60*24));document.getElementById('u_status').innerHTML=\`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Days Left)</span>\`;}else{document.getElementById('u_status').innerText='Free Plan';}}else{document.getElementById('loginForm').style.display='block';document.getElementById('profileView').style.display='none';}}
       async function doRegister(){const u=document.getElementById('reg_user').value;const p=document.getElementById('reg_pass').value;if(!u||!p)return showAlert("Error", "Missing fields", false);showLoader();const res=await fetch('/api/auth/register',{method:'POST',body:JSON.stringify({username:u,password:p})});hideLoader();if(res.ok)showAlert("Success", "Registered!");else showAlert("Error", "Taken", false);}
       async function doLogin(){const u=document.getElementById('reg_user').value;const p=document.getElementById('reg_pass').value;const remember=document.getElementById('rememberMe').checked;showLoader();const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})});hideLoader();if(res.ok){const user=await res.json();user.sessionExpiry=Date.now()+(remember?15:1)*24*60*60*1000;currentUser=user;localStorage.setItem('user_session',JSON.stringify(currentUser));updateProfileUI();showAlert("Welcome", "Login Success");}else showAlert("Error", "Invalid Login", false);}
       function doLogout(){localStorage.removeItem('user_session');currentUser=null;updateProfileUI();showAlert("Logged Out", "Bye!");}
@@ -320,6 +263,8 @@ export function renderWebsite() {
       function showGridInternal(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex';}
       function openCategory(c,p=true){showLoader();currentCategory=c;showGridInternal();document.getElementById('gridTitle').innerText=decodeURIComponent(c).toUpperCase();if(p){const u=\`?view=grid&cat=\${encodeURIComponent(c)}\`;window.history.pushState({path:u},'',u);}currentPage=1;isLoading=false;hasMore=true;document.getElementById('mainGrid').innerHTML="";document.getElementById('end-msg').style.display="none";fetchMovies(1,c,true).then(hideLoader);}
       async function openFavorites(){showLoader();showGridInternal();document.getElementById('gridTitle').innerText="FAVORITES";document.getElementById('mainGrid').innerHTML=getClientSkeleton(6);window.history.pushState({},'','?view=grid&cat=fav');const favs=JSON.parse(localStorage.getItem('my_favs')||'[]');if(favs.length===0){document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center;">No favorites.</p>';hideLoader();return;}let html='';for(const id of favs){try{const res=await fetch(\`/api/get_movie?id=\${id}\`);const m=await res.json();if(m&&m.title){html+=createCardHtml(m);if(!allMoviesData.find(x=>x.id===m.id))allMoviesData.push(m);}}catch(e){}}document.getElementById('mainGrid').innerHTML=html;hideLoader();}
+      async function executeSearch(){const q=document.getElementById('searchInput').value;if(!q)return goHome();showLoader();showGridInternal();document.getElementById('gridTitle').innerText="SEARCH: "+q;window.history.pushState({},'','?view=grid&q='+encodeURIComponent(q));document.getElementById('mainGrid').innerHTML=getClientSkeleton(10);try{const res=await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);const results=await res.json();allMoviesData=results;if(results.length===0)document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1;text-align:center;padding:20px;">No results found.</p>';else renderGrid(results,false);}catch(e){document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1;text-align:center;">Error.</p>';}finally{hideLoader();}}
+      function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
       async function fetchSingleMovie(id){showLoader();resetPlayerUI();document.getElementById('playerModal').style.display='block';const res=await fetch(\`/api/get_movie?id=\${id}\`);const movie=await res.json();if(movie&&movie.title)setupModal(movie);hideLoader();}
       function openModalById(id){const m=allMoviesData.find(x=>x.id===id);if(m){setupModal(m);}else{fetchSingleMovie(id);}const urlP=new URLSearchParams(window.location.search);const v=urlP.get('view')?\`&view=\${urlP.get('view')}\`:'';const u=window.location.pathname+'?id='+id+v;window.history.pushState({path:u},'',u);}
       function resetPlayerUI(){document.getElementById('m_title').innerText="Loading...";document.getElementById('m_desc').innerText="";document.getElementById('m_tags').innerHTML="";document.getElementById('ep_section').innerHTML="";document.getElementById('dl_area').innerHTML="";document.getElementById('coverOverlay').style.backgroundImage="";document.getElementById('vip-lock').style.display="none";document.getElementById('error-msg').style.display="none";document.getElementById('video').style.display="block";}
@@ -329,12 +274,11 @@ export function renderWebsite() {
       function setupPlayButton(l,p){activeVideoLink=l;activeIsPremium=p;}
       window.switchEpisode=function(b,l,p){document.querySelectorAll('.ep-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');setupPlayButton(l,p);if(document.getElementById('video').style.display!=='none')startPlayback();else startPlayback();}
       window.startPlayback=function(){if(activeIsPremium){if(!currentUser||currentUser.vipExpiry<Date.now()){document.getElementById('vip-lock').style.display='flex';document.getElementById('video').style.display='none';return;}}document.getElementById('coverOverlay').style.display='none';const v=document.getElementById('video');playViaSecureToken(activeVideoLink).then(()=>{const t=localStorage.getItem('watch_'+currentMovieId);if(t)v.currentTime=parseFloat(t);});}
-      async function playViaSecureToken(u){const v=document.getElementById('video');v.style.display='block';document.getElementById('error-msg').style.display='none';const sf=()=>{v.style.display='none';document.getElementById('error-msg').style.display='flex';document.getElementById('fallback-btn').href=u;};if(u.includes('.m3u8')){v.src="";if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=u;v.addEventListener('loadedmetadata',()=>{v.play().catch(e=>{});});v.onerror=()=>tryHlsJs(v,u,sf);}else{tryHlsJs(v,u,sf);}return;}try{const res=await fetch('/api/sign_url',{method:'POST',body:JSON.stringify({url:u,movieId:currentMovieId,username:currentUser?currentUser.username:null})});if(res.status===403){document.getElementById('vip-lock').style.display='flex';v.style.display='none';return;}const j=await res.json();if(j.token){v.src="/api/play?t="+j.token;v.play().catch(sf);v.onerror=sf;}else sf();}catch(e){sf();}}
+      async function playViaSecureToken(u){const v=document.getElementById('video');v.style.display='block';document.getElementById('error-msg').style.display='none';const qSelect = document.getElementById('qualitySelect'); qSelect.innerHTML = ""; qSelect.style.display = "none"; const sf=()=>{v.style.display='none';document.getElementById('error-msg').style.display='flex';document.getElementById('fallback-btn').href=u;};if(u.includes('.m3u8')){v.src="";if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=u;v.addEventListener('loadedmetadata',()=>{v.play().catch(e=>{});});v.onerror=()=>tryHlsJs(v,u,sf);}else{tryHlsJs(v,u,sf);}return;}try{const res=await fetch('/api/sign_url',{method:'POST',body:JSON.stringify({url:u,movieId:currentMovieId,username:currentUser?currentUser.username:null})});if(res.status===403){document.getElementById('vip-lock').style.display='flex';v.style.display='none';return;}const j=await res.json();if(j.token){v.src="/api/play?t="+j.token;v.play().catch(sf);v.onerror=sf;}else sf();}catch(e){sf();}}
       function tryHlsJs(v,u,cb){if(Hls.isSupported()){if(window.hlsInstance)window.hlsInstance.destroy();const h=new Hls();window.hlsInstance=h;h.loadSource(u);h.attachMedia(v);h.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});const l=h.levels;const s=document.getElementById('qualitySelect');if(l.length>1){s.innerHTML="";const a=document.createElement('option');a.value=-1;a.text="Auto";s.appendChild(a);l.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.text=x.height+"p";s.appendChild(o);});s.style.display="block";}});h.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal){h.destroy();cb();}});}else{cb();}}
       window.changeQuality=function(s){if(window.hlsInstance)window.hlsInstance.currentLevel=parseInt(s.value);}
       function closePlayerInternal(){const v=document.getElementById('video');v.pause();v.src="";if(window.hlsInstance){window.hlsInstance.destroy();window.hlsInstance=null;}document.getElementById('playerModal').style.display='none';document.body.style.overflow='auto';if(document.fullscreenElement)document.exitFullscreen();}
       function closePlayer(){closePlayerInternal();const u=new URLSearchParams(window.location.search);let l=window.location.pathname;if(u.get('view'))l+='?view='+u.get('view');window.history.pushState({path:l},'',l);}
-      function toggleFullScreen(){const w=document.getElementById('videoWrapper');if(!document.fullscreenElement){if(w.requestFullscreen)w.requestFullscreen();if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(e=>{});}else{if(document.exitFullscreen)document.exitFullscreen();}}
     </script>
   </body>
   </html>
