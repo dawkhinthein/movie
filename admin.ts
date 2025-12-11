@@ -91,6 +91,7 @@ export function renderAdmin() {
               <div class="tab active" onclick="switchTab('all', this)">All</div>
               <div class="tab" onclick="switchTab('movies', this)">Mov</div>
               <div class="tab" onclick="switchTab('series', this)">Ser</div>
+              <div class="tab" onclick="switchTab('18+', this)">18+</div>
            </div>
            <div id="contentList" style="max-height:600px; overflow-y:auto;"></div>
         </div>
@@ -188,6 +189,12 @@ export function renderAdmin() {
         if(res.ok) { showToast("Saved!"); resetForm(); loadList('all'); }
       }
 
+      // 🔥 FIX: Safe Edit (No JSON in HTML)
+      function startEdit(id) {
+        const item = currentList.find(m => m.id === id);
+        if(item) editItem(item);
+      }
+
       function editItem(item) {
         document.getElementById('editId').value = item.id;
         document.getElementById('title').value = item.title;
@@ -248,7 +255,9 @@ export function renderAdmin() {
       async function loadList(cat) {
         document.getElementById('contentList').innerHTML = '<p style="text-align:center; padding:10px;">Loading...</p>';
         try {
-            const res = await fetch(\`/api/movies?page=1&cat=\${cat}\`);
+            // 🔥 FIX: Encode 18+ for server search
+            const encodedCat = encodeURIComponent(cat);
+            const res = await fetch(\`/api/movies?page=1&cat=\${encodedCat}\`);
             const json = await res.json();
             currentList = json.data;
             renderList(currentList);
@@ -266,7 +275,7 @@ export function renderAdmin() {
           <div class="item">
             <img src="\${m.image}" onerror="this.src='https://via.placeholder.com/50'">
             <div style="flex:1"><b>\${m.title}</b><br><small>\${(m.episodes && m.episodes.length) || 1} Videos</small></div>
-            <button class="btn-del" onclick="editItem(\${JSON.stringify(m).replace(/'/g, "&#39;")})">Edit</button>
+            <button class="btn-del" onclick="startEdit('\${m.id}')">Edit</button>
             <button class="btn-del" onclick="del('\${m.id}')" style="margin-left:5px;">Del</button>
           </div>
         \`).join('');
@@ -281,7 +290,11 @@ export function renderAdmin() {
           if(confirm("Delete?")) await fetch('/api/delete', { method:'POST', body:JSON.stringify({password:adminPass, id})});
           loadList('all');
       }
-      function switchTab(cat, btn) { loadList(cat); }
+      function switchTab(cat, btn) { 
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          btn.classList.add('active');
+          loadList(cat); 
+      }
     </script>
   </body>
   </html>
