@@ -1,54 +1,55 @@
-// ui.ts
 export function renderWebsite() {
   return `
   <!DOCTYPE html>
   <html>
   <head>
-    <title>Movie App</title>
+    <title>My Streaming App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
       body { background: #121212; color: #e0e0e0; font-family: sans-serif; margin:0; padding-bottom: 60px; }
-      header { background: #181818; padding: 10px; position: sticky; top:0; z-index:50; text-align: center; border-bottom: 2px solid #e50914; }
+      header { background: #181818; padding: 10px; position: sticky; top:0; z-index:50; border-bottom: 2px solid #e50914; display:flex; justify-content:center; gap:5px; flex-wrap:wrap;}
       
-      .nav-btn { background: transparent; color: #aaa; border: 1px solid #333; padding: 6px 12px; margin: 0 2px; border-radius: 20px; cursor: pointer; font-size: 13px; }
-      .nav-btn.active { background: #e50914; color: white; border-color: #e50914; }
+      .nav-btn { background: #333; color: #aaa; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight:bold;}
+      .nav-btn.active { background: #e50914; color: white; }
       
-      .container { max-width: 900px; margin: 0 auto; padding: 10px; }
-      
-      /* 3 Columns Layout */
+      .container { max-width: 1000px; margin: 0 auto; padding: 15px; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-      @media (min-width: 800px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
+      @media (min-width: 700px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
+      @media (min-width: 1000px) { .grid { grid-template-columns: repeat(5, 1fr); } }
 
       .card { background: #222; border-radius: 6px; overflow: hidden; cursor: pointer; transition: 0.2s; position: relative; }
-      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
+      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; }
+      .title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
       
-      .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-      @media (min-width: 600px) { .title { font-size: 14px; } }
+      /* Tags on Card */
+      .card-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #ffd700; font-size: 10px; padding: 2px 5px; border-radius: 3px; }
 
-      .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; align-items: center; }
+      .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
       .page-btn:disabled { opacity: 0.3; }
 
       /* Modal */
-      #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,1); z-index:100; overflow-y: auto; }
-      .modal-content { width: 100%; max-width: 800px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #000; }
-      .video-wrapper { position: relative; width: 100%; background: #000; position: sticky; top: 0; z-index: 10; }
-      video { width: 100%; max-height: 80vh; background: black; display: block; }
-      .controls-bar { padding: 10px; display: flex; justify-content: space-between; background: #181818; }
-      .close-btn { padding: 5px 15px; background: #333; color: white; border:none; border-radius: 4px; cursor: pointer; }
-      .fs-btn { padding: 5px 15px; background: #e50914; color: white; border:none; border-radius: 4px; cursor: pointer; }
+      #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:100; overflow-y: auto; }
+      .modal-content { width: 100%; max-width: 900px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+      
+      .video-wrapper { position: sticky; top: 0; z-index: 10; background:black;}
+      video { width: 100%; max-height: 60vh; background: black; display: block; }
+      
+      .controls { padding: 10px; background: #1a1a1a; display: flex; justify-content: space-between; }
+      .btn-icon { background: #333; color: white; border:none; padding: 5px 12px; border-radius: 4px; cursor: pointer; }
 
-      .info-sec { padding: 15px; }
-      h2.movie-title { margin: 0 0 10px 0; color: #fff; font-size: 18px; }
-      p.movie-desc { color: #bbb; font-size: 14px; line-height: 1.5; margin-bottom: 20px; background: #222; padding: 10px; border-radius: 5px; border-left: 3px solid #e50914; white-space: pre-wrap; }
+      .info-sec { padding: 20px; }
+      h2 { margin: 0; color: #fff; font-size: 18px; }
+      .tags-row { margin: 10px 0; display: flex; gap: 5px; flex-wrap: wrap; }
+      .tag-pill { background: #333; color: #aaa; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
+      p.desc { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; margin-top: 10px;}
 
-      .review-sec { background: #111; padding-top: 20px; border-top: 1px solid #333; }
-      .review-sec input, .review-sec textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #222; color: white; border: 1px solid #444; box-sizing: border-box; }
-      .review-sec button { width: 100%; background: #444; color: white; padding: 10px; border: none; cursor: pointer; }
-      .review-item { border-bottom: 1px solid #333; padding: 10px 0; }
-      .r-user { color: #e50914; font-weight: bold; font-size: 13px; }
-      .r-text { font-size: 13px; color: #ddd; margin-top: 4px; }
+      /* Series Episode Buttons */
+      .episode-list { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
+      .ep-btn { background: #222; border: 1px solid #444; color: white; padding: 10px; cursor: pointer; border-radius: 4px; text-align: center; font-size: 12px; }
+      .ep-btn:hover, .ep-btn.active { background: #e50914; border-color: #e50914; font-weight: bold; }
+
     </style>
   </head>
   <body>
@@ -56,14 +57,14 @@ export function renderWebsite() {
       <button class="nav-btn active" onclick="changeCategory('all', this)">All</button>
       <button class="nav-btn" onclick="changeCategory('movies', this)">Movies</button>
       <button class="nav-btn" onclick="changeCategory('series', this)">Series</button>
-      <button class="nav-btn" onclick="changeCategory('18+', this)" style="color:#ff5555">18+</button>
+      <button class="nav-btn" onclick="changeCategory('18+', this)">18+</button>
     </header>
 
     <div class="container">
       <div class="grid" id="grid"><p style="text-align:center;">Loading...</p></div>
       <div class="pagination" id="pagControls" style="display:none;">
         <button class="page-btn" id="prevBtn" onclick="changePage(-1)">Prev</button>
-        <span id="pageInfo" style="color:#888; font-size: 12px;">Page 1</span>
+        <span id="pageInfo" style="color:#888; font-size: 12px;"></span>
         <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next</button>
       </div>
     </div>
@@ -71,28 +72,29 @@ export function renderWebsite() {
     <div id="playerModal">
       <div class="modal-content">
         <div class="video-wrapper">
-            <video id="video" controls playsinline></video>
-            <div class="controls-bar">
-                <button class="close-btn" onclick="closePlayer()">Close ❌</button>
-                <button class="fs-btn" onclick="toggleFullScreen()">Full Screen ⛶</button>
+            <video id="video" controls playsinline poster="https://via.placeholder.com/800x450/000000/FFFFFF?text=Select+Episode"></video>
+            <div class="controls">
+                <button class="btn-icon" onclick="closePlayer()">❌ Close</button>
+                <button class="btn-icon" onclick="toggleFullScreen()">⛶ Full</button>
             </div>
         </div>
+        
         <div class="info-sec">
-          <h2 id="m_title" class="movie-title"></h2>
-          <p id="m_desc" class="movie-desc"></p>
-          <div class="review-sec">
-            <h3>Reviews</h3>
-            <input type="text" id="r_user" placeholder="Name (Optional)">
-            <textarea id="r_text" placeholder="Write a comment..." rows="2"></textarea>
-            <button onclick="postReview()">Submit</button>
-            <div id="reviewList" style="margin-top:20px;"></div>
+          <h2 id="m_title"></h2>
+          <div class="tags-row" id="m_tags"></div>
+          
+          <div id="ep_section" style="display:none">
+            <h4 style="color:#e50914; margin: 15px 0 5px 0;">Select Episode:</h4>
+            <div class="episode-list" id="ep_list"></div>
           </div>
+
+          <p id="m_desc" class="desc"></p>
         </div>
       </div>
     </div>
 
     <script>
-      let currentPage = 1, currentCategory = 'all', currentMovieId = null, allMoviesData = [];
+      let currentPage = 1, currentCategory = 'all', allMoviesData = [];
       fetchMovies(1, 'all');
 
       async function fetchMovies(page, cat) {
@@ -102,12 +104,17 @@ export function renderWebsite() {
         allMoviesData = json.data;
 
         const grid = document.getElementById('grid');
-        if(json.data.length === 0) grid.innerHTML = '<p>No movies.</p>';
-        else grid.innerHTML = json.data.map((m, i) => \`
-          <div class="card" onclick="play(\${i})">
+        if(json.data.length === 0) grid.innerHTML = '<p>No contents.</p>';
+        else grid.innerHTML = json.data.map((m, i) => {
+          // Show first tag on card if available
+          const tagHtml = m.tags && m.tags.length > 0 ? \`<div class="card-tag">\${m.tags[0]}</div>\` : '';
+          return \`
+          <div class="card" onclick="openModal(\${i})">
             <img src="\${m.image}" onerror="this.src='https://via.placeholder.com/200x300'">
+            \${tagHtml}
             <div class="title">\${m.title}</div>
-          </div>\`).join('');
+          </div>\`;
+        }).join('');
 
         updatePagination(json);
         currentPage = json.currentPage;
@@ -132,21 +139,56 @@ export function renderWebsite() {
       }
       function changePage(d) { fetchMovies(currentPage + d, currentCategory); }
 
-      function play(index) {
+      // 🔥 OPEN MODAL LOGIC
+      function openModal(index) {
         const movie = allMoviesData[index];
-        currentMovieId = movie.id;
-        document.getElementById('playerModal').style.display = 'block';
+        const modal = document.getElementById('playerModal');
+        modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-        
+
         document.getElementById('m_title').innerText = movie.title;
-        document.getElementById('m_desc').innerText = movie.description || "No description.";
+        document.getElementById('m_desc').innerText = movie.description || "";
         
+        // Render Tags
+        const tagsDiv = document.getElementById('m_tags');
+        tagsDiv.innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
+
+        // Render Episodes / Play Video
         const vid = document.getElementById('video');
-        if(Hls.isSupported() && movie.link.includes('.m3u8')) {
-          const hls = new Hls(); hls.loadSource(movie.link); hls.attachMedia(vid);
+        const epSection = document.getElementById('ep_section');
+        const epList = document.getElementById('ep_list');
+
+        if (movie.episodes.length === 1) {
+            // Single Movie
+            epSection.style.display = 'none';
+            playVideo(movie.episodes[0].link);
+        } else {
+            // Series
+            epSection.style.display = 'block';
+            epList.innerHTML = movie.episodes.map((ep, idx) => \`
+                <button class="ep-btn" onclick="playSeriesVideo(this, '\${ep.link}')">\${ep.label}</button>
+            \`).join('');
+            
+            // Auto play first episode
+            playVideo(movie.episodes[0].link);
+            // Highlight first button
+            if(epList.firstChild) epList.firstChild.classList.add('active');
+        }
+      }
+
+      function playSeriesVideo(btn, link) {
+        // Highlight active button
+        document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        playVideo(link);
+      }
+
+      function playVideo(url) {
+        const vid = document.getElementById('video');
+        if(Hls.isSupported() && url.includes('.m3u8')) {
+          const hls = new Hls(); hls.loadSource(url); hls.attachMedia(vid);
           hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
-        } else { vid.src = movie.link; vid.play(); }
-        loadReviews(movie.id);
+        } else { vid.src = url; vid.play(); }
       }
 
       function closePlayer() {
@@ -163,27 +205,7 @@ export function renderWebsite() {
             if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
         } else {
             if(document.exitFullscreen) document.exitFullscreen();
-            if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
         }
-      }
-
-      async function loadReviews(id) {
-        const list = document.getElementById('reviewList');
-        list.innerHTML = 'Loading...';
-        const res = await fetch('/api/get_reviews?id='+id);
-        const json = await res.json();
-        list.innerHTML = json.length ? json.map(r => \`
-          <div class="review-item"><div class="r-user">\${r.user} <span style="font-size:10px; color:#666; float:right">\${r.date}</span></div><div class="r-text">\${r.text}</div></div>
-        \`).join('') : '<p style="color:#666; font-size:12px;">No reviews yet.</p>';
-      }
-
-      async function postReview() {
-        const user = document.getElementById('r_user').value || "Anonymous";
-        const text = document.getElementById('r_text').value;
-        if(!text) return;
-        await fetch('/api/add_review', { method:'POST', body: JSON.stringify({ movieId: currentMovieId, user, text }) });
-        document.getElementById('r_text').value = "";
-        loadReviews(currentMovieId);
       }
     </script>
   </body>
