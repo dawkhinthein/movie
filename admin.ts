@@ -166,15 +166,12 @@ export function renderAdmin() {
                     if(groupName.toLowerCase() === 'movie') {
                         label = "Movie";
                     } else {
-                        // Create structured label "Season 1 Ep 1"
                         label = \`\${groupName} Ep \${index + 1}\`; 
                     }
                 }
                 episodeList.push({ label: label, link: finalLink });
             });
         });
-
-        if(episodeList.length === 0) return showToast("No links added!");
 
         const data = {
           id: document.getElementById('editId').value || null,
@@ -192,7 +189,6 @@ export function renderAdmin() {
       }
 
       function editItem(item) {
-        // Safe edit for legacy data
         document.getElementById('editId').value = item.id;
         document.getElementById('title').value = item.title;
         document.getElementById('image').value = item.image;
@@ -205,16 +201,10 @@ export function renderAdmin() {
         container.innerHTML = "";
         
         const groups = {};
-        
-        // 🔥 FIX: Handle old data where episodes array might be missing
         let episodesToProcess = item.episodes;
         if (!episodesToProcess || episodesToProcess.length === 0) {
-            // Old data? Check if 'link' exists
-            if (item.link) {
-                 episodesToProcess = [{ label: "Movie", link: item.link }];
-            } else {
-                 episodesToProcess = [];
-            }
+            if (item.link) episodesToProcess = [{ label: "Movie", link: item.link }];
+            else episodesToProcess = [];
         }
 
         episodesToProcess.forEach(ep => {
