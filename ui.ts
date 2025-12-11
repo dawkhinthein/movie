@@ -57,10 +57,11 @@ export function renderWebsite() {
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
 
-      /* 🔥 ERROR MESSAGE STYLE */
-      #error-msg { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; width: 90%; }
-      #error-msg p { color: white; margin-bottom: 10px; font-size: 14px; }
-      .retry-btn { background: #e50914; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; }
+      /* 🔥 IMPROVED ERROR MESSAGE STYLE (Glassmorphism) */
+      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); flex-direction: column; align-items: center; justify-content: center; z-index: 5; backdrop-filter: blur(5px); }
+      #error-msg p { color: #ddd; margin-bottom: 15px; font-size: 14px; font-weight:500; }
+      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; display:flex; align-items:center; gap:8px; transition:0.2s; }
+      .retry-btn:hover { background: #e50914; border-color:#e50914; }
 
       .info-sec { padding: 15px; }
       h2 { margin: 0; color: #fff; font-size: 18px; }
@@ -126,8 +127,8 @@ export function renderWebsite() {
             <video id="video" controls playsinline controlsList="nodownload"></video>
             
             <div id="error-msg">
-                <p>⚠️ Playback Error (CORS)</p>
-                <a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original Link</a>
+                <p>Playback requires external player</p>
+                <a id="fallback-btn" class="retry-btn" target="_blank">▶ Click to Play</a>
             </div>
 
             <div class="player-overlay" id="playerOverlay">
@@ -286,7 +287,7 @@ export function renderWebsite() {
         document.getElementById('m_tags').innerHTML = "";
         document.getElementById('ep_section').innerHTML = "";
         document.getElementById('coverOverlay').style.backgroundImage = "";
-        document.getElementById('error-msg').style.display = "none"; // Hide error
+        document.getElementById('error-msg').style.display = "none";
         
         const res = await fetch(\`/api/get_movie?id=\${id}\`);
         const movie = await res.json();
@@ -385,48 +386,44 @@ export function renderWebsite() {
         else startPlayback();
       }
 
-      // 🔥 ROBUST PLAYER LOGIC (With Fallback)
+      // 🔥 🔥 🔥 REVISED PLAYER LOGIC: NATIVE FIRST FOR MOBILE 🔥 🔥 🔥
       async function playViaSecureToken(realUrl) {
         const vid = document.getElementById('video');
         vid.style.display = 'block';
-        document.getElementById('error-msg').style.display = "none"; // Hide error initially
+        document.getElementById('error-msg').style.display = "none"; 
         
         // Helper to show fallback button
         const showFallback = () => {
-            vid.style.display = 'none'; // Hide video
+            vid.style.display = 'none'; 
             const errDiv = document.getElementById('error-msg');
             const btn = document.getElementById('fallback-btn');
             btn.href = realUrl;
-            errDiv.style.display = "block";
+            errDiv.style.display = "flex"; // Show flex to center
         };
 
-        // 1. M3U8 Direct Play
+        // 1. M3U8 Handling
         if (realUrl.includes('.m3u8')) {
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(realUrl);
-                hls.attachMedia(vid);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play().catch(()=>{}));
-                
-                // If Error -> Show Fallback
-                hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) {
-                        hls.destroy();
-                        showFallback();
-                    }
-                });
-            } 
-            else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+            vid.src = ""; // Clear src first
+            
+            // 🔥 Priority 1: Native Player (Best for Android/iOS/Mobile)
+            if (vid.canPlayType('application/vnd.apple.mpegurl')) {
                 vid.src = realUrl;
-                vid.addEventListener('loadedmetadata', () => vid.play());
-                vid.addEventListener('error', showFallback);
-            } else {
-                showFallback();
+                vid.addEventListener('loadedmetadata', () => {
+                    vid.play().catch(e => console.log("Native Play prevented"));
+                });
+                vid.onerror = () => {
+                    // If native fails, try HLS.js as backup
+                    tryHlsJs(vid, realUrl, showFallback);
+                };
+            } 
+            // 🔥 Priority 2: HLS.js (For Desktop Chrome/Firefox)
+            else {
+                tryHlsJs(vid, realUrl, showFallback);
             }
             return;
         }
 
-        // 2. MP4/Other (Use Token)
+        // 2. MP4/Other Handling (Secure Token)
         try {
             const res = await fetch('/api/sign_url', { method: 'POST', body: JSON.stringify({ url: realUrl }) });
             const json = await res.json();
@@ -436,6 +433,26 @@ export function renderWebsite() {
                 vid.onerror = showFallback;
             } else { showFallback(); }
         } catch(e) { showFallback(); }
+      }
+
+      // Helper for HLS.js
+      function tryHlsJs(vid, url, fallbackCb) {
+          if (Hls.isSupported()) {
+                const hls = new Hls({ debug: false });
+                hls.loadSource(url);
+                hls.attachMedia(vid);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    vid.play().catch(() => {});
+                });
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) {
+                        hls.destroy();
+                        fallbackCb(); // Show nice button
+                    }
+                });
+          } else {
+              fallbackCb(); // Nothing works, show button
+          }
       }
 
       function closePlayerInternal() {
