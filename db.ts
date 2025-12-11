@@ -1,33 +1,35 @@
+// db.ts
 const kv = await Deno.openKv();
 
 export interface Episode {
-  label: string; // ဥပမာ: "S1 E1"
-  link: string;  // Video Link
+  label: string;
+  link: string;
 }
 
 export interface Movie {
   id: string;
   title: string;
-  image: string;
-  episodes: Episode[]; // Series အတွက် Link အများကြီး
+  image: string; // Poster (Home Page အတွက်)
+  cover: string; // 🔥 New: Cover/Backdrop (Player အတွက်)
+  episodes: Episode[];
   description: string;
   category: string;
-  tags: string[]; // Tags (Horror, 2025...)
+  tags: string[];
   timestamp: number;
 }
 
 export async function addOrUpdateMovie(data: any) {
-  // ID ပါလာရင် Edit (Update), မပါရင် New (Add)
   const id = data.id || Date.now().toString();
   const movie: Movie = {
     id,
     title: data.title,
     image: data.image,
-    episodes: data.episodes, // Array of links
+    cover: data.cover || data.image, // Cover မထည့်ရင် Poster ပဲ ပြန်သုံးမယ်
+    episodes: data.episodes,
     description: data.description,
     category: data.category,
-    tags: data.tags, // Array of tags
-    timestamp: Date.now() // For sorting
+    tags: data.tags,
+    timestamp: Date.now()
   };
   
   await kv.set(["movies", id], movie);
@@ -44,15 +46,12 @@ export async function getMovies(page: number = 1, category: string = "all") {
     allMovies.push(entry.value as Movie);
   }
 
-  // Latest First
   allMovies.sort((a, b) => b.timestamp - a.timestamp);
 
-  // Filter Category
   if (category !== "all") {
     allMovies = allMovies.filter((m) => m.category === category);
   }
 
-  // Pagination
   const ITEMS_PER_PAGE = 15;
   const totalMovies = allMovies.length;
   const totalPages = Math.ceil(totalMovies / ITEMS_PER_PAGE);
@@ -67,3 +66,7 @@ export async function getMovies(page: number = 1, category: string = "all") {
     hasPrev: page > 1,
   };
 }
+
+// Reviews
+export async function addReview(movieId: string, user: string, text: string) { /* Same as before */ }
+export async function getReviews(movieId: string) { /* Same as before */ }
