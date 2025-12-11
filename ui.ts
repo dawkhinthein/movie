@@ -8,19 +8,20 @@ export function renderWebsite() {
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
       body { background: #121212; color: #e0e0e0; font-family: sans-serif; margin:0; padding-bottom: 60px; }
+      
       header { background: #181818; padding: 10px; position: sticky; top:0; z-index:50; border-bottom: 2px solid #e50914; display:flex; justify-content:center; gap:5px; flex-wrap:wrap;}
       .nav-btn { background: #333; color: #aaa; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight:bold;}
       .nav-btn.active { background: #e50914; color: white; }
       
-      .container { max-width: 1000px; margin: 0 auto; padding: 15px; }
-      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-      @media (min-width: 700px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
-      @media (min-width: 1000px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+      .container { max-width: 1000px; margin: 0 auto; padding: 10px; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
+      @media (min-width: 900px) { .grid { grid-template-columns: repeat(5, 1fr); } }
 
-      .card { background: #222; border-radius: 6px; overflow: hidden; cursor: pointer; transition: 0.2s; position: relative; }
+      .card { background: #222; border-radius: 6px; overflow: hidden; cursor: pointer; position: relative; }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; }
-      .title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-      .card-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #ffd700; font-size: 10px; padding: 2px 5px; border-radius: 3px; }
+      .title { padding: 6px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+      .card-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); color: #ffd700; font-size: 9px; padding: 2px 5px; border-radius: 3px; }
 
       .pagination { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
       .page-btn { padding: 8px 16px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
@@ -29,6 +30,8 @@ export function renderWebsite() {
       .modal-content { width: 100%; max-width: 900px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
       
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
+      
+      /* Cover & Play Button */
       .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
       .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: 0.2s; }
       .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
@@ -43,14 +46,6 @@ export function renderWebsite() {
       .tags-row { margin: 10px 0; display: flex; gap: 5px; flex-wrap: wrap; }
       .tag-pill { background: #333; color: #aaa; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
       p.desc { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; margin-top: 10px;}
-      
-      .season-wrapper { margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; }
-      .season-header { font-size: 16px; color: #e50914; font-weight: bold; margin-bottom: 10px; }
-      .season-select { width: 100%; padding: 12px; background: #222; color: white; border: 1px solid #444; border-radius: 6px; font-size: 15px; outline: none; }
-      .episode-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 15px; }
-      .ep-btn { background: #222; border: 1px solid #444; color: #ddd; padding: 12px 5px; cursor: pointer; border-radius: 4px; text-align: center; font-size: 13px; transition: 0.2s; }
-      .ep-btn:hover { background: #333; }
-      .ep-btn.active { background: #e50914; border-color: #e50914; color: white; font-weight: bold; box-shadow: 0 0 10px rgba(229,9,20,0.4); }
     </style>
   </head>
   <body>
@@ -88,10 +83,9 @@ export function renderWebsite() {
           <h2 id="m_title"></h2>
           <div class="tags-row" id="m_tags"></div>
           
-          <div id="ep_section" class="season-wrapper" style="display:none;">
-            <div class="season-header">Select Season:</div>
-            <select id="season_select" class="season-select" onchange="loadEpisodes(this.value)"></select>
-            <div class="episode-list" id="ep_list"></div>
+          <div id="ep_section" style="margin-top:20px; display:none;">
+            <div style="font-weight:bold; color:#e50914; margin-bottom:10px;">Episodes:</div>
+            <div id="ep_list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px;"></div>
           </div>
 
           <p id="m_desc" class="desc"></p>
@@ -111,11 +105,13 @@ export function renderWebsite() {
         const json = await res.json();
         allMoviesData = json.data;
         const grid = document.getElementById('grid');
+        
         if(json.data.length === 0) grid.innerHTML = '<p>No contents.</p>';
         else grid.innerHTML = json.data.map((m, i) => {
           const tagHtml = m.tags && m.tags.length > 0 ? \`<div class="card-tag">\${m.tags[0]}</div>\` : '';
           return \`<div class="card" onclick="openModal(\${i})"><img src="\${m.image}" onerror="this.src='https://via.placeholder.com/200x300'">\${tagHtml}<div class="title">\${m.title}</div></div>\`;
         }).join('');
+        
         updatePagination(json);
         currentPage = json.currentPage;
         currentCategory = cat;
@@ -144,15 +140,21 @@ export function renderWebsite() {
         const modal = document.getElementById('playerModal');
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
+
         document.getElementById('m_title').innerText = movie.title;
         document.getElementById('m_desc').innerText = movie.description || "";
+        
+        // Show Cover, Hide Video
         const coverDiv = document.getElementById('coverOverlay');
         const coverUrl = movie.cover || movie.image;
         coverDiv.style.backgroundImage = \`url('\${coverUrl}')\`;
         coverDiv.style.display = 'flex';
         document.getElementById('video').style.display = 'none';
         document.getElementById('video').pause();
+        
         document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
+
+        // Episodes setup
         const epSection = document.getElementById('ep_section');
         const epList = document.getElementById('ep_list');
         epList.innerHTML = "";
@@ -162,65 +164,62 @@ export function renderWebsite() {
             currentVideoLink = movie.episodes[0].link;
         } else {
             epSection.style.display = 'block';
-            organizeSeasons(movie.episodes);
+            epList.innerHTML = movie.episodes.map(ep => \`
+                <button style="background:#222; border:1px solid #444; color:white; padding:8px; cursor:pointer;" onclick="switchEpisode(this, '\${ep.link}')">\${ep.label}</button>
+            \`).join('');
+            currentVideoLink = movie.episodes[0].link; // Default first ep
         }
-      }
-
-      function organizeSeasons(episodes) {
-        const seasonSelect = document.getElementById('season_select');
-        const seasons = {};
-        episodes.forEach(ep => {
-            const match = ep.label.match(/(S\d+|Season \d+)/i);
-            const seasonName = match ? match[0].toUpperCase() : "Other";
-            if(!seasons[seasonName]) seasons[seasonName] = [];
-            seasons[seasonName].push(ep);
-        });
-        const sortedKeys = Object.keys(seasons).sort();
-        seasonSelect.innerHTML = sortedKeys.map(s => \`<option value="\${s}">\${s}</option>\`).join('');
-        seasonSelect.seasonMap = seasons;
-        if(sortedKeys.length > 0) loadEpisodes(sortedKeys[0]);
-      }
-
-      function loadEpisodes(seasonKey) {
-        const seasonMap = document.getElementById('season_select').seasonMap;
-        const eps = seasonMap[seasonKey];
-        const epList = document.getElementById('ep_list');
-        epList.innerHTML = eps.map(ep => \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}')">\${ep.label.replace(seasonKey, '').trim() || ep.label}</button>\`).join('');
-        if(eps.length > 0) currentVideoLink = eps[0].link;
       }
 
       function startPlayback() {
         document.getElementById('coverOverlay').style.display = 'none';
         const vid = document.getElementById('video');
         vid.style.display = 'block';
-        playViaGatekeeper(currentVideoLink);
+        
+        // 🔥 Call Secure Play
+        playViaSecureToken(currentVideoLink);
       }
 
       function switchEpisode(btn, link) {
-        document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
         currentVideoLink = link;
-        if(document.getElementById('video').style.display !== 'none') playViaGatekeeper(link);
-        else startPlayback();
+        // If video is already visible, play immediately. Else, wait for cover click.
+        if(document.getElementById('video').style.display !== 'none') {
+            playViaSecureToken(link);
+        } else {
+            startPlayback();
+        }
       }
 
-      // 🔥 GATEKEEPER PLAY (No Bandwidth on Deno)
-      function playViaGatekeeper(realUrl) {
+      // 🔥 SECURE TOKEN LOGIC (This is key!)
+      async function playViaSecureToken(realUrl) {
         const vid = document.getElementById('video');
 
-        // M3U8 (Use HLS)
+        // M3U8 (Direct Play with HLS)
         if(Hls.isSupported() && realUrl.includes('.m3u8')) {
            const hls = new Hls(); hls.loadSource(realUrl); hls.attachMedia(vid);
            hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
            return;
         }
-        
-        // MP4: Use Redirect Gatekeeper
-        // The link looks like: /api/play?v=ENCRYPTED_URL
-        // The browser calls this, Deno checks headers, then redirects to Real URL.
-        const gatekeeperUrl = "/api/play?v=" + btoa(realUrl);
-        vid.src = gatekeeperUrl;
-        vid.play();
+
+        // MP4: Request Token -> Then Play
+        try {
+            const res = await fetch('/api/sign_url', {
+                method: 'POST',
+                body: JSON.stringify({ url: realUrl }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const json = await res.json();
+            
+            if(json.token) {
+                // Play using the secure token URL
+                vid.src = "/api/play?t=" + json.token;
+                vid.play();
+            } else {
+                alert("Error generating token");
+            }
+        } catch(e) {
+            console.error("Token error", e);
+        }
       }
 
       function closePlayer() {
