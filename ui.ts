@@ -52,7 +52,7 @@ export function renderWebsite() {
       .tag-pill { background: #333; color: #aaa; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
       p.desc { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; margin-top: 10px;}
       
-      /* 🔥 NEW ACCORDION SERIES UI */
+      /* Accordion Styles */
       .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 12px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; transition: 0.4s; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; margin-top: 5px; border-radius: 4px; }
       .accordion.active, .accordion:hover { background-color: #333; color: #e50914; }
       .accordion:after { content: '\\002B'; color: #777; font-weight: bold; float: right; margin-left: 5px; }
@@ -118,16 +118,33 @@ export function renderWebsite() {
       let currentPage = 1, currentCategory = 'all', allMoviesData = [];
       let currentVideoLink = "";
 
-      // 🔥 Initial Load Logic (Check URL for ID)
+      // 🔥 FIX: Back Button Logic Added Here
+      window.addEventListener('popstate', function(event) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const movieId = urlParams.get('id');
+
+        if (!movieId) {
+            // URL မှာ ID မပါတော့ဘူး (Back နှိပ်လိုက်လို့) -> Modal ကိုပိတ်မယ်
+            const vid = document.getElementById('video');
+            vid.pause();
+            vid.src = "";
+            document.getElementById('playerModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            if (document.fullscreenElement) document.exitFullscreen();
+        } else {
+            // ID ပါနေသေးရင် (Forward ပြန်နှိပ်တာမျိုး) -> Movie ပြန်ဖွင့်မယ်
+             const movie = allMoviesData.find(m => m.id === movieId);
+             if(movie) setupModal(movie);
+        }
+      });
+
       window.onload = async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
 
         if (movieId) {
-            // User refreshed on a movie page -> Fetch single movie & open
             await fetchSingleMovie(movieId);
         } else {
-            // Normal Load
             fetchMovies(1, 'all');
         }
       };
@@ -136,7 +153,7 @@ export function renderWebsite() {
         document.getElementById('grid').innerHTML = '<p>Loading...</p>';
         const res = await fetch(\`/api/movies?page=\${page}&cat=\${cat}\`);
         const json = await res.json();
-        allMoviesData = json.data; // Stores current page data
+        allMoviesData = json.data;
         renderGrid(json.data);
         updatePagination(json);
         currentPage = json.currentPage;
@@ -148,40 +165,33 @@ export function renderWebsite() {
         if(data.length === 0) grid.innerHTML = '<p>No contents.</p>';
         else grid.innerHTML = data.map((m) => {
           const tagHtml = m.tags && m.tags.length > 0 ? \`<div class="card-tag">\${m.tags[0]}</div>\` : '';
-          // We pass the full object ID to openModal
           return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" onerror="this.src='https://via.placeholder.com/200x300'">\${tagHtml}<div class="title">\${m.title}</div></div>\`;
         }).join('');
       }
 
-      // 🔥 SEARCH LOGIC
       async function handleSearch(e) {
         if (e.key === 'Enter') {
             const query = document.getElementById('searchInput').value;
             if(!query) return fetchMovies(1, 'all');
             
             document.getElementById('grid').innerHTML = '<p>Searching...</p>';
-            document.getElementById('pagControls').style.display = 'none'; // Hide pagination for search
+            document.getElementById('pagControls').style.display = 'none';
             
             const res = await fetch(\`/api/search?q=\${encodeURIComponent(query)}\`);
             const results = await res.json();
             
-            // Store results in global var so we can open them
             allMoviesData = results; 
             renderGrid(results);
         }
       }
 
-      // 🔥 FETCH SINGLE & OPEN (For Refresh)
       async function fetchSingleMovie(id) {
-        // Hide grid initially
         document.getElementById('playerModal').style.display = 'block';
-        
         const res = await fetch(\`/api/get_movie?id=\${id}\`);
         const movie = await res.json();
         
         if (movie && movie.title) {
             setupModal(movie);
-            // Also load background grid
             fetchMovies(1, 'all');
         } else {
             alert("Movie not found");
@@ -190,13 +200,11 @@ export function renderWebsite() {
       }
 
       function openModalById(id) {
-        // Find movie in currently loaded data
         const movie = allMoviesData.find(m => m.id === id);
         if(movie) {
-            // Update URL without reloading
+            // Push State update url
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + id;
             window.history.pushState({path:newUrl},'',newUrl);
-            
             setupModal(movie);
         }
       }
@@ -209,7 +217,6 @@ export function renderWebsite() {
         document.getElementById('m_title').innerText = movie.title;
         document.getElementById('m_desc').innerText = movie.description || "";
         
-        // Setup Cover
         const coverDiv = document.getElementById('coverOverlay');
         const coverUrl = movie.cover || movie.image;
         coverDiv.style.backgroundImage = \`url('\${coverUrl}')\`;
@@ -219,15 +226,12 @@ export function renderWebsite() {
         
         document.getElementById('m_tags').innerHTML = movie.tags ? movie.tags.map(t => \`<span class="tag-pill">\${t}</span>\`).join('') : '';
 
-        // 🔥 ACCORDION EPISODES
         const epSection = document.getElementById('ep_section');
-        epSection.innerHTML = ""; // Clear
+        epSection.innerHTML = "";
         
         if (movie.episodes.length === 1) {
-            // Single Movie
             currentVideoLink = movie.episodes[0].link;
         } else {
-            // Series
             renderAccordion(movie.episodes);
             currentVideoLink = movie.episodes[0].link;
         }
@@ -237,7 +241,6 @@ export function renderWebsite() {
         const container = document.getElementById('ep_section');
         const seasons = {};
         
-        // Group by Season
         episodes.forEach(ep => {
             const match = ep.label.match(/(S\d+|Season \d+)/i);
             const seasonName = match ? match[0].toUpperCase() : "Other";
@@ -245,14 +248,11 @@ export function renderWebsite() {
             seasons[seasonName].push(ep);
         });
 
-        // Create HTML for each season
         Object.keys(seasons).sort().forEach((seasonKey, index) => {
-            // Button
             const btn = document.createElement("button");
             btn.className = "accordion";
             btn.innerHTML = seasonKey;
             
-            // Panel
             const panel = document.createElement("div");
             panel.className = "panel";
             
@@ -266,7 +266,6 @@ export function renderWebsite() {
             container.appendChild(btn);
             container.appendChild(panel);
 
-            // Add Click Event
             btn.addEventListener("click", function() {
                 this.classList.toggle("active");
                 if (panel.style.maxHeight) {
@@ -276,7 +275,6 @@ export function renderWebsite() {
                 }
             });
 
-            // Open first season by default
             if(index === 0) btn.click();
         });
       }
@@ -315,7 +313,7 @@ export function renderWebsite() {
         document.getElementById('playerModal').style.display = 'none';
         document.body.style.overflow = 'auto';
         
-        // Clear URL param on close
+        // Manual Close - Update URL to home
         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
         window.history.pushState({path:newUrl},'',newUrl);
         
