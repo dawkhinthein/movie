@@ -9,26 +9,34 @@ export function renderWebsite() {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
+      /* --- GLOBAL RESET --- */
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
       
+      /* --- HEADER --- */
       header { background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px); padding: 12px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-      .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; }
-      .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; }
+      .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; letter-spacing: 1px; }
+      .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; transition: 0.3s; }
+      .search-box:focus-within { border-color: #e50914; background: #2a2a2a; width: 60%; }
       .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
+      /* --- LOADER --- */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
-      .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s ease; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
+      /* --- SIDEBAR --- */
+      .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
       .user-panel.open { transform: translateX(0); }
-      .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; outline: none; }
-      .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; }
+      .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+      .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; outline: none; }
+      .auth-input:focus { border-color: #e50914; }
+      .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; transition: 0.2s; }
       .auth-btn.secondary { background: #333; margin-top: 5px; }
 
+      /* --- HOME LAYOUT --- */
       .home-section { padding: 20px 0 5px 15px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 12px; }
       .section-title { color: #fff; font-size: 16px; font-weight: 700; border-left: 4px solid #e50914; padding-left: 10px; }
@@ -37,11 +45,14 @@ export function renderWebsite() {
       .scroll-row::-webkit-scrollbar { display: none; } 
       .scroll-row .card { min-width: 115px; max-width: 115px; }
 
+      /* --- GRID --- */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; }
-      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
+      @media (min-width: 900px) { .grid { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
+      .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+      .card:active { transform: scale(0.96); }
+      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; -webkit-user-drag: none; pointer-events: none; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
       .year-tag { position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-left-radius: 6px; z-index: 2; }
@@ -50,46 +61,58 @@ export function renderWebsite() {
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
       .grid-title { font-size: 14px; font-weight: bold; color: #ccc; margin-left: auto; margin-right: auto; }
 
+      /* --- PLAYER --- */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:200; overflow-y: auto; }
       .modal-content { width: 100%; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: #111; }
       .video-area { position: sticky; top: 0; z-index: 10; background:black; width: 100%; aspect-ratio: 16/9; position: relative; }
-      video { width: 100%; height: 100%; background: black; }
+      video { width: 100%; height: 100%; background: black; display: block; }
       
+      /* Controls Overlay - Top */
+      .player-overlay { 
+          position: absolute; top: 0; left: 0; width: 100%; height: 60px; 
+          display: none; justify-content: flex-end; align-items: center;
+          padding: 10px; box-sizing: border-box; 
+          transition: opacity 0.3s; pointer-events: none; 
+          background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); z-index: 20;
+      }
+      .ctrl-group { display: flex; gap: 10px; pointer-events: auto; }
+      .ctrl-btn { background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight:bold; backdrop-filter: blur(4px); }
+      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; margin-right: 10px; }
+      .quality-select option { background: #222; color: white; }
+
+      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
+      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
+
       #vip-lock { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 25; }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
       .lock-btn { background: #e50914; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 14px; width: auto; cursor: pointer; }
+
+      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
+      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
 
       .info-sec { padding: 20px; }
       .action-row { display: flex; gap: 10px; margin: 15px 0; align-items: center; }
       .fav-btn { background: #222; border: 1px solid #444; color: #ccc; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; }
       .fav-btn.active { color: #e50914; border-color: #e50914; }
+      .dl-btn { background: #4db8ff; color: #000; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: bold; }
+      .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
+
       .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 6px; }
       .accordion.active { background-color: #333; color: #e50914; }
       .panel { padding: 0 5px; background-color: #151515; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 15px 5px; max-height: 350px; overflow-y: auto; }
       .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ddd; padding: 10px 5px; cursor: pointer; border-radius: 4px; font-size: 12px; text-align: center; }
       .ep-btn.active { background: #e50914; color: white; border-color: #e50914; font-weight: bold; }
-      
-      .player-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 60px; display: none; justify-content: flex-end; align-items: center; padding: 10px; box-sizing: border-box; transition: opacity 0.3s; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); z-index: 20; }
-      .ctrl-group { display: flex; gap: 10px; pointer-events: auto; }
-      .ctrl-btn { background: rgba(30,30,30,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight:bold; backdrop-filter: blur(4px); }
-      .quality-select { pointer-events: auto; background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; font-size: 12px; outline: none; margin-right: 10px; }
-      .quality-select option { background: #222; color: white; }
-      
-      .cover-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
-      .play-btn-circle { width: 60px; height: 60px; background: rgba(229, 9, 20, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-      .play-btn-circle::after { content: '▶'; color: white; font-size: 24px; margin-left: 4px; }
-      
-      #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
-      .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
-      
-      #scroll-sentinel { height: 50px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
-      #bottom-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
 
+      /* Alert & Scroll */
       #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px); animation: fadeIn 0.2s; }
       .alert-box { background: #1e1e1e; width: 85%; max-width: 320px; border-radius: 12px; padding: 25px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; transform: scale(0.9); animation: popIn 0.3s forwards; }
       .alert-btn { background: #e50914; color: white; border: none; padding: 12px 0; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
       
+      #scroll-sentinel { height: 50px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
+      #bottom-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid #e50914; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+
       @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
     </style>
@@ -138,6 +161,7 @@ export function renderWebsite() {
             <video id="video" controls playsinline controlsList="nodownload"></video>
             <div id="vip-lock"><div style="font-size:40px; margin-bottom:10px;">👑</div><h2 style="color:#ffd700;">Premium</h2><p style="color:#ccc;">VIP required.</p><button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button></div>
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
+            
             <div class="player-overlay" id="playerOverlay">
                 <div class="ctrl-group">
                     <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
@@ -172,7 +196,7 @@ export function renderWebsite() {
       function showAlert(title, msg, isSuccess = true) { const el = document.getElementById('custom-alert'); document.getElementById('alert-icon').innerText = isSuccess ? '✅' : '⚠️'; document.getElementById('alert-title').innerText = title; document.getElementById('alert-msg').innerText = msg; el.style.display = 'flex'; }
       function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
       
-      // 🔥 FIX: Sanitize "18+" category issue
+      // Helper to fix 18+ space issue
       function sanitizeCategory(c) {
           if (!c) return 'all';
           if (c.trim() === '18' || c.includes('18 ')) return '18+';
@@ -183,14 +207,12 @@ export function renderWebsite() {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
-        // 🔥 FIX: Sanitize here too
         const cat = sanitizeCategory(urlParams.get('cat'));
         
         if (movieId) {
              openModalById(movieId, false); 
         } else if (view === 'grid') {
              closePlayerInternal();
-             // Check if category changed or grid empty
              if(currentCategory !== cat || document.getElementById('mainGrid').innerHTML === "") {
                  openCategory(cat || 'all', false); 
              } else {
@@ -213,21 +235,23 @@ export function renderWebsite() {
         else if (view === 'grid') { openCategory(catParam || 'all', false); }
         
         const vid = document.getElementById('video');
-        vid.addEventListener('timeupdate', () => { if(vid.currentTime > 5 && currentMovieId) localStorage.setItem('watch_' + currentMovieId, vid.currentTime); });
+        vid.addEventListener('timeupdate', () => { 
+            // 🔥 FIX: Use Video Link as Key for Unique Resume
+            if(vid.currentTime > 5 && activeVideoLink) localStorage.setItem('watch_' + activeVideoLink, vid.currentTime); 
+        });
       };
 
-      // 🔥 FIX: CLOSE BUTTON LOGIC (PRESERVES PARAMS)
+      // 🔥 FIX: CLOSE BUTTON LOGIC
       function closePlayer() {
           closePlayerInternal();
           const currentParams = new URLSearchParams(window.location.search);
-          currentParams.delete('id'); // Only remove ID
+          currentParams.delete('id'); 
           
           let newUrl = window.location.pathname;
           if(currentParams.toString()) newUrl += '?' + currentParams.toString();
           
-          window.history.pushState({path:newUrl},'',newUrl);
+          window.history.pushState(null, '', newUrl);
           
-          // Determine View
           if(currentParams.get('view') === 'grid') showGridInternal();
           else goHomeInternal();
       }
@@ -249,6 +273,7 @@ export function renderWebsite() {
           const o = document.getElementById('playerOverlay');
           const v = document.getElementById('video');
           const show = () => {
+              if(v.style.display === 'none') return;
               o.style.display = "flex"; o.style.opacity = "1";
               clearTimeout(controlsTimeout);
               if(!v.paused) controlsTimeout = setTimeout(() => { o.style.opacity = "0"; }, 3000);
@@ -257,12 +282,19 @@ export function renderWebsite() {
           v.addEventListener('play', show); v.addEventListener('pause', () => { o.style.opacity = "1"; clearTimeout(controlsTimeout); });
       }
 
-      // ... (Rest of functions) ...
       function renderAccordion(episodes, isPremium) { const container = document.getElementById('ep_section'); container.innerHTML = ""; const seasons = {}; episodes.forEach(ep => { let g = "Videos"; const match = ep.label.match(/^(Season \\d+|S\\d+)/i); if(match) { let s = match[0]; if(s.toUpperCase().startsWith('S') && !s.toUpperCase().startsWith('SEASON')) s = s.replace(/^S/i, 'Season '); g = s; if(g.match(/Season\s*Season/i)) g = g.replace(/Season\s*Season/i, 'Season'); } else if(ep.label === 'Movie') g = "Movie"; if(!seasons[g]) seasons[g] = []; seasons[g].push(ep); }); Object.keys(seasons).sort().forEach(key => { const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = key; const panel = document.createElement('div'); panel.className = "panel"; const grid = document.createElement('div'); grid.className = "episode-grid"; grid.innerHTML = seasons[key].map(ep => { let clean = ep.label.replace(key, '').trim(); if(!clean) clean = ep.label; return \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${clean}</button>\`; }).join(''); panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel); btn.onclick = () => { btn.classList.toggle("active"); if(panel.style.maxHeight) panel.style.maxHeight=null; else panel.style.maxHeight="400px"; }; }); }
       function setupInfiniteScroll() { const sentinel = document.getElementById('scroll-sentinel'); if(!sentinel) return; observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting && !isLoading && hasMore) { fetchMovies(currentPage + 1, currentCategory, true); } }, { rootMargin: '100px' }); observer.observe(sentinel); }
       async function fetchMovies(page, cat, append=false) { if(isLoading) return; isLoading = true; document.getElementById('bottom-spinner').style.display = 'block'; const encodedCat = (cat==='all'||cat==='movies'||cat==='series') ? cat : encodeURIComponent(cat); const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodedCat}\`); const json = await res.json(); isLoading = false; document.getElementById('bottom-spinner').style.display = 'none'; if(json.data.length === 0) { hasMore = false; if(append) document.getElementById('end-msg').style.display = 'block'; return; } allMoviesData = append ? allMoviesData.concat(json.data) : json.data; renderGrid(json.data, append); currentPage = page; }
       function renderGrid(data, append) { const grid = document.getElementById('mainGrid'); const html = data.map(m => createCardHtml(m)).join(''); if(append) grid.innerHTML += html; else grid.innerHTML = html; }
-      function createCardHtml(m) { const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : ''; const yearTag = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; const yearHtml = yearTag ? \`<div class="year-tag">\${yearTag}</div>\` : ''; return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'" oncontextmenu="return false;">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; }
+      
+      // 🔥 FIX: YEAR TAG POSITION
+      function createCardHtml(m) { 
+          const tag = m.isPremium ? '<div class="prem-tag">👑</div>' : ''; 
+          const yearTag = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; 
+          const yearHtml = yearTag ? \`<div class="year-tag">\${yearTag}</div>\` : ''; 
+          return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225?text=No+Img'" oncontextmenu="return false;">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; 
+      }
+      
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
       function updateProfileUI(){if(currentUser){document.getElementById('loginForm').style.display='none';document.getElementById('profileView').style.display='block';document.getElementById('u_name').innerText=currentUser.username;const exp=currentUser.vipExpiry;if(exp>Date.now()){const date=new Date(exp);const dStr=date.toLocaleString('en-GB',{timeZone:'Asia/Yangon',day:'2-digit',month:'2-digit',year:'numeric'});const daysLeft=Math.ceil((exp-Date.now())/(1000*60*60*24));document.getElementById('u_status').innerHTML=\`<span style="color:#ffd700">👑 \${dStr} (P-\${daysLeft} Days Left)</span>\`;}else{document.getElementById('u_status').innerText='Free Plan';}}else{document.getElementById('loginForm').style.display='block';document.getElementById('profileView').style.display='none';}}
@@ -276,13 +308,11 @@ export function renderWebsite() {
       function goHomeInternal(){document.getElementById('homeView').style.display='block';document.getElementById('gridViewContainer').style.display='none';document.getElementById('backNav').style.display='none';document.getElementById('searchInput').value='';}
       function showGridInternal(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex';}
       
-      // 🔥 FIX: OPEN CATEGORY WITH RESET AND SANITIZATION
+      // 🔥 FIX: OPEN CATEGORY WITH RESET
       function openCategory(c,p=true){
           showLoader(); 
-          // Ensure correct formatting
           if(c.trim()==='18' || c.includes('18 ')) c = '18+';
-          currentCategory=c; 
-          showGridInternal(); 
+          currentCategory=c; showGridInternal(); 
           document.getElementById('gridTitle').innerText=decodeURIComponent(c).toUpperCase();
           if(p){const u=\`?view=grid&cat=\${encodeURIComponent(c)}\`;window.history.pushState({path:u},'',u);}
           resetGridState();
@@ -298,7 +328,26 @@ export function renderWebsite() {
       window.toggleFavorite=function(){if(!currentMovieId)return;let f=JSON.parse(localStorage.getItem('my_favs')||'[]');if(f.includes(currentMovieId))f=f.filter(i=>i!==currentMovieId);else f.push(currentMovieId);localStorage.setItem('my_favs',JSON.stringify(f));updateFavBtnState();}
       function setupPlayButton(l,p){activeVideoLink=l;activeIsPremium=p;}
       window.switchEpisode=function(b,l,p){document.querySelectorAll('.ep-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');setupPlayButton(l,p);if(document.getElementById('video').style.display!=='none')startPlayback();else startPlayback();}
-      window.startPlayback=function(){if(activeIsPremium){if(!currentUser||currentUser.vipExpiry<Date.now()){document.getElementById('vip-lock').style.display='flex';document.getElementById('video').style.display='none';return;}}document.getElementById('coverOverlay').style.display='none';document.getElementById('playerOverlay').style.display='flex';const v=document.getElementById('video');setupPlayerIdle();playViaSecureToken(activeVideoLink).then(()=>{const t=localStorage.getItem('watch_'+currentMovieId);if(t)v.currentTime=parseFloat(t);});}
+      
+      window.startPlayback=function(){
+          if(activeIsPremium){
+              if(!currentUser||currentUser.vipExpiry<Date.now()){
+                  document.getElementById('vip-lock').style.display='flex';
+                  document.getElementById('video').style.display='none';
+                  return;
+              }
+          }
+          document.getElementById('coverOverlay').style.display='none';
+          document.getElementById('playerOverlay').style.display='flex';
+          const v=document.getElementById('video');
+          setupPlayerIdle();
+          // 🔥 FIX: USE UNIQUE KEY FOR RESUME (Using activeVideoLink)
+          playViaSecureToken(activeVideoLink).then(()=>{
+              const t=localStorage.getItem('watch_'+activeVideoLink);
+              if(t)v.currentTime=parseFloat(t);
+          });
+      }
+
       async function playViaSecureToken(u){const v=document.getElementById('video');v.style.display='block';document.getElementById('error-msg').style.display='none';const qSelect = document.getElementById('qualitySelect'); qSelect.innerHTML = ""; qSelect.style.display = "none"; const sf=()=>{v.style.display='none';document.getElementById('error-msg').style.display='flex';document.getElementById('fallback-btn').href=u;};if(u.includes('.m3u8')){v.src="";if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=u;v.addEventListener('loadedmetadata',()=>{v.play().catch(e=>{});});v.onerror=()=>tryHlsJs(v,u,sf);}else{tryHlsJs(v,u,sf);}return;}try{const res=await fetch('/api/sign_url',{method:'POST',body:JSON.stringify({url:u,movieId:currentMovieId,username:currentUser?currentUser.username:null})});if(res.status===403){document.getElementById('vip-lock').style.display='flex';v.style.display='none';return;}const j=await res.json();if(j.token){v.src="/api/play?t="+j.token;v.play().catch(sf);v.onerror=sf;}else sf();}catch(e){sf();}}
       function tryHlsJs(v,u,cb){if(Hls.isSupported()){if(window.hlsInstance)window.hlsInstance.destroy();const h=new Hls();window.hlsInstance=h;h.loadSource(u);h.attachMedia(v);h.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});const l=h.levels;const s=document.getElementById('qualitySelect');if(l.length>1){s.innerHTML="";const a=document.createElement('option');a.value=-1;a.text="Auto";s.appendChild(a);l.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.text=x.height+"p";s.appendChild(o);});s.style.display="block";}});h.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal){h.destroy();cb();}});}else{cb();}}
       window.changeQuality=function(s){if(window.hlsInstance)window.hlsInstance.currentLevel=parseInt(s.value);}
