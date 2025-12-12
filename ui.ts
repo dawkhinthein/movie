@@ -45,7 +45,7 @@ export function renderWebsite() {
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 0; left: 0; background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-right-radius: 6px; z-index: 2; }
-      .year-tag { position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 6px; border-bottom-left-radius: 6px; z-index: 2; }
+      .year-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.85); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
       
       .back-nav { display: none; padding: 10px 15px; align-items: center; gap: 10px; background: #121212; position: sticky; top: 59px; z-index: 40; border-bottom: 1px solid #222; }
       .back-btn { background: #333; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
@@ -137,7 +137,7 @@ export function renderWebsite() {
     <div id="homeView">
         <div class="home-section"><div class="section-head"><span class="section-title">Latest</span><a class="see-more" onclick="openCategory('movies')">More ></a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
         <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">More ></a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
-        <div class="home-section"><div class="section-head"><span class="section-title">18+</span><a class="see-more" onclick="openCategory('18+')">More ></a></div><div class="scroll-row" id="row_18">${getServerSkeleton()}</div></div>
+        <div class="home-section"><div class="section-head"><span class="section-title">Adult</span><a class="see-more" onclick="openCategory('Adult')">More ></a></div><div class="scroll-row" id="row_18">${getServerSkeleton()}</div></div>
     </div>
 
     <div class="back-nav" id="backNav"><button class="back-btn" onclick="goHome()">⬅ Back</button><span id="gridTitle" class="grid-title"></span></div>
@@ -186,18 +186,12 @@ export function renderWebsite() {
       function getClientSkeleton(count) { return Array(count).fill('<div class="card skeleton" style="min-width:110px; height:160px;"></div>').join(''); }
       function showAlert(title, msg, isSuccess = true) { const el = document.getElementById('custom-alert'); document.getElementById('alert-icon').innerText = isSuccess ? '✅' : '⚠️'; document.getElementById('alert-title').innerText = title; document.getElementById('alert-msg').innerText = msg; el.style.display = 'flex'; }
       function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
-      
-      function sanitizeCategory(c) {
-          if (!c) return 'all';
-          if (c.trim() === '18' || c.includes('18 ')) return '18+';
-          return c;
-      }
 
       window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
-        const cat = sanitizeCategory(urlParams.get('cat'));
+        const cat = urlParams.get('cat');
         
         if (movieId) {
              openModalById(movieId, false); 
@@ -215,18 +209,25 @@ export function renderWebsite() {
       });
 
       window.onload = async () => {
-        loadSession(); updateProfileUI(); await loadHomeData(); setupPlayerIdle(); hideLoader(); setupInfiniteScroll();
+        loadSession(); updateProfileUI(); 
+        
+        // 🔥 LOAD ALL ROWS INCLUDING 'ADULT'
+        await Promise.all([
+            fetchRow('movies', 'row_movies'),
+            fetchRow('series', 'row_series'),
+            fetchRow('Adult', 'row_18')
+        ]);
+        
+        setupPlayerIdle(); hideLoader(); setupInfiniteScroll();
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const view = urlParams.get('view');
-        const catParam = sanitizeCategory(urlParams.get('cat'));
+        const catParam = urlParams.get('cat');
         
-        // 🔥 FIX: Set currentCategory IMMEDIATELY on load to avoid "All" fallback on refresh
         if(catParam) currentCategory = catParam;
 
         if (movieId) {
             fetchSingleMovie(movieId);
-            // If in grid view, load background data silently
             if(view === 'grid') {
                 document.getElementById('gridTitle').innerText = decodeURIComponent(currentCategory).toUpperCase();
                 fetchMovies(1, currentCategory, false);
@@ -234,7 +235,7 @@ export function renderWebsite() {
         }
         else if (view === 'grid') { openCategory(catParam || 'all', false); }
         
-        // 🔥 REMOVED RESUME LOGIC (No localStorage read)
+        // No Resume logic
       };
 
       function closePlayer() {
@@ -285,12 +286,23 @@ export function renderWebsite() {
       async function doLogin(){const u=document.getElementById('reg_user').value;const p=document.getElementById('reg_pass').value;const remember=document.getElementById('rememberMe').checked;showLoader();const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})});hideLoader();if(res.ok){const user=await res.json();user.sessionExpiry=Date.now()+(remember?15:1)*24*60*60*1000;currentUser=user;localStorage.setItem('user_session',JSON.stringify(currentUser));updateProfileUI();showAlert("Welcome", "Login Success");}else showAlert("Error", "Invalid Login", false);}
       function doLogout(){localStorage.removeItem('user_session');currentUser=null;updateProfileUI();showAlert("Logged Out", "Bye!");}
       async function doRedeem(){const code=document.getElementById('vip_code').value;showLoader();const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code})});hideLoader();if(res.ok){const updatedUser=await res.json();updatedUser.sessionExpiry=currentUser.sessionExpiry;currentUser=updatedUser;localStorage.setItem('user_session',JSON.stringify(currentUser));showAlert("Success!", "VIP Extended");updateProfileUI();}else showAlert("Error", "Invalid Code", false);}
-      async function loadHomeData(){await Promise.all([fetchRow('movies','row_movies'),fetchRow('series','row_series'),fetchRow('18+','row_18')]);}
+      
+      // 🔥 FIX: LOAD ADULT ROW
       async function fetchRow(c,id){try{const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);const json=await res.json();document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');}catch(e){}}
+      
       function goHome(){showLoader();setTimeout(()=>{const u=window.location.protocol+"//"+window.location.host+window.location.pathname;window.history.pushState({path:u},'',u);goHomeInternal();hideLoader();},300);}
       function goHomeInternal(){document.getElementById('homeView').style.display='block';document.getElementById('gridViewContainer').style.display='none';document.getElementById('backNav').style.display='none';document.getElementById('searchInput').value='';}
       function showGridInternal(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex';}
-      function openCategory(c,p=true){showLoader();if(c.trim()==='18'||c.includes('18 '))c='18+';currentCategory=c;showGridInternal();document.getElementById('gridTitle').innerText=decodeURIComponent(c).toUpperCase();if(p){const u=\`?view=grid&cat=\${encodeURIComponent(c)}\`;window.history.pushState({path:u},'',u);}resetGridState();fetchMovies(1,c,true).then(hideLoader);}
+      
+      function openCategory(c,p=true){
+          showLoader(); 
+          currentCategory=c; 
+          showGridInternal(); 
+          document.getElementById('gridTitle').innerText=decodeURIComponent(c).toUpperCase();
+          if(p){const u=\`?view=grid&cat=\${encodeURIComponent(c)}\`;window.history.pushState({path:u},'',u);}
+          resetGridState();
+          fetchMovies(1,c,true).then(hideLoader);
+      }
       async function openFavorites(){showLoader();showGridInternal();document.getElementById('gridTitle').innerText="FAVORITES";resetGridState();document.getElementById('mainGrid').innerHTML=getClientSkeleton(6);window.history.pushState({},'','?view=grid&cat=fav');const favs=JSON.parse(localStorage.getItem('my_favs')||'[]');if(favs.length===0){document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center;">No favorites.</p>';hideLoader();return;}let html='';for(const id of favs){try{const res=await fetch(\`/api/get_movie?id=\${id}\`);const m=await res.json();if(m&&m.title){html+=createCardHtml(m);if(!allMoviesData.find(x=>x.id===m.id))allMoviesData.push(m);}}catch(e){}}document.getElementById('mainGrid').innerHTML=html;hideLoader();}
       async function executeSearch(){const q=document.getElementById('searchInput').value;if(!q)return goHome();showLoader();showGridInternal();document.getElementById('gridTitle').innerText="SEARCH: "+q;window.history.pushState({},'','?view=grid&q='+encodeURIComponent(q));resetGridState();document.getElementById('mainGrid').innerHTML=getClientSkeleton(10);try{const res=await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);const results=await res.json();allMoviesData=results;if(results.length===0)document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1;text-align:center;padding:20px;">No results found.</p>';else renderGrid(results,false);}catch(e){document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1;text-align:center;">Error.</p>';}finally{hideLoader();}}
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
@@ -314,7 +326,6 @@ export function renderWebsite() {
           document.getElementById('playerOverlay').style.display='flex';
           const v=document.getElementById('video');
           setupPlayerIdle();
-          // 🔥 REMOVED RESUME CALL
           playViaSecureToken(activeVideoLink);
       }
 
@@ -322,7 +333,6 @@ export function renderWebsite() {
       function tryHlsJs(v,u,cb){if(Hls.isSupported()){if(window.hlsInstance)window.hlsInstance.destroy();const h=new Hls();window.hlsInstance=h;h.loadSource(u);h.attachMedia(v);h.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});const l=h.levels;const s=document.getElementById('qualitySelect');if(l.length>1){s.innerHTML="";const a=document.createElement('option');a.value=-1;a.text="Auto";s.appendChild(a);l.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.text=x.height+"p";s.appendChild(o);});s.style.display="block";}});h.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal){h.destroy();cb();}});}else{cb();}}
       window.changeQuality=function(s){if(window.hlsInstance)window.hlsInstance.currentLevel=parseInt(s.value);}
       function closePlayerInternal(){const v=document.getElementById('video');v.pause();v.src="";if(window.hlsInstance){window.hlsInstance.destroy();window.hlsInstance=null;}document.getElementById('playerModal').style.display='none';document.body.style.overflow='auto';if(document.fullscreenElement)document.exitFullscreen();}
-      function closePlayer(){closePlayerInternal();const u=new URLSearchParams(window.location.search);let l=window.location.pathname;if(u.get('view'))l+='?view='+u.get('view');window.history.pushState({path:l},'',l);}
       function toggleFullScreen(){const w=document.getElementById('videoWrapper');if(!document.fullscreenElement){if(w.requestFullscreen)w.requestFullscreen();if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(e=>{});}else{if(document.exitFullscreen)document.exitFullscreen();}}
       function resetGridState(){currentPage=1;isLoading=false;hasMore=true;allMoviesData=[];document.getElementById('mainGrid').innerHTML="";document.getElementById('end-msg').style.display="none";document.getElementById('bottom-spinner').style.display="none";}
     </script>
