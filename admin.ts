@@ -51,10 +51,12 @@ export function renderAdmin() {
               </select>
               <input type="text" id="tags" placeholder="Tags (e.g. 2025, Action)" style="flex:2;">
           </div>
+          
           <div style="margin:10px 0; display:flex; align-items:center; gap:10px;">
-              <input type="checkbox" id="isPremium" style="width:auto; margin:0;">
-              <span style="color:#ffd700; font-weight:bold;">Premium 👑</span>
+              <input type="checkbox" id="isPremium" checked style="width:auto; margin:0;">
+              <span style="color:#ffd700; font-weight:bold;">Premium 👑 (Auto Checked)</span>
           </div>
+
           <input type="text" id="dl_link" placeholder="Download Link">
           <textarea id="desc" rows="2" placeholder="Description"></textarea>
           
@@ -190,7 +192,8 @@ export function renderAdmin() {
 
       function resetForm() {
           document.querySelectorAll('input, textarea').forEach(i => i.value = "");
-          document.getElementById('isPremium').checked = false;
+          // 🔥 FIX: KEEP CHECKED ON RESET
+          document.getElementById('isPremium').checked = true; 
           document.getElementById('seasonsContainer').innerHTML = "";
           addSeasonBox();
       }
