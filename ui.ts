@@ -9,18 +9,9 @@ export function renderWebsite() {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-      /* 🔥 IMPORT PA'OH/MYANMAR FONT */
       @import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap');
-
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-      
-      body { 
-        background: #121212; 
-        color: #e0e0e0; 
-        /* 🔥 USE PADAUK FONT */
-        font-family: 'Padauk', sans-serif; 
-        margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; 
-      }
+      body { background: #121212; color: #e0e0e0; font-family: 'Padauk', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
       
       header { background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px); padding: 12px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; }
@@ -159,6 +150,7 @@ export function renderWebsite() {
             <video id="video" controls playsinline controlsList="nodownload"></video>
             <div id="vip-lock"><div style="font-size:40px; margin-bottom:10px;">👑</div><h2 style="color:#ffd700;">Premium</h2><p style="color:#ccc;">VIP required.</p><button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button></div>
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
+            
             <div class="player-overlay" id="playerOverlay">
                 <div class="ctrl-group">
                     <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
@@ -229,10 +221,20 @@ export function renderWebsite() {
         const view = urlParams.get('view');
         const catParam = sanitizeCategory(urlParams.get('cat'));
         
-        if (movieId) fetchSingleMovie(movieId);
+        // 🔥 FIX: Set currentCategory IMMEDIATELY on load to avoid "All" fallback on refresh
+        if(catParam) currentCategory = catParam;
+
+        if (movieId) {
+            fetchSingleMovie(movieId);
+            // If in grid view, load background data silently
+            if(view === 'grid') {
+                document.getElementById('gridTitle').innerText = decodeURIComponent(currentCategory).toUpperCase();
+                fetchMovies(1, currentCategory, false);
+            }
+        }
         else if (view === 'grid') { openCategory(catParam || 'all', false); }
         
-        // 🔥 REMOVED RESUME LOGIC HERE
+        // 🔥 REMOVED RESUME LOGIC (No localStorage read)
       };
 
       function closePlayer() {
