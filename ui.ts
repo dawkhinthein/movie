@@ -9,13 +9,23 @@ export function renderWebsite() {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
+      /* 🔥 IMPORT PA'OH/MYANMAR FONT */
+      @import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap');
+
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-      body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; }
+      
+      body { 
+        background: #121212; 
+        color: #e0e0e0; 
+        /* 🔥 USE PADAUK FONT */
+        font-family: 'Padauk', sans-serif; 
+        margin:0; padding-bottom: 60px; user-select: none; overflow-x: hidden; 
+      }
       
       header { background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px); padding: 12px 15px; position: sticky; top:0; z-index:50; border-bottom: 1px solid #333; display:flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
       .brand { color: #e50914; font-weight: 900; font-size: 22px; text-decoration: none; cursor:pointer; }
       .search-box { display: flex; align-items: center; background: #222; border: 1px solid #444; border-radius: 25px; padding: 5px 12px; width: 50%; max-width: 200px; }
-      .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
+      .search-input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; font-family: 'Padauk', sans-serif; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
@@ -25,8 +35,8 @@ export function renderWebsite() {
 
       .user-panel { position: fixed; top: 0; right: 0; width: 280px; height: 100%; background: #1a1a1a; z-index: 100; transform: translateX(100%); transition: transform 0.3s ease; padding: 20px; box-shadow: -5px 0 20px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
       .user-panel.open { transform: translateX(0); }
-      .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; outline: none; }
-      .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; }
+      .auth-input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; outline: none; font-family: 'Padauk', sans-serif; }
+      .auth-btn { width: 100%; padding: 12px; background: #e50914; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; font-family: 'Padauk', sans-serif; }
       .auth-btn.secondary { background: #333; margin-top: 5px; }
 
       .home-section { padding: 20px 0 5px 15px; }
@@ -75,6 +85,7 @@ export function renderWebsite() {
       #vip-lock { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 25; }
       #vip-lock h2 { color: #ffd700; margin-bottom: 10px; font-size: 24px; }
       .lock-btn { background: #e50914; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 14px; width: auto; cursor: pointer; }
+
       #error-msg { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background: #000; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
       .retry-btn { background: #333; border: 1px solid #555; color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; text-decoration: none; }
 
@@ -84,8 +95,9 @@ export function renderWebsite() {
       .fav-btn.active { color: #e50914; border-color: #e50914; }
       .dl-btn { background: #4db8ff; color: #000; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: bold; }
       .tag-pill { background: #333; color: #aaa; font-size: 10px; padding: 3px 8px; border-radius: 10px; margin-right:5px; }
+      p.desc { color: #bbb; font-size: 14px; line-height: 1.6; margin-top: 15px; }
 
-      .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 6px; }
+      .accordion { background-color: #222; color: #eee; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; outline: none; font-size: 15px; font-weight: bold; border-bottom: 1px solid #333; display: flex; justify-content: space-between; margin-top: 5px; border-radius: 6px; font-family: 'Padauk', sans-serif; }
       .accordion.active { background-color: #333; color: #e50914; }
       .panel { padding: 0 5px; background-color: #151515; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; padding: 15px 5px; max-height: 350px; overflow-y: auto; }
@@ -147,7 +159,6 @@ export function renderWebsite() {
             <video id="video" controls playsinline controlsList="nodownload"></video>
             <div id="vip-lock"><div style="font-size:40px; margin-bottom:10px;">👑</div><h2 style="color:#ffd700;">Premium</h2><p style="color:#ccc;">VIP required.</p><button class="lock-btn" onclick="closePlayer(); toggleUserPanel();">Login / Redeem</button></div>
             <div id="error-msg"><p>Playback Error</p><a id="fallback-btn" class="retry-btn" target="_blank">▶ Play Original</a></div>
-            
             <div class="player-overlay" id="playerOverlay">
                 <div class="ctrl-group">
                     <select id="qualitySelect" class="quality-select" style="display:none;" onchange="changeQuality(this)"></select>
@@ -174,8 +185,8 @@ export function renderWebsite() {
       window.hlsInstance = null;
       let controlsTimeout;
       let isLoading = false, hasMore = true, observer;
-      // 🔥 FIX: Track Current Playing Link
-      let currentPlayingLink = "";
+      let activeVideoLink = ""; 
+      let activeIsPremium = false;
 
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
@@ -221,11 +232,7 @@ export function renderWebsite() {
         if (movieId) fetchSingleMovie(movieId);
         else if (view === 'grid') { openCategory(catParam || 'all', false); }
         
-        const vid = document.getElementById('video');
-        vid.addEventListener('timeupdate', () => { 
-            // 🔥 FIX: Use link instead of MovieID
-            if(vid.currentTime > 5 && currentPlayingLink) localStorage.setItem('watch_' + currentPlayingLink, vid.currentTime); 
-        });
+        // 🔥 REMOVED RESUME LOGIC HERE
       };
 
       function closePlayer() {
@@ -242,7 +249,6 @@ export function renderWebsite() {
       function openModalById(id, pushState = true) {
         const m = allMoviesData.find(x => x.id === id);
         if(m) { setupModal(m); } else { fetchSingleMovie(id); }
-        
         if(pushState) {
             const currentParams = new URLSearchParams(window.location.search);
             currentParams.set('id', id);
@@ -291,10 +297,7 @@ export function renderWebsite() {
       function setupModal(m){currentMovieId=m.id;document.getElementById('playerModal').style.display='block';document.body.style.overflow='hidden';document.getElementById('m_title').innerText=m.title;document.getElementById('m_desc').innerText=m.description||"";document.getElementById('coverOverlay').style.backgroundImage=\`url('\${m.cover||m.image}')\`;document.getElementById('coverOverlay').style.display='flex';document.getElementById('video').style.display='none';document.getElementById('video').pause();if(m.tags)document.getElementById('m_tags').innerHTML=m.tags.map(t=>\`<span class="tag-pill">\${t}</span>\`).join('');updateFavBtnState();const dl=document.getElementById('dl_area');dl.innerHTML="";if(m.downloadLink)dl.innerHTML=\`<a href="\${m.downloadLink}" target="_blank" class="dl-btn">📥 DL</a>\`;if(!m.episodes||m.episodes.length<=1){document.getElementById('ep_section').style.display='none';const l=(m.episodes&&m.episodes[0])?m.episodes[0].link:m.link;setupPlayButton(l,m.isPremium);}else{document.getElementById('ep_section').style.display='block';renderAccordion(m.episodes,m.isPremium);const f=m.episodes[0].link;setupPlayButton(f,m.isPremium);}}
       function updateFavBtnState(){const f=JSON.parse(localStorage.getItem('my_favs')||'[]');const b=document.getElementById('favBtn');if(f.includes(currentMovieId)){b.innerHTML="❤️ Saved";b.classList.add('active');}else{b.innerHTML="🤍 Fav";b.classList.remove('active');}}
       window.toggleFavorite=function(){if(!currentMovieId)return;let f=JSON.parse(localStorage.getItem('my_favs')||'[]');if(f.includes(currentMovieId))f=f.filter(i=>i!==currentMovieId);else f.push(currentMovieId);localStorage.setItem('my_favs',JSON.stringify(f));updateFavBtnState();}
-      
-      // 🔥 FIX: Set Link Global
-      function setupPlayButton(l,p){activeVideoLink=l; currentPlayingLink=l; activeIsPremium=p;}
-      
+      function setupPlayButton(l,p){activeVideoLink=l;activeIsPremium=p;}
       window.switchEpisode=function(b,l,p){document.querySelectorAll('.ep-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');setupPlayButton(l,p);if(document.getElementById('video').style.display!=='none')startPlayback();else startPlayback();}
       
       window.startPlayback=function(){
@@ -309,16 +312,15 @@ export function renderWebsite() {
           document.getElementById('playerOverlay').style.display='flex';
           const v=document.getElementById('video');
           setupPlayerIdle();
-          playViaSecureToken(activeVideoLink).then(()=>{
-              const t=localStorage.getItem('watch_'+currentPlayingLink);
-              if(t)v.currentTime=parseFloat(t);
-          });
+          // 🔥 REMOVED RESUME CALL
+          playViaSecureToken(activeVideoLink);
       }
 
       async function playViaSecureToken(u){const v=document.getElementById('video');v.style.display='block';document.getElementById('error-msg').style.display='none';const qSelect = document.getElementById('qualitySelect'); qSelect.innerHTML = ""; qSelect.style.display = "none"; const sf=()=>{v.style.display='none';document.getElementById('error-msg').style.display='flex';document.getElementById('fallback-btn').href=u;};if(u.includes('.m3u8')){v.src="";if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=u;v.addEventListener('loadedmetadata',()=>{v.play().catch(e=>{});});v.onerror=()=>tryHlsJs(v,u,sf);}else{tryHlsJs(v,u,sf);}return;}try{const res=await fetch('/api/sign_url',{method:'POST',body:JSON.stringify({url:u,movieId:currentMovieId,username:currentUser?currentUser.username:null})});if(res.status===403){document.getElementById('vip-lock').style.display='flex';v.style.display='none';return;}const j=await res.json();if(j.token){v.src="/api/play?t="+j.token;v.play().catch(sf);v.onerror=sf;}else sf();}catch(e){sf();}}
       function tryHlsJs(v,u,cb){if(Hls.isSupported()){if(window.hlsInstance)window.hlsInstance.destroy();const h=new Hls();window.hlsInstance=h;h.loadSource(u);h.attachMedia(v);h.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});const l=h.levels;const s=document.getElementById('qualitySelect');if(l.length>1){s.innerHTML="";const a=document.createElement('option');a.value=-1;a.text="Auto";s.appendChild(a);l.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.text=x.height+"p";s.appendChild(o);});s.style.display="block";}});h.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal){h.destroy();cb();}});}else{cb();}}
       window.changeQuality=function(s){if(window.hlsInstance)window.hlsInstance.currentLevel=parseInt(s.value);}
       function closePlayerInternal(){const v=document.getElementById('video');v.pause();v.src="";if(window.hlsInstance){window.hlsInstance.destroy();window.hlsInstance=null;}document.getElementById('playerModal').style.display='none';document.body.style.overflow='auto';if(document.fullscreenElement)document.exitFullscreen();}
+      function closePlayer(){closePlayerInternal();const u=new URLSearchParams(window.location.search);let l=window.location.pathname;if(u.get('view'))l+='?view='+u.get('view');window.history.pushState({path:l},'',l);}
       function toggleFullScreen(){const w=document.getElementById('videoWrapper');if(!document.fullscreenElement){if(w.requestFullscreen)w.requestFullscreen();if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(e=>{});}else{if(document.exitFullscreen)document.exitFullscreen();}}
       function resetGridState(){currentPage=1;isLoading=false;hasMore=true;allMoviesData=[];document.getElementById('mainGrid').innerHTML="";document.getElementById('end-msg').style.display="none";document.getElementById('bottom-spinner').style.display="none";}
     </script>
