@@ -21,8 +21,9 @@ export function renderWebsite() {
     <style>
       :root {
         --primary: #00b894;
-        --bg-body: #121212; /* Dark Background */
-        --bg-card: #1e1e1e; /* Dark Card */
+        --red-btn: #ff4757; /* New Red Color for Play Button */
+        --bg-body: #121212;
+        --bg-card: #1e1e1e;
         --text-main: #ffffff;
         --text-sec: #b3b3b3;
         --border-color: #333;
@@ -45,7 +46,6 @@ export function renderWebsite() {
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
-      /* --- Header --- */
       header { 
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
         padding: 15px 20px; position: sticky; top:0; z-index:50; 
@@ -57,17 +57,22 @@ export function renderWebsite() {
       .search-input { background: transparent; border: none; color: white; width: 100%; font-size: 14px; font-family: inherit; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
-      /* --- Loader --- */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
-      /* --- Cards & Layout --- */
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 18px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
-      .see-more { color: var(--primary); font-size: 13px; cursor: pointer; font-weight: 600; }
+      
+      /* 🔥 FIX: See All Button Style */
+      .see-more { 
+          color: var(--primary); font-size: 12px; cursor: pointer; font-weight: 600; 
+          border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px;
+          transition: background 0.2s;
+      }
+      .see-more:active { background: rgba(0, 184, 148, 0.2); }
       
       .scroll-row { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
@@ -81,7 +86,6 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 4px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* --- Profile Panel (Dark Theme) --- */
       .user-panel { 
         position: fixed; top: 0; right: 0; width: 320px; height: 100%; 
         background: #1a1a1a; z-index: 100; transform: translateX(100%); 
@@ -126,20 +130,36 @@ export function renderWebsite() {
       .menu-btn:active { transform: scale(0.98); background: #333; }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
-      /* --- Details Page (Dark Theme) --- */
+      /* --- Alert Animation (Toast from Top) --- */
+      #custom-alert { 
+          display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(0,0,0,0.6); z-index: 10000; 
+          align-items: flex-start; /* Align to top */
+          justify-content: center; 
+          padding-top: 20px;
+      }
+      .alert-box { 
+          background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; 
+          width: 90%; max-width: 350px; 
+          box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444;
+          animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      }
+      @keyframes slideDown { 
+          from { transform: translateY(-100%); opacity: 0; } 
+          to { transform: translateY(0); opacity: 1; } 
+      }
+
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
           background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
       }
       
-      /* Gradient Header for Dark Mode */
       .details-header { 
           position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
           display: flex; justify-content: space-between; z-index: 20; 
           background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%);
       }
       
-      /* Dark Theme Circle Buttons */
       .nav-circle-btn {
           width: 45px; height: 45px; border-radius: 50%;
           background: rgba(40, 40, 40, 0.8); 
@@ -153,7 +173,7 @@ export function renderWebsite() {
 
       .modal-body-content { padding: 10px 20px 40px 20px; }
 
-      .top-info-section { display: flex; gap: 20px; margin-bottom: 30px; align-items: flex-start; }
+      .top-info-section { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; }
       .poster-img-sidebar { 
           width: 120px; height: 180px; border-radius: 12px; object-fit: cover; 
           box-shadow: 0 8px 20px rgba(0,0,0,0.5); flex-shrink: 0; background: #222; 
@@ -163,14 +183,15 @@ export function renderWebsite() {
       .movie-title { font-size: 22px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
       
-      .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+      .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
       
+      /* 🔥 FIX: Red Play Button & White Text */
       .btn-play { 
           width: 100%; padding: 16px; border-radius: 50px; border: none; 
-          background: var(--primary); color: white;
+          background: var(--red-btn); color: white; /* Red BG, White Text */
           font-weight: 700; font-size: 16px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          box-shadow: 0 6px 20px rgba(0, 184, 148, 0.2);
+          box-shadow: 0 6px 20px rgba(255, 71, 87, 0.3);
           transition: transform 0.1s;
       }
       .btn-dl { 
@@ -209,7 +230,6 @@ export function renderWebsite() {
       
       .genre-tag { background: #222; color: #ccc; font-size: 11px; padding: 5px 10px; border-radius: 8px; font-weight: 600; border: 1px solid #444; margin-right:5px; margin-bottom:5px; display:inline-block; }
       
-      /* Skeleton Dark */
       .skeleton-card { background: transparent; pointer-events: none; }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
       .poster-ratio { width: 100%; aspect-ratio: 2/3; margin-bottom: 8px; }
@@ -219,8 +239,8 @@ export function renderWebsite() {
   </head>
   <body>
 
-    <div id="custom-alert" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
-        <div style="background:#222; padding:30px; border-radius:20px; text-align:center; width:80%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #333;">
+    <div id="custom-alert">
+        <div class="alert-box">
             <h3 id="alert-title" style="color:#fff; margin-top:0;"></h3><p id="alert-msg" style="color:#aaa; margin-bottom:20px;"></p>
             <button onclick="document.getElementById('custom-alert').style.display='none'" class="auth-btn-solid">OK</button>
         </div>
@@ -305,11 +325,12 @@ export function renderWebsite() {
               </a>
           </div>
 
-          <div class="desc-text">
+          <div id="ep_section"></div>
+
+          <div class="desc-text" style="margin-top:20px;">
               <span id="dt_desc"></span>
           </div>
 
-          <div id="ep_section"></div>
           <div style="height:50px;"></div>
       </div>
 
@@ -346,7 +367,12 @@ export function renderWebsite() {
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
       function hideLoader() { loader.classList.add('hidden-loader'); }
-      function showAlert(t, m) { document.getElementById('custom-alert').style.display='flex'; document.getElementById('alert-title').innerText=t; document.getElementById('alert-msg').innerText=m; }
+      function showAlert(t, m) { 
+          const alert = document.getElementById('custom-alert');
+          document.getElementById('alert-title').innerText=t; 
+          document.getElementById('alert-msg').innerText=m;
+          alert.style.display='flex';
+      }
 
       window.onload = async () => {
         loadSession(); updateProfileUI(); 
@@ -650,7 +676,28 @@ export function renderWebsite() {
       function doLogout(){localStorage.removeItem('user_session'); currentUser=null; updateProfileUI();}
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
       async function openFavorites(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "MY LIST"; const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res);} else document.getElementById('mainGrid').innerHTML="Empty";}
-      async function executeSearch(){const q=document.getElementById('searchInput').value; if(!q)return; openCategory('search'); document.getElementById('gridTitle').innerText = "SEARCH"; const res=await fetch(\`/api/search?q=\${q}\`); const j=await res.json(); renderGrid(j);}
+      
+      // 🔥 FIX: Search Logic
+      async function executeSearch(){
+          const q=document.getElementById('searchInput').value; 
+          if(!q)return; 
+          
+          showLoader();
+          // Manually switch UI
+          document.getElementById('homeView').style.display='none';
+          document.getElementById('gridViewContainer').style.display='block';
+          document.getElementById('backNav').style.display='flex'; 
+          document.getElementById('gridTitle').innerText = "SEARCH: " + q.toUpperCase();
+          document.getElementById('mainGrid').innerHTML = ""; // Clear old
+          
+          try {
+              const res=await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`); 
+              const j=await res.json(); 
+              renderGrid(j);
+          } catch(e){ console.error(e); }
+          
+          hideLoader();
+      }
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
     </script>
   </body>
