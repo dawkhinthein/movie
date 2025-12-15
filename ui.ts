@@ -21,9 +21,8 @@ export function renderWebsite() {
     <style>
       :root {
         --primary: #00b894;
-        --red-btn: #ff4757; /* New Red Color for Play Button */
-        --bg-body: #121212;
-        --bg-card: #1e1e1e;
+        --bg-body: #121212; /* Dark Background */
+        --bg-card: #1e1e1e; /* Dark Card */
         --text-main: #ffffff;
         --text-sec: #b3b3b3;
         --border-color: #333;
@@ -46,6 +45,7 @@ export function renderWebsite() {
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
+      /* --- Header --- */
       header { 
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
         padding: 15px 20px; position: sticky; top:0; z-index:50; 
@@ -57,16 +57,17 @@ export function renderWebsite() {
       .search-input { background: transparent; border: none; color: white; width: 100%; font-size: 14px; font-family: inherit; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
+      /* --- Loader --- */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
+      /* --- Cards & Layout --- */
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 18px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
       
-      /* 🔥 FIX: See All Button Style */
       .see-more { 
           color: var(--primary); font-size: 12px; cursor: pointer; font-weight: 600; 
           border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px;
@@ -86,6 +87,7 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 4px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
+      /* --- Profile Panel (Dark Theme) --- */
       .user-panel { 
         position: fixed; top: 0; right: 0; width: 320px; height: 100%; 
         background: #1a1a1a; z-index: 100; transform: translateX(100%); 
@@ -130,11 +132,11 @@ export function renderWebsite() {
       .menu-btn:active { transform: scale(0.98); background: #333; }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
-      /* --- Alert Animation (Toast from Top) --- */
+      /* --- Alert Animation --- */
       #custom-alert { 
           display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
           background: rgba(0,0,0,0.6); z-index: 10000; 
-          align-items: flex-start; /* Align to top */
+          align-items: flex-start;
           justify-content: center; 
           padding-top: 20px;
       }
@@ -149,6 +151,7 @@ export function renderWebsite() {
           to { transform: translateY(0); opacity: 1; } 
       }
 
+      /* --- Details Page (Dark Theme) --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
           background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
@@ -173,7 +176,7 @@ export function renderWebsite() {
 
       .modal-body-content { padding: 10px 20px 40px 20px; }
 
-      .top-info-section { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; }
+      .top-info-section { display: flex; gap: 20px; margin-bottom: 30px; align-items: flex-start; }
       .poster-img-sidebar { 
           width: 120px; height: 180px; border-radius: 12px; object-fit: cover; 
           box-shadow: 0 8px 20px rgba(0,0,0,0.5); flex-shrink: 0; background: #222; 
@@ -183,15 +186,14 @@ export function renderWebsite() {
       .movie-title { font-size: 22px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
       
-      .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+      .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
       
-      /* 🔥 FIX: Red Play Button & White Text */
       .btn-play { 
           width: 100%; padding: 16px; border-radius: 50px; border: none; 
-          background: var(--red-btn); color: white; /* Red BG, White Text */
+          background: #ff4757; color: white; /* Red Play Button */
           font-weight: 700; font-size: 16px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          box-shadow: 0 6px 20px rgba(255, 71, 87, 0.3);
+          box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2);
           transition: transform 0.1s;
       }
       .btn-dl { 
@@ -679,22 +681,41 @@ export function renderWebsite() {
       
       // 🔥 FIX: Search Logic
       async function executeSearch(){
-          const q=document.getElementById('searchInput').value; 
-          if(!q)return; 
+          const q=document.getElementById('searchInput').value.trim(); 
+          if(!q) return; 
           
           showLoader();
-          // Manually switch UI
           document.getElementById('homeView').style.display='none';
           document.getElementById('gridViewContainer').style.display='block';
           document.getElementById('backNav').style.display='flex'; 
           document.getElementById('gridTitle').innerText = "SEARCH: " + q.toUpperCase();
-          document.getElementById('mainGrid').innerHTML = ""; // Clear old
+          
+          const grid = document.getElementById('mainGrid');
+          grid.innerHTML = ""; 
           
           try {
-              const res=await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`); 
-              const j=await res.json(); 
-              renderGrid(j);
-          } catch(e){ console.error(e); }
+              const res = await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);
+              if (!res.ok) throw new Error("Server Error");
+              
+              const json = await res.json();
+              
+              // Handle mixed response types
+              let results = [];
+              if (Array.isArray(json)) {
+                  results = json;
+              } else if (json.data && Array.isArray(json.data)) {
+                  results = json.data;
+              }
+
+              if (results.length === 0) {
+                  grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found for "' + q + '"</div>';
+              } else {
+                  renderGrid(results);
+              }
+          } catch(e) { 
+              console.error(e); 
+              grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#ff4757;">Search failed. Please try again.</div>';
+          }
           
           hideLoader();
       }
