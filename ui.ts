@@ -30,53 +30,62 @@ export function renderWebsite() {
         --border-color: #333;
         --shadow: 0 4px 12px rgba(0,0,0,0.3);
         --nav-height: 65px;
+        --header-height: 60px;
       }
 
-      /* 🔥 APP SHELL LOCK (The Key Fix) */
+      /* 🔥 GLOBAL FIX: Disable ALL Overscroll Glows */
       * { 
           box-sizing: border-box; 
           -webkit-tap-highlight-color: transparent; 
           outline: none;
-          -ms-overflow-style: none; scrollbar-width: none; /* Hide Scrollbars */
+          overscroll-behavior: none !important; 
+          -ms-overflow-style: none; 
+          scrollbar-width: none; 
       }
       ::-webkit-scrollbar { display: none; }
-
+      
       html, body { 
           background: var(--bg-body); 
           color: var(--text-main); 
           font-family: 'Padauk', 'Inter', sans-serif; 
-          margin: 0; padding: 0;
-          width: 100%; height: 100%; /* Force Full Screen */
-          overflow: hidden; /* ⛔ STOP BODY SCROLL */
-          position: fixed; /* ⛔ LOCK SCREEN POSITION */
-          overscroll-behavior: none;
-          touch-action: none; /* Disable browser gestures on body */
+          margin:0; padding:0;
+          width: 100%; height: 100%;
+          overflow: hidden; position: fixed; /* Lock Body */
+          user-select: none; -webkit-user-select: none;
       }
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
-      /* Fixed Header */
+      /* --- Headers --- */
       header { 
-        position: fixed; top: 0; left: 0; width: 100%; height: 60px;
-        background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
+        position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+        background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px);
         border-bottom: 1px solid rgba(255,255,255,0.1); 
         display:flex; justify-content: center; align-items: center; 
-        z-index:50;
+        z-index: 50; transition: opacity 0.2s;
       }
       .brand { color: var(--primary); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
-      /* 🔥 SCROLLABLE VIEW CONTAINER */
-      /* This allows inner content to scroll while body stays fixed */
-      .scroll-view {
-          position: absolute; top: 60px; left: 0; width: 100%; bottom: var(--nav-height);
-          overflow-y: auto; /* Allow vertical scroll inside */
-          overflow-x: hidden;
-          -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
-          overscroll-behavior: contain;
-          touch-action: pan-y; /* Allow vertical drag only here */
+      /* Back Navigation Header */
+      .back-nav { 
+          position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+          background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(255,255,255,0.1); 
+          display: none; /* Hidden by default */
+          align-items: center; padding: 0 20px;
+          z-index: 60; /* Higher than main header */
       }
 
-      /* Bottom Nav */
+      /* --- Scrollable Views --- */
+      .scroll-view, .full-view {
+          position: absolute; top: var(--header-height); left: 0; width: 100%; bottom: var(--nav-height);
+          overflow-y: auto; overflow-x: hidden;
+          background: var(--bg-body);
+          -webkit-overflow-scrolling: touch;
+          padding-top: 10px; /* Space for posters */
+      }
+
+      /* --- Bottom Nav --- */
       .bottom-nav {
           position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
           background: #1a1a1a; border-top: 1px solid #333;
@@ -98,84 +107,42 @@ export function renderWebsite() {
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
-      .home-section { padding: 20px 0 10px 20px; }
+      .home-section { padding: 10px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
-      
       .see-more { 
           color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; 
           border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px;
       }
-      
-      .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; touch-action: pan-x; }
-      
+      .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
       .card:active { transform: scale(0.97); }
       .scroll-row .card { min-width: 110px; max-width: 110px; }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; font-weight: 600; }
-      
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* Full Screen Views (Profile, Search, Grid) */
-      .full-view {
-          display: none;
-          position: absolute; top: 60px; left: 0; width: 100%; bottom: var(--nav-height);
-          overflow-y: auto; background: var(--bg-body);
-          -webkit-overflow-scrolling: touch;
-      }
-
-      .profile-card {
-          margin: 20px; padding: 25px;
-          background: linear-gradient(135deg, var(--primary), #00b894, #006266);
-          border-radius: 20px; color: white; text-align: center;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
-      }
-      .profile-avatar {
-          width: 70px; height: 70px; background: rgba(0,0,0,0.2); 
-          border-radius: 50%; margin: 0 auto 10px; display:flex; 
-          align-items:center; justify-content:center; font-size:30px;
-          border: 2px solid rgba(255,255,255,0.3);
-      }
+      /* Profiles & Forms */
+      .profile-card { margin: 20px; padding: 25px; background: linear-gradient(135deg, var(--primary), #00b894, #006266); border-radius: 20px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); }
+      .profile-avatar { width: 70px; height: 70px; background: rgba(0,0,0,0.2); border-radius: 50%; margin: 0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:30px; border: 2px solid rgba(255,255,255,0.3); }
       .panel-body { padding: 0 20px; }
       .auth-input { width: 100%; padding: 15px; margin-bottom: 15px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 12px; font-size: 14px; font-family: inherit; }
-      .menu-btn {
-          width: 100%; padding: 15px; border-radius: 12px; border: none;
-          background: #2a2a2a; color: #ddd; text-align: left;
-          font-weight: 600; font-size: 14px; margin-bottom: 10px; cursor: pointer;
-          display: flex; align-items: center; gap: 10px; border: 1px solid #333;
-      }
+      .menu-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #2a2a2a; color: #ddd; text-align: left; font-weight: 600; font-size: 14px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; border: 1px solid #333; }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
       .checkbox-container { display: flex; align-items: center; margin-bottom: 20px; }
       .custom-checkbox { width: 18px; height: 18px; accent-color: var(--primary); margin-right: 10px; cursor: pointer; }
       .checkbox-label { color: #ccc; font-size: 13px; cursor: pointer; }
-
       .search-bar-large { width: 90%; margin: 20px 5%; padding: 15px 20px; background: #2a2a2a; border: 1px solid #444; border-radius: 30px; color: white; font-size: 16px; outline:none; }
 
       #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: flex-start; justify-content: center; padding-top: 20px; }
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-      /* --- Details Page --- */
-      #playerModal { 
-          display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
-          background: var(--bg-body); z-index:200; overflow-y: auto; 
-          overscroll-behavior: none !important;
-          padding-bottom: 80px; 
-      }
-      .details-header { 
-          position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
-          display: flex; justify-content: space-between; z-index: 20; 
-          background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%);
-      }
-      .nav-circle-btn {
-          width: 40px; height: 40px; border-radius: 50%;
-          background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px);
-          border: 1px solid #444; display: flex; align-items: center; justify-content: center;
-          font-size: 18px; color: #fff; cursor: pointer;
-      }
-
+      /* Details Page */
+      #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: none !important; padding-bottom: 80px; }
+      .details-header { position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 20; background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%); }
+      .nav-circle-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px); border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; cursor: pointer; }
       .modal-body-content { padding: 10px 20px 40px 20px; }
       .top-info-section { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; }
       .poster-img-sidebar { width: 110px; height: 160px; border-radius: 10px; object-fit: cover; box-shadow: 0 8px 20px rgba(0,0,0,0.5); flex-shrink: 0; background: #222; }
@@ -183,31 +150,16 @@ export function renderWebsite() {
       .movie-title { font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 12px; margin-bottom: 15px; }
       .actions-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-      .btn-play { 
-          width: 100%; padding: 14px; border-radius: 50px; border: none; 
-          background: var(--red-btn); color: white;
-          font-weight: 700; font-size: 15px; cursor: pointer; 
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-          box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2);
-      }
-      .btn-dl { 
-          width: 100%; padding: 14px; border-radius: 50px; 
-          background: #2a2a2a; color: white; border: 1px solid #444;
-          font-weight: 600; font-size: 14px; cursor: pointer; 
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-      }
-      .btn-fav {
-          width: 100%; padding: 14px; border-radius: 50px; 
-          background: transparent; color: #bbb; border: 1px solid #444;
-          font-weight: 600; font-size: 14px; cursor: pointer; 
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-      }
+      .btn-play { width: 100%; padding: 14px; border-radius: 50px; border: none; background: var(--red-btn); color: white; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2); }
+      .btn-dl { width: 100%; padding: 14px; border-radius: 50px; background: #2a2a2a; color: white; border: 1px solid #444; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+      .btn-fav { width: 100%; padding: 14px; border-radius: 50px; background: transparent; color: #bbb; border: 1px solid #444; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
       .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
+      
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #333; }
+      
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
       .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
@@ -242,9 +194,14 @@ export function renderWebsite() {
     </div>
     <div id="global-loader"><div class="spinner"></div></div>
 
-    <header>
+    <header id="mainHeader">
       <div class="brand" onclick="switchTab('home')">Stream X</div>
     </header>
+
+    <div id="backNav" class="back-nav">
+        <button class="nav-circle-btn" onclick="switchTab('home')" style="border:none;">⬅</button>
+        <span id="gridTitle" style="color:white; font-weight:bold; margin-left:10px;">MOVIES</span>
+    </div>
 
     <div id="homeView" class="scroll-view">
         <div class="home-section"><div class="section-head"><span class="section-title">Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
@@ -257,11 +214,7 @@ export function renderWebsite() {
         <div class="grid" id="searchGrid"></div>
     </div>
 
-    <div class="back-nav" id="backNav">
-        <button class="nav-circle-btn" onclick="switchTab('home')" style="border:none;">⬅</button>
-        <span id="gridTitle" style="color:white; font-weight:bold; margin-left:10px;">MOVIES</span>
-    </div>
-    <div class="full-view" id="gridViewContainer" style="top:60px;">
+    <div class="full-view" id="gridViewContainer">
         <div class="grid" id="mainGrid"></div>
         <div id="scroll-loader"><div class="small-spinner"></div></div>
     </div>
@@ -271,12 +224,10 @@ export function renderWebsite() {
             <h3 style="color:white; margin-bottom:20px;">Login</h3>
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
-            
             <div class="checkbox-container">
                 <input type="checkbox" id="remember_me" class="custom-checkbox">
                 <label for="remember_me" class="checkbox-label">Remember Me</label>
             </div>
-
             <button class="auth-btn-solid" onclick="doLogin()">Log In</button>
             <button class="auth-btn-solid" style="background:#555;" onclick="doRegister()">Create Account</button>
         </div>
@@ -406,7 +357,6 @@ export function renderWebsite() {
         else if (view === 'fav') { switchTab('fav', false); }
         else if (view === 'grid') { openCategory(p.get('cat') || 'movies', false); }
         
-        // Dynamic Scroll Listener
         document.querySelectorAll('.scroll-view, .full-view').forEach(el => {
             el.addEventListener('scroll', (e) => {
                 if(e.target.id === 'gridViewContainer') {
@@ -424,18 +374,13 @@ export function renderWebsite() {
           const view = p.get('view');
           const cat = p.get('cat');
           
-          if (!id) {
-              closePlayerInternal();
-          } else if(document.getElementById('playerModal').style.display === 'none') {
-              fetchSingleMovie(id);
-          }
+          if (!id) closePlayerInternal(); 
+          else if(document.getElementById('playerModal').style.display === 'none') fetchSingleMovie(id);
 
           if(view === 'profile') switchTabInternal('profile');
           else if(view === 'search') switchTabInternal('search');
           else if(view === 'fav') switchTabInternal('fav');
-          else if(view === 'grid') {
-              if (cat) openCategory(cat, false);
-          }
+          else if(view === 'grid' && cat) openCategory(cat, false);
           else if(!id) switchTabInternal('home');
       };
 
@@ -452,12 +397,14 @@ export function renderWebsite() {
           const btn = document.getElementById('nav_' + tab);
           if(btn) btn.classList.add('active');
 
-          // Hide all views first
+          // Reset Header
+          document.getElementById('mainHeader').style.display = 'flex';
+          document.getElementById('backNav').style.display = 'none';
+
           document.getElementById('homeView').style.display='none';
           document.getElementById('searchView').style.display='none';
           document.getElementById('gridViewContainer').style.display='none';
           document.getElementById('profileViewContainer').style.display='none';
-          document.getElementById('backNav').style.display='none';
 
           if(tab === 'home') document.getElementById('homeView').style.display='block';
           else if(tab === 'search') { 
@@ -475,11 +422,13 @@ export function renderWebsite() {
           document.getElementById('mainGrid').innerHTML = ""; 
           showLoader(); 
           
+          // 🔥 UI Toggle for Category
+          document.getElementById('mainHeader').style.display = 'none';
+          document.getElementById('backNav').style.display = 'flex'; // Show Back Header
           document.getElementById('homeView').style.display='none'; 
           document.getElementById('gridViewContainer').style.display='block'; 
-          document.getElementById('backNav').style.display='flex'; 
-          document.getElementById('gridTitle').innerText = c.toUpperCase();
           
+          document.getElementById('gridTitle').innerText = c.toUpperCase();
           if(pushState) { const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`; window.history.pushState({path:u},'',u); }
           await fetchMovies(1,c, true); hideLoader();
       }
@@ -665,6 +614,12 @@ export function renderWebsite() {
           document.getElementById('mainGrid').innerHTML = "";
           document.getElementById('homeView').style.display='none'; document.getElementById('searchView').style.display='none';
           document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='none';
+          
+          // Reset Headers for Fav
+          document.getElementById('mainHeader').style.display = 'none';
+          document.getElementById('backNav').style.display = 'flex';
+          document.getElementById('gridTitle').innerText = "MY LIST";
+
           const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
           if(f.length){ Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))).then(res => renderGrid(res, 'mainGrid')); } 
           else document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No favorites yet.</p>';
