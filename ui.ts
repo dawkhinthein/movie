@@ -69,9 +69,7 @@ export function renderWebsite() {
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
       .title { padding: 8px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       
-      /* Tags on Poster */
       .prem-tag { position: absolute; top: 5px; left: 5px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
-      /* 🔥 NEW: Year Tag on Poster */
       .year-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
       .user-panel { 
@@ -91,6 +89,10 @@ export function renderWebsite() {
       .back-nav { display: none; padding: 10px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid #333; }
       .back-nav-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
 
+      /* Infinite Scroll Spinner */
+      #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
+      .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
           background: #121212; z-index:200; overflow-y: auto; overscroll-behavior: contain; 
@@ -100,21 +102,16 @@ export function renderWebsite() {
       .details-header button { pointer-events: auto; background: rgba(0,0,0,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); cursor: pointer; }
 
       .backdrop-container { position: relative; width: 100%; height: 260px; background: #000; }
-      .backdrop-img { width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%); transition: opacity 0.3s; }
+      .backdrop-img { width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%); transition: opacity 0.5s ease; opacity: 0; }
       
       .info-container { padding: 0 20px; position: relative; display: flex; flex-direction: column; }
-      
       .top-info-row { display: flex; gap: 15px; margin-top: -50px; position: relative; z-index: 5; margin-bottom: 20px; }
       .poster-img-large { width: 110px; height: 160px; border-radius: 8px; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.6); flex-shrink: 0; background: #222; }
-      
       .meta-col { padding-top: 55px; flex: 1; }
       .movie-title { font-size: 20px; font-weight: bold; color: white; margin: 0 0 8px 0; line-height: 1.2; }
-      
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 12px; margin-bottom: 10px; }
-      
       .genre-row { display: flex; flex-wrap: wrap; gap: 5px; }
       .genre-tag { border: 1px solid #444; color: #ccc; font-size: 10px; padding: 4px 10px; border-radius: 20px; }
-
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
 
       .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
@@ -127,7 +124,21 @@ export function renderWebsite() {
       video { width: 100%; height: 100%; }
       .close-video-btn { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5); border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; z-index: 310; }
       
-      .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:black; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
+      /* New Fallback Player UI (Imitates a Video Player) */
+      .fallback-box { 
+          position:absolute; top:0; left:0; width:100%; height:100%; 
+          background: #000; display:none; flex-direction:column; 
+          align-items:center; justify-content:center; z-index:20; 
+      }
+      .big-play-btn {
+          width: 70px; height: 70px; border-radius: 50%;
+          background: rgba(0, 184, 148, 0.9);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 30px; color: white; cursor: pointer;
+          box-shadow: 0 0 20px rgba(0, 184, 148, 0.5);
+          animation: pulse 2s infinite;
+      }
+      @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
       .accordion { background-color: #1e1e1e; color: #eee; padding: 15px; width: 100%; border: none; text-align: left; font-weight: 600; border-bottom: 1px solid #333; margin-top: 8px; border-radius: 8px; display: flex; justify-content: space-between; }
       .panel { padding: 0 5px; background-color: #121212; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
@@ -184,7 +195,11 @@ export function renderWebsite() {
         <button class="back-nav-btn" onclick="goHome()">⬅</button>
         <span id="gridTitle" style="color:white; font-weight:bold; margin-left:10px;">MOVIES</span>
     </div>
-    <div class="container" id="gridViewContainer"><div class="grid" id="mainGrid"></div><div style="height:50px;"></div></div>
+    <div class="container" id="gridViewContainer">
+        <div class="grid" id="mainGrid"></div>
+        <div id="scroll-loader"><div class="small-spinner"></div></div>
+        <div style="height:50px;"></div>
+    </div>
 
     <div id="playerModal">
       <div class="details-header">
@@ -193,7 +208,7 @@ export function renderWebsite() {
       </div>
 
       <div class="backdrop-container">
-        <img id="dt_backdrop" class="backdrop-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+        <img id="dt_backdrop" class="backdrop-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" loading="eager">
       </div>
 
       <div class="info-container">
@@ -235,8 +250,8 @@ export function renderWebsite() {
             </div>
             
             <div id="fallback-box" class="fallback-box">
-                <p style="color:white; margin-bottom:10px;">Playback Error (Source Restricted)</p>
-                <a id="fallback-link" href="#" target="_blank" class="action-btn btn-dl" style="width:auto; padding:8px 20px;">▶ Play External</a>
+                <div class="big-play-btn" onclick="openExternalLink()">▶</div>
+                <p style="color:#aaa; margin-top:15px; font-size:12px;">Tap to Start Video</p>
             </div>
 
             <video id="video" controls playsinline controlsList="nodownload"></video>
@@ -246,18 +261,22 @@ export function renderWebsite() {
     </div>
 
     <script>
-      let allMoviesData = [];
       let currentUser = JSON.parse(localStorage.getItem('user_session') || 'null');
       let currentMovieId = "";
       let activeVideoLink = ""; 
       let activeIsPremium = false;
+      
+      // Infinite Scroll Variables
+      let currentCat = '';
+      let pageNum = 1;
+      let isLoading = false;
+      let hasMore = true;
 
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
       function hideLoader() { loader.classList.add('hidden-loader'); }
       function showAlert(t, m) { document.getElementById('custom-alert').style.display='flex'; document.getElementById('alert-title').innerText=t; document.getElementById('alert-msg').innerText=m; }
 
-      // 🔥 FIX: Refresh Logic - Handle URL params on load
       window.onload = async () => {
         loadSession(); updateProfileUI(); 
         await Promise.all([fetchRow('movies', 'row_movies'), fetchRow('series', 'row_series'), fetchRow('Adult', 'row_18')]);
@@ -271,8 +290,20 @@ export function renderWebsite() {
         if (movieId) {
              fetchSingleMovie(movieId);
         } else if (view === 'grid' && cat) {
-             openCategory(cat); // Stay in category
+             openCategory(cat); 
         }
+        
+        // Infinite Scroll Listener
+        window.addEventListener('scroll', () => {
+            if(document.getElementById('gridViewContainer').style.display === 'block') {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                    if(!isLoading && hasMore) {
+                        pageNum++;
+                        fetchMovies(pageNum, currentCat, true);
+                    }
+                }
+            }
+        });
       };
 
       window.onpopstate = function() {
@@ -281,7 +312,6 @@ export function renderWebsite() {
           if(!p.get('view')) {
               goHomeInternal();
           } else {
-              // Handle back button for categories
               const cat = p.get('cat');
               if(cat) openCategory(cat, false);
           }
@@ -299,27 +329,31 @@ export function renderWebsite() {
       }
       
       async function openCategory(c, pushState = true){
+          // Reset for new category
+          currentCat = c;
+          pageNum = 1;
+          hasMore = true;
+          document.getElementById('mainGrid').innerHTML = ""; 
+          
           showLoader(); 
           document.getElementById('homeView').style.display='none';
           document.getElementById('gridViewContainer').style.display='block';
           document.getElementById('backNav').style.display='flex'; 
-          
           document.getElementById('gridTitle').innerText = c.toUpperCase();
+          
           if(pushState) {
               const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`;
               window.history.pushState({path:u},'',u);
           }
-          await fetchMovies(1,c);
+          await fetchMovies(1,c, true); // initial load
           hideLoader();
       }
 
       function closePlayer() {
           closePlayerInternal();
-          // Return to previous state logic
           const p = new URLSearchParams(window.location.search);
           const cat = p.get('cat');
           if(cat) {
-              // If we were in a category, URL should still reflect that, just remove ID
               const u = \`?view=grid&cat=\${encodeURIComponent(cat)}\`;
               window.history.pushState({path:u},'',u);
           } else {
@@ -352,14 +386,16 @@ export function renderWebsite() {
           document.getElementById('videoOverlay').style.display='none';
       }
       
+      // Open link from the "Fake Player" button
+      function openExternalLink() {
+          if(activeVideoLink) window.open(activeVideoLink, '_blank');
+      }
+      
       async function playViaSecureToken(u){
           const v=document.getElementById('video');
-          
-          // Error Handler for HLS
-          const onError = () => {
+          const onFail = () => {
               v.style.display = 'none';
-              document.getElementById('fallback-box').style.display = 'flex';
-              document.getElementById('fallback-link').href = u;
+              document.getElementById('fallback-box').style.display = 'flex'; // Show "Tap to Play"
           };
 
           if(u.includes('.m3u8')){
@@ -369,40 +405,61 @@ export function renderWebsite() {
                  window.hlsInstance = h;
                  h.loadSource(u); 
                  h.attachMedia(v); 
-                 h.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(()=>{}));
+                 h.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(onFail));
                  h.on(Hls.Events.ERROR, (event, data) => {
                      if(data.fatal) {
-                         console.log("HLS Error", data);
-                         onError(); // Show fallback on CORS/Network error
                          h.destroy();
+                         onFail(); // Auto switch to "Tap to Play" UI
                      }
                  });
              } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
                  v.src=u; 
-                 v.play();
-                 v.onerror = onError;
+                 v.play().catch(onFail);
+                 v.onerror = onFail;
+             } else {
+                 onFail();
              }
              return;
           }
           try{
              const res=await fetch('/api/sign_url',{method:'POST',body:JSON.stringify({url:u,movieId:currentMovieId,username:currentUser?currentUser.username:null})});
              const j=await res.json();
-             if(j.token){ v.src="/api/play?t="+j.token; v.play(); } else { v.src=u; }
-          }catch(e){ v.src=u; }
+             if(j.token){ v.src="/api/play?t="+j.token; v.play().catch(onFail); v.onerror=onFail; } else { v.src=u; v.onerror=onFail; }
+          }catch(e){ v.src=u; v.onerror=onFail; }
       }
 
-      async function fetchMovies(page, cat) { 
-          const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodeURIComponent(cat)}\`); 
-          const json = await res.json(); renderGrid(json.data); 
+      // 🔥 Modified Fetch for Infinite Scroll
+      async function fetchMovies(page, cat, append = false) { 
+          if(isLoading) return;
+          isLoading = true;
+          if(page > 1) document.getElementById('scroll-loader').style.display = 'block';
+
+          try {
+              const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodeURIComponent(cat)}\`); 
+              const json = await res.json(); 
+              
+              if(json.data.length === 0) {
+                  hasMore = false;
+              } else {
+                  const html = json.data.map(m => createCardHtml(m)).join('');
+                  if(append) {
+                      document.getElementById('mainGrid').innerHTML += html;
+                  } else {
+                      document.getElementById('mainGrid').innerHTML = html;
+                  }
+              }
+          } catch(e) { console.error(e); }
+          
+          isLoading = false;
+          document.getElementById('scroll-loader').style.display = 'none';
       }
-      function renderGrid(data) { document.getElementById('mainGrid').innerHTML = data.map(m => createCardHtml(m)).join(''); }
       
-      // 🔥 FIX: Year Logic & Year Tag
+      async function fetchRow(c,id){try{const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);const json=await res.json();document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');}catch(e){}}
+
       function createCardHtml(m) { 
           const tag = m.isPremium ? '<div class="prem-tag">VIP</div>' : '';
           const yearNum = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; 
           const yearHtml = yearNum ? \`<div class="year-tag">\${yearNum}</div>\` : '';
-          
           return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; 
       }
 
@@ -411,10 +468,12 @@ export function renderWebsite() {
           const u = \`?id=\${id}\`; window.history.pushState({path:u},'',u);
       }
 
-      // 🔥 FIX: Reset UI to prevent flashing
       function resetDetailsUI() {
            const spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-           document.getElementById('dt_backdrop').src = spacer;
+           const backdrop = document.getElementById('dt_backdrop');
+           backdrop.style.opacity = '0'; // Hide first
+           backdrop.src = spacer;
+           
            document.getElementById('dt_poster').src = spacer;
            document.getElementById('dt_title').innerText = "Loading...";
            document.getElementById('dt_year').innerText = "";
@@ -425,7 +484,7 @@ export function renderWebsite() {
 
       async function fetchSingleMovie(id){
           showLoader(); 
-          resetDetailsUI(); // Clear old data
+          resetDetailsUI(); 
           document.getElementById('playerModal').style.display='block';
           const res=await fetch(\`/api/get_movie?id=\${id}\`); const m=await res.json();
           hideLoader();
@@ -435,7 +494,15 @@ export function renderWebsite() {
       function setupDetailsPage(m){
           currentMovieId=m.id;
           
-          document.getElementById('dt_backdrop').src = m.cover || m.image;
+          const backdrop = document.getElementById('dt_backdrop');
+          // 🔥 Load Image Logic
+          const imgLoader = new Image();
+          imgLoader.src = m.cover || m.image;
+          imgLoader.onload = () => {
+              backdrop.src = imgLoader.src;
+              backdrop.style.opacity = '1'; // Fade in
+          };
+
           document.getElementById('dt_poster').src = m.image;
           document.getElementById('dt_title').innerText = m.title;
           document.getElementById('dt_desc').innerText = m.description || "No description available.";
@@ -467,7 +534,6 @@ export function renderWebsite() {
               activeIsPremium = m.isPremium;
               renderAccordion(m.episodes, m.isPremium);
           }
-          
           updateFavBtnState();
       }
 
@@ -530,7 +596,6 @@ export function renderWebsite() {
       async function doLogin(){const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; showLoader(); const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})}); hideLoader(); if(res.ok){ const user=await res.json(); user.vipExpiry=user.vipExpiry||0; currentUser=user; localStorage.setItem('user_session',JSON.stringify(user)); updateProfileUI(); } else showAlert("Error","Fail");}
       function doLogout(){localStorage.removeItem('user_session'); currentUser=null; updateProfileUI();}
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
-      async function fetchRow(c,id){try{const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);const json=await res.json();document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');}catch(e){}}
       async function openFavorites(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "MY LIST"; const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res);} else document.getElementById('mainGrid').innerHTML="Empty";}
       async function executeSearch(){const q=document.getElementById('searchInput').value; if(!q)return; openCategory('search'); document.getElementById('gridTitle').innerText = "SEARCH"; const res=await fetch(\`/api/search?q=\${q}\`); const j=await res.json(); renderGrid(j);}
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
