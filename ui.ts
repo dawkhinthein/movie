@@ -1,3 +1,4 @@
+
 export function renderWebsite() {
   function getServerSkeleton() { 
     return Array(6).fill(`
@@ -11,22 +12,16 @@ export function renderWebsite() {
 
   return `
   <!DOCTYPE html>
-  <html lang="en">
+  <html>
   <head>
     <title>Stream X</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, minimal-ui">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="display" content="standalone">
-    <meta name="orientation" content="landscape">
-
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
-    
     <style>
       :root {
         --primary: #00b894;
@@ -41,7 +36,6 @@ export function renderWebsite() {
         --header-height: 60px;
       }
 
-      /* 🔥 GLOBAL FIX: Disable ALL Overscroll & Scrollbars */
       * { 
           box-sizing: border-box; 
           -webkit-tap-highlight-color: transparent; 
@@ -131,22 +125,6 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* Contact Box */
-      .contact-box {
-          margin: 20px 20px 40px 20px; padding: 25px;
-          background: linear-gradient(135deg, #6c5ce7, #8e44ad);
-          border-radius: 16px; color: white;
-          display: flex; align-items: center; justify-content: space-between;
-          box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
-          cursor: pointer; position: relative; overflow: hidden;
-          border: 1px solid rgba(255,255,255,0.1);
-      }
-      .contact-box:active { transform: scale(0.98); transition: transform 0.1s; }
-      .contact-icon { font-size: 32px; margin-right: 15px; }
-      .contact-text h3 { margin: 0; font-size: 18px; font-weight: 800; }
-      .contact-text p { margin: 5px 0 0 0; font-size: 12px; opacity: 0.9; }
-      .contact-arrow { font-size: 24px; font-weight: bold; opacity: 0.8; }
-
       /* Profiles */
       .profile-card { margin: 20px; padding: 25px; background: linear-gradient(135deg, var(--primary), #00b894, #006266); border-radius: 20px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); }
       .profile-avatar { width: 70px; height: 70px; background: rgba(0,0,0,0.2); border-radius: 50%; margin: 0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:30px; border: 2px solid rgba(255,255,255,0.3); }
@@ -186,10 +164,23 @@ export function renderWebsite() {
       .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       .video-wrapper { width: 100%; height: 100%; background: black; position: relative; }
       .artplayer-app { width: 100%; height: 100%; display: block; }
-      /* 🔥 Hide default Fullscreen button if we want to force our own logic (Optional) */
-      /* .art-control-fullscreen { display: none !important; } */
       
-      .close-video-btn { position: absolute; top: 20px; right: 20px; z-index: 310; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color:white; border:none; font-size:18px; cursor:pointer; }
+      /* 🔥 CUSTOM CONTROLS OVERLAY */
+      .custom-controls {
+          position: absolute; top: 20px; right: 20px; z-index: 310;
+          display: flex; gap: 15px;
+      }
+      .custom-btn {
+          width: 45px; height: 45px; border-radius: 50%;
+          background: rgba(255, 255, 255, 0.15); 
+          backdrop-filter: blur(5px);
+          border: 1px solid rgba(255,255,255,0.3);
+          color: white; font-size: 20px;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; -webkit-tap-highlight-color: transparent;
+      }
+      .custom-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
+
       .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
       .big-play-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.5); animation: pulse 2s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -230,17 +221,6 @@ export function renderWebsite() {
         <div class="home-section"><div class="section-head"><span class="section-title">Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
         <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">See All</a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
         
-        <div class="contact-box" onclick="window.open('https://t.me/iqowoq', '_blank')">
-            <div style="display:flex; align-items:center;">
-                <div class="contact-icon">🎧</div>
-                <div class="contact-text">
-                    <h3>Contact Admin</h3>
-                    <p>Get VIP or Report Error</p>
-                </div>
-            </div>
-            <div class="contact-arrow">➜</div>
-        </div>
-
         <div style="height:20px;"></div>
     </div>
 
@@ -329,7 +309,11 @@ export function renderWebsite() {
       </div>
 
       <div id="videoOverlay" class="video-overlay">
-         <button class="close-video-btn" onclick="closeVideo()">✕</button>
+         <div class="custom-controls">
+             <button class="custom-btn" onclick="toggleFullScreen()" ontouchstart="toggleFullScreen()">⛶</button>
+             <button class="custom-btn" onclick="closeVideo()" ontouchstart="closeVideo()">✕</button>
+         </div>
+
          <div class="video-wrapper">
             <div id="artplayer-app" class="artplayer-app"></div>
 
@@ -409,13 +393,18 @@ export function renderWebsite() {
           const view = p.get('view');
           const cat = p.get('cat');
           
-          if (!id) closePlayerInternal(); 
-          else if(document.getElementById('playerModal').style.display === 'none') fetchSingleMovie(id);
+          if (!id) {
+              closePlayerInternal();
+          } else if(document.getElementById('playerModal').style.display === 'none') {
+              fetchSingleMovie(id);
+          }
 
           if(view === 'profile') switchTabInternal('profile');
           else if(view === 'search') switchTabInternal('search');
           else if(view === 'fav') switchTabInternal('fav');
-          else if(view === 'grid' && cat) openCategory(cat, false);
+          else if(view === 'grid') {
+              if (cat) openCategory(cat, false);
+          }
           else if(!id) switchTabInternal('home');
       };
 
@@ -481,7 +470,39 @@ export function renderWebsite() {
       function closeVideo() {
           if (art) { art.destroy(false); art = null; }
           document.querySelectorAll('video').forEach(v => { v.pause(); v.src = ""; });
+          // Ensure we exit fullscreen if active
+          if (document.fullscreenElement) {
+              document.exitFullscreen().catch(e => {});
+          }
           document.getElementById('videoOverlay').style.display='none';
+      }
+      
+      // 🔥 Custom Fullscreen Logic with Immersive Hack
+      function toggleFullScreen() {
+          const wrapper = document.querySelector('.video-wrapper');
+          const video = document.querySelector('video');
+          
+          // 1. Try Native Android Interface (Best for WebViews)
+          if(video && video.webkitEnterFullScreen) {
+              video.webkitEnterFullScreen();
+              return;
+          }
+
+          // 2. Fallback to Standard API
+          if (!document.fullscreenElement) {
+              if (wrapper.requestFullscreen) wrapper.requestFullscreen().catch(e => {});
+              else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+              
+              // Try locking orientation
+              if (screen.orientation && screen.orientation.lock) {
+                  screen.orientation.lock('landscape').catch(e => {});
+              }
+          } else {
+              if (document.exitFullscreen) document.exitFullscreen();
+              if (screen.orientation && screen.orientation.unlock) {
+                  screen.orientation.unlock();
+              }
+          }
       }
       
       function openExternalLink() { if(activeVideoLink) window.open(activeVideoLink, '_blank'); }
@@ -494,17 +515,15 @@ export function renderWebsite() {
               type: url.includes('.m3u8') ? 'm3u8' : 'auto',
               autoplay: true,
               muted: false,
-              
-              // 🔥 FULLSCREEN & IMMERSIVE SETTINGS
-              fullscreen: true,
-              fullscreenWeb: false, // Use Native Fullscreen
-              flip: true,
+              // 🔥 Disable Native Controls so we use Custom Ones
+              fullscreen: false, 
+              fullscreenWeb: false,
+              setting: true,
               playbackRate: true,
               aspectRatio: true,
               miniProgressBar: true,
               autoOrientation: true,
               theme: '#00b894',
-              
               customType: {
                   m3u8: function (video, url) {
                       if (Hls.isSupported()) {
@@ -523,16 +542,7 @@ export function renderWebsite() {
                   },
               },
           });
-          
           art.on('ready', () => { art.play(); });
-          
-          // 🔥 FORCE HIDE STATUS BAR ON FULLSCREEN
-          art.on('fullscreen', (state) => {
-              if (state && screen.orientation && screen.orientation.lock) {
-                  screen.orientation.lock('landscape').catch(() => {});
-              }
-          });
-
           art.on('error', () => { document.getElementById('fallback-box').style.display = 'flex'; });
       }
 
@@ -688,4 +698,4 @@ export function renderWebsite() {
   </body>
   </html>
   `;
-          }
+}
