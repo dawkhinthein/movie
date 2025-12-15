@@ -14,7 +14,7 @@ export function renderWebsite() {
   <html>
   <head>
     <title>Stream X</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#121212">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
@@ -32,10 +32,20 @@ export function renderWebsite() {
         --nav-height: 65px;
       }
 
-      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+      /* 🔥 GLOBAL FIX: Disable ALL Overscroll Glows */
+      * { 
+          box-sizing: border-box; 
+          -webkit-tap-highlight-color: transparent; 
+          outline: none;
+          overscroll-behavior: none !important; /* The Magic Kill Switch */
+          -ms-overflow-style: none; 
+          scrollbar-width: none; 
+      }
+      
+      /* Hide Scrollbar Globally */
+      ::-webkit-scrollbar { display: none; }
       
       html, body { 
-          overscroll-behavior-y: none; 
           background: var(--bg-body); 
           color: var(--text-main); 
           font-family: 'Padauk', 'Inter', sans-serif; 
@@ -43,7 +53,8 @@ export function renderWebsite() {
           padding-bottom: var(--nav-height);
           user-select: none;
           -webkit-user-select: none;
-          overflow-x: hidden; 
+          overflow-x: hidden;
+          width: 100%; height: 100%; /* Ensure full height */
       }
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
@@ -56,6 +67,7 @@ export function renderWebsite() {
       }
       .brand { color: var(--primary); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
+      /* --- Bottom Nav --- */
       .bottom-nav {
           position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
           background: #1a1a1a; border-top: 1px solid #333;
@@ -80,17 +92,20 @@ export function renderWebsite() {
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
+      
       .see-more { 
           color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; 
           border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px;
       }
+      
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
-      .scroll-row::-webkit-scrollbar { display: none; } 
+      
       .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
       .card:active { transform: scale(0.97); }
       .scroll-row .card { min-width: 110px; max-width: 110px; }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; font-weight: 600; }
+      
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
@@ -129,9 +144,26 @@ export function renderWebsite() {
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-      #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; padding-bottom: 80px; }
-      .details-header { position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 20; background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%); }
-      .nav-circle-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px); border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; cursor: pointer; }
+      /* --- Details Page --- */
+      #playerModal { 
+          display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
+          background: var(--bg-body); z-index:200; overflow-y: auto; 
+          overscroll-behavior: none !important; /* 🔥 Fix for Review Section */
+          padding-bottom: 80px; 
+      }
+      
+      .details-header { 
+          position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
+          display: flex; justify-content: space-between; z-index: 20; 
+          background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%);
+      }
+      
+      .nav-circle-btn {
+          width: 40px; height: 40px; border-radius: 50%;
+          background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px);
+          border: 1px solid #444; display: flex; align-items: center; justify-content: center;
+          font-size: 18px; color: #fff; cursor: pointer;
+      }
 
       .modal-body-content { padding: 10px 20px 40px 20px; }
       .top-info-section { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; }
@@ -139,23 +171,48 @@ export function renderWebsite() {
       .meta-col-sidebar { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
       .movie-title { font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 12px; margin-bottom: 15px; }
+      
       .actions-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-      .btn-play { width: 100%; padding: 14px; border-radius: 50px; border: none; background: var(--red-btn); color: white; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2); }
-      .btn-dl { width: 100%; padding: 14px; border-radius: 50px; background: #2a2a2a; color: white; border: 1px solid #444; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-      .btn-fav { width: 100%; padding: 14px; border-radius: 50px; background: transparent; color: #bbb; border: 1px solid #444; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+      
+      .btn-play { 
+          width: 100%; padding: 14px; border-radius: 50px; border: none; 
+          background: var(--red-btn); color: white;
+          font-weight: 700; font-size: 15px; cursor: pointer; 
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+          box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2);
+      }
+      .btn-dl { 
+          width: 100%; padding: 14px; border-radius: 50px; 
+          background: #2a2a2a; color: white;
+          border: 1px solid #444;
+          font-weight: 600; font-size: 14px; cursor: pointer; 
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+      }
+      .btn-fav {
+          width: 100%; padding: 14px; border-radius: 50px; 
+          background: transparent; color: #bbb;
+          border: 1px solid #444;
+          font-weight: 600; font-size: 14px; cursor: pointer; 
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+      }
       .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
+
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
+
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
       .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #333; }
+
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
       .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
       .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       .video-wrapper { width: 100%; height: 100%; background: black; position: relative; }
       .artplayer-app { width: 100%; height: 100%; display: block; }
+      
       .close-video-btn { position: absolute; top: 20px; right: 20px; z-index: 310; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color:white; border:none; font-size:18px; cursor:pointer; }
+      
       .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
       .big-play-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.5); animation: pulse 2s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -315,6 +372,7 @@ export function renderWebsite() {
 
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
+      // Auto-hide loader safety
       window.hideLoader = function() { if(loader) loader.classList.add('hidden-loader'); }
       function showAlert(t, m) { 
           const alert = document.getElementById('custom-alert');
@@ -327,7 +385,7 @@ export function renderWebsite() {
         setTimeout(() => window.hideLoader(), 3000);
 
         try {
-            loadSession(); // Check 15 days expiry here
+            loadSession(); 
             updateProfileUI(); 
             await Promise.allSettled([
                 fetchRow('movies', 'row_movies'), 
@@ -439,7 +497,7 @@ export function renderWebsite() {
               container: '#artplayer-app',
               url: url,
               type: url.includes('.m3u8') ? 'm3u8' : 'auto',
-              autoplay: true,
+              autoplay: true, // 🔥 FORCE AUTO PLAY
               muted: false,
               customType: {
                   m3u8: function (video, url) {
@@ -447,6 +505,7 @@ export function renderWebsite() {
                           const hls = new Hls();
                           hls.loadSource(url);
                           hls.attachMedia(video);
+                          // 🔥 FORCE PLAY ON M3U8 LOAD
                           hls.on(Hls.Events.MANIFEST_PARSED, function() {
                               video.play().catch(() => {
                                   video.muted = true;
