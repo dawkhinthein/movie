@@ -56,7 +56,6 @@ export function renderWebsite() {
       }
       .brand { color: var(--primary); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
-      /* --- Bottom Nav --- */
       .bottom-nav {
           position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
           background: #1a1a1a; border-top: 1px solid #333;
@@ -99,7 +98,6 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* User Profile View */
       #profileViewContainer { display: none; padding-bottom: 80px; }
       .profile-card {
           margin: 20px; padding: 25px;
@@ -123,7 +121,6 @@ export function renderWebsite() {
       }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
-      /* Search View */
       #searchView { display: none; padding: 20px; padding-bottom: 80px; }
       .search-bar-large { width: 100%; padding: 15px 20px; background: #2a2a2a; border: 1px solid #444; border-radius: 30px; color: white; font-size: 16px; margin-bottom: 20px; outline:none; }
 
@@ -131,7 +128,6 @@ export function renderWebsite() {
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-      /* --- Details Page --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
           background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
@@ -154,13 +150,10 @@ export function renderWebsite() {
       .modal-body-content { padding: 10px 20px 40px 20px; }
       .top-info-section { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; }
       .poster-img-sidebar { width: 110px; height: 160px; border-radius: 10px; object-fit: cover; box-shadow: 0 8px 20px rgba(0,0,0,0.5); flex-shrink: 0; background: #222; }
-      
       .meta-col-sidebar { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
       .movie-title { font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 12px; margin-bottom: 15px; }
-      
       .actions-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-      
       .btn-play { 
           width: 100%; padding: 14px; border-radius: 50px; border: none; 
           background: var(--red-btn); color: white;
@@ -170,36 +163,29 @@ export function renderWebsite() {
       }
       .btn-dl { 
           width: 100%; padding: 14px; border-radius: 50px; 
-          background: #2a2a2a; color: white;
-          border: 1px solid #444;
+          background: #2a2a2a; color: white; border: 1px solid #444;
           font-weight: 600; font-size: 14px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
       }
       .btn-fav {
           width: 100%; padding: 14px; border-radius: 50px; 
-          background: transparent; color: #bbb;
-          border: 1px solid #444;
+          background: transparent; color: #bbb; border: 1px solid #444;
           font-weight: 600; font-size: 14px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
       }
       .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
-
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
-
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
       .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #333; }
-
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
       .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
       .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       .video-wrapper { width: 100%; height: 100%; background: black; position: relative; }
       .artplayer-app { width: 100%; height: 100%; display: block; }
-      
       .close-video-btn { position: absolute; top: 20px; right: 20px; z-index: 310; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color:white; border:none; font-size:18px; cursor:pointer; }
-      
       .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
       .big-play-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.5); animation: pulse 2s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -239,7 +225,6 @@ export function renderWebsite() {
     <div id="homeView">
         <div class="home-section"><div class="section-head"><span class="section-title">Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
         <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">See All</a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
-        <div class="home-section"><div class="section-head"><span class="section-title">Adult</span><a class="see-more" onclick="openCategory('Adult')">See All</a></div><div class="scroll-row" id="row_18">${getServerSkeleton()}</div></div>
     </div>
 
     <div class="back-nav" id="backNav">
@@ -354,7 +339,7 @@ export function renderWebsite() {
 
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
-      // 🔥 FIX: Ensure hideLoader is global and safe
+      // Auto-hide loader safety
       window.hideLoader = function() { if(loader) loader.classList.add('hidden-loader'); }
       function showAlert(t, m) { 
           const alert = document.getElementById('custom-alert');
@@ -363,25 +348,18 @@ export function renderWebsite() {
           alert.style.display='flex';
       }
 
-      // 🔥 FIX: Safe Initialization with Timeout to prevent stuck spinner
       window.onload = async () => {
-        // Safety: Force hide loader after 3 seconds no matter what
-        setTimeout(() => window.hideLoader(), 3000);
+        setTimeout(() => window.hideLoader(), 3000); // Failsafe
 
         try {
             loadSession(); 
             updateProfileUI(); 
-            // Attempt to load all rows, catch errors silently
             await Promise.allSettled([
                 fetchRow('movies', 'row_movies'), 
-                fetchRow('series', 'row_series'), 
-                fetchRow('Adult', 'row_18')
+                fetchRow('series', 'row_series')
             ]);
-        } catch(e) {
-            console.error("Init Error", e);
-        } finally {
-            window.hideLoader(); // Success path hide
-        }
+        } catch(e) { console.error("Init Error", e); } 
+        finally { window.hideLoader(); }
         
         const p = new URLSearchParams(window.location.search);
         const movieId = p.get('id');
@@ -465,7 +443,6 @@ export function renderWebsite() {
              document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='flex'; return;
           }
           document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='none'; document.getElementById('fallback-box').style.display='none';
-          
           playViaArtPlayer(activeVideoLink);
       }
       
@@ -476,22 +453,33 @@ export function renderWebsite() {
       
       function openExternalLink() { if(activeVideoLink) window.open(activeVideoLink, '_blank'); }
       
+      // 🔥 FIX: M3U8 AutoPlay & HLS
       function playViaArtPlayer(url) {
           if(art) art.destroy(false);
           
-          // 🔥 Fix: ArtPlayer config
           art = new Artplayer({
               container: '#artplayer-app',
               url: url,
               type: url.includes('.m3u8') ? 'm3u8' : 'auto',
+              autoplay: true, // Force Autoplay
+              muted: false,
               customType: {
                   m3u8: function (video, url) {
                       if (Hls.isSupported()) {
                           const hls = new Hls();
                           hls.loadSource(url);
                           hls.attachMedia(video);
+                          // 🔥 FORCE PLAY ON M3U8 LOAD
+                          hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                              video.play().catch(e => {
+                                  // Browser might block audio, try muted
+                                  video.muted = true;
+                                  video.play();
+                              });
+                          });
                       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                           video.src = url;
+                          video.play();
                       } else {
                           art.notice.show = 'Unsupported M3U8';
                           document.getElementById('fallback-box').style.display = 'flex';
@@ -508,6 +496,8 @@ export function renderWebsite() {
               autoOrientation: true,
               theme: '#00b894',
           });
+          
+          art.on('ready', () => { art.play(); });
           art.on('error', () => { document.getElementById('fallback-box').style.display = 'flex'; });
       }
 
