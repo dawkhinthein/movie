@@ -33,7 +33,6 @@ export function renderWebsite() {
         --header-height: 60px;
       }
 
-      /* 🔥 GLOBAL FIX: Disable ALL Overscroll Glows */
       * { 
           box-sizing: border-box; 
           -webkit-tap-highlight-color: transparent; 
@@ -74,15 +73,16 @@ export function renderWebsite() {
           z-index: 60;
       }
 
-      /* Views */
+      /* Views - 🔥 Added Solid Background to prevent overlap transparency */
       .scroll-view, .full-view {
           position: absolute; top: var(--header-height); left: 0; width: 100%; bottom: var(--nav-height);
           overflow-y: auto; overflow-x: hidden;
-          background: var(--bg-body);
+          background: var(--bg-body); /* Solid Background Fix */
           -webkit-overflow-scrolling: touch;
           padding-top: 10px;
-          display: none; 
+          display: none; /* Hide all by default */
       }
+      /* Home is active by default in HTML only for fallback, JS will handle logic */
       #homeView { display: block; }
 
       /* Bottom Nav */
@@ -110,10 +110,7 @@ export function renderWebsite() {
       .home-section { padding: 10px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
-      .see-more { 
-          color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; 
-          border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px;
-      }
+      .see-more { color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px; }
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
       .card:active { transform: scale(0.97); }
@@ -122,24 +119,6 @@ export function renderWebsite() {
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; font-weight: 600; }
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
-
-      /* 🔥 Contact Box */
-      .contact-box {
-          margin: 20px 20px 40px 20px; /* Spacing */
-          padding: 25px;
-          background: linear-gradient(135deg, #6c5ce7, #8e44ad);
-          border-radius: 16px;
-          color: white;
-          display: flex; align-items: center; justify-content: space-between;
-          box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
-          cursor: pointer; position: relative; overflow: hidden;
-          border: 1px solid rgba(255,255,255,0.1);
-      }
-      .contact-box:active { transform: scale(0.98); transition: transform 0.1s; }
-      .contact-icon { font-size: 32px; margin-right: 15px; }
-      .contact-text h3 { margin: 0; font-size: 18px; font-weight: 800; }
-      .contact-text p { margin: 5px 0 0 0; font-size: 12px; opacity: 0.9; }
-      .contact-arrow { font-size: 24px; font-weight: bold; opacity: 0.8; }
 
       /* Profiles */
       .profile-card { margin: 20px; padding: 25px; background: linear-gradient(135deg, var(--primary), #00b894, #006266); border-radius: 20px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); }
@@ -157,6 +136,7 @@ export function renderWebsite() {
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+      /* Details */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: none !important; padding-bottom: 80px; }
       .details-header { position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 20; background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%); }
       .nav-circle-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px); border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; cursor: pointer; }
@@ -175,7 +155,7 @@ export function renderWebsite() {
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #333; }
+      
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
       .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
@@ -222,18 +202,6 @@ export function renderWebsite() {
     <div id="homeView" class="scroll-view" style="display:block;">
         <div class="home-section"><div class="section-head"><span class="section-title">Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
         <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">See All</a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
-        
-        <div class="contact-box" onclick="window.open('https://t.me/iqowoq', '_blank')">
-            <div style="display:flex; align-items:center;">
-                <div class="contact-icon">🎧</div>
-                <div class="contact-text">
-                    <h3>Contact Admin</h3>
-                    <p>Get VIP or Report Error</p>
-                </div>
-            </div>
-            <div class="contact-arrow">➜</div>
-        </div>
-
         <div style="height:20px;"></div>
     </div>
 
@@ -379,12 +347,13 @@ export function renderWebsite() {
         const movieId = p.get('id');
         const view = p.get('view');
         
+        // 🔥 FORCE UI RESET
         if (movieId) { fetchSingleMovie(movieId); } 
         else if (view === 'profile') { switchTab('profile', false); }
         else if (view === 'search') { switchTab('search', false); }
         else if (view === 'fav') { switchTab('fav', false); }
         else if (view === 'grid') { openCategory(p.get('cat') || 'movies', false); }
-        else { switchTab('home', false); }
+        else { switchTab('home', false); } // Explicitly set Home
         
         document.querySelectorAll('.scroll-view, .full-view').forEach(el => {
             el.addEventListener('scroll', (e) => {
@@ -431,9 +400,11 @@ export function renderWebsite() {
           const btn = document.getElementById('nav_' + tab);
           if(btn) btn.classList.add('active');
 
+          // Reset Header State
           document.getElementById('mainHeader').style.display = 'flex';
           document.getElementById('backNav').style.display = 'none';
 
+          // Hide All Views
           document.getElementById('homeView').style.display='none';
           document.getElementById('searchView').style.display='none';
           document.getElementById('gridViewContainer').style.display='none';
@@ -455,6 +426,7 @@ export function renderWebsite() {
           document.getElementById('mainGrid').innerHTML = ""; 
           showLoader(); 
           
+          // 🔥 UI SWITCH
           document.getElementById('homeView').style.display='none'; 
           document.getElementById('gridViewContainer').style.display='block'; 
           document.getElementById('mainHeader').style.display='none';
@@ -644,11 +616,15 @@ export function renderWebsite() {
       
       function openFavoritesInternal(){
           document.getElementById('mainGrid').innerHTML = "";
+          // Reset Headers for Fav
           document.getElementById('mainHeader').style.display = 'none';
           document.getElementById('backNav').style.display = 'flex';
+          
           document.getElementById('homeView').style.display='none'; document.getElementById('searchView').style.display='none';
           document.getElementById('gridViewContainer').style.display='block'; 
+          
           document.getElementById('gridTitle').innerText = "MY LIST";
+
           const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
           if(f.length){ Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))).then(res => renderGrid(res, 'mainGrid')); } 
           else document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No favorites yet.</p>';
