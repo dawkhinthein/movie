@@ -80,21 +80,17 @@ export function renderWebsite() {
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
-      
       .see-more { 
           color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; 
           border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px;
       }
-      
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
-      
       .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
       .card:active { transform: scale(0.97); }
       .scroll-row .card { min-width: 110px; max-width: 110px; }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
       .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; font-weight: 600; }
-      
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
@@ -133,13 +129,11 @@ export function renderWebsite() {
           background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
           padding-bottom: 80px; 
       }
-      
       .details-header { 
           position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
           display: flex; justify-content: space-between; z-index: 20; 
           background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%);
       }
-      
       .nav-circle-btn {
           width: 40px; height: 40px; border-radius: 50%;
           background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px);
@@ -349,7 +343,7 @@ export function renderWebsite() {
       }
 
       window.onload = async () => {
-        setTimeout(() => window.hideLoader(), 3000); // Failsafe
+        setTimeout(() => window.hideLoader(), 3000);
 
         try {
             loadSession(); 
@@ -364,13 +358,12 @@ export function renderWebsite() {
         const p = new URLSearchParams(window.location.search);
         const movieId = p.get('id');
         const view = p.get('view');
-        const cat = p.get('cat');
         
         if (movieId) { fetchSingleMovie(movieId); } 
         else if (view === 'profile') { switchTab('profile', false); }
         else if (view === 'search') { switchTab('search', false); }
         else if (view === 'fav') { switchTab('fav', false); }
-        else if (view === 'grid' && cat) { openCategory(cat, false); }
+        else if (view === 'grid') { openCategory(p.get('cat') || 'movies', false); }
         
         window.addEventListener('scroll', () => {
             if(document.getElementById('gridViewContainer').style.display === 'block') {
@@ -385,8 +378,12 @@ export function renderWebsite() {
           const p = new URLSearchParams(window.location.search);
           const id = p.get('id');
           const view = p.get('view');
-          if (!id) closePlayerInternal(); 
-          else if(document.getElementById('playerModal').style.display === 'none') fetchSingleMovie(id);
+          
+          if (!id) {
+              closePlayerInternal(); // Ensure video cleanup on back
+          } else if(document.getElementById('playerModal').style.display === 'none') {
+              fetchSingleMovie(id);
+          }
 
           if(view === 'profile') switchTabInternal('profile');
           else if(view === 'search') switchTabInternal('search');
@@ -446,14 +443,24 @@ export function renderWebsite() {
           playViaArtPlayer(activeVideoLink);
       }
       
+      // 🔥 FIX: Nuclear Stop Video Function
       function closeVideo() {
-          if(art) { art.destroy(false); art = null; }
+          if (art) {
+              art.pause(); // Pause first
+              art.destroy(false); // Destroy logic
+              art = null;
+          }
+          // Double kill: Find any video tag and kill it
+          document.querySelectorAll('video').forEach(v => {
+              v.pause();
+              v.src = "";
+              v.load();
+          });
           document.getElementById('videoOverlay').style.display='none';
       }
       
       function openExternalLink() { if(activeVideoLink) window.open(activeVideoLink, '_blank'); }
       
-      // 🔥 FIX: M3U8 AutoPlay & HLS
       function playViaArtPlayer(url) {
           if(art) art.destroy(false);
           
@@ -461,8 +468,8 @@ export function renderWebsite() {
               container: '#artplayer-app',
               url: url,
               type: url.includes('.m3u8') ? 'm3u8' : 'auto',
-              autoplay: true, // Force Autoplay
-              muted: false,
+              autoplay: true, // 🔥 FORCE AUTOPLAY
+              muted: false, // Ensure sound is on
               customType: {
                   m3u8: function (video, url) {
                       if (Hls.isSupported()) {
@@ -471,8 +478,7 @@ export function renderWebsite() {
                           hls.attachMedia(video);
                           // 🔥 FORCE PLAY ON M3U8 LOAD
                           hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                              video.play().catch(e => {
-                                  // Browser might block audio, try muted
+                              video.play().catch(() => {
                                   video.muted = true;
                                   video.play();
                               });
