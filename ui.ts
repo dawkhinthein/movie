@@ -21,8 +21,8 @@ export function renderWebsite() {
     <style>
       :root {
         --primary: #00b894;
-        --bg-body: #121212; /* Dark Background */
-        --bg-card: #1e1e1e; /* Dark Card */
+        --bg-body: #121212;
+        --bg-card: #1e1e1e;
         --text-main: #ffffff;
         --text-sec: #b3b3b3;
         --border-color: #333;
@@ -45,7 +45,6 @@ export function renderWebsite() {
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
-      /* --- Header --- */
       header { 
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
         padding: 15px 20px; position: sticky; top:0; z-index:50; 
@@ -57,13 +56,11 @@ export function renderWebsite() {
       .search-input { background: transparent; border: none; color: white; width: 100%; font-size: 14px; font-family: inherit; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
-      /* --- Loader --- */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
-      /* --- Cards & Layout --- */
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 18px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
@@ -87,7 +84,6 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 4px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* --- Profile Panel (Dark Theme) --- */
       .user-panel { 
         position: fixed; top: 0; right: 0; width: 320px; height: 100%; 
         background: #1a1a1a; z-index: 100; transform: translateX(100%); 
@@ -132,13 +128,10 @@ export function renderWebsite() {
       .menu-btn:active { transform: scale(0.98); background: #333; }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
-      /* --- Alert Animation --- */
       #custom-alert { 
           display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
           background: rgba(0,0,0,0.6); z-index: 10000; 
-          align-items: flex-start;
-          justify-content: center; 
-          padding-top: 20px;
+          align-items: flex-start; justify-content: center; padding-top: 20px;
       }
       .alert-box { 
           background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; 
@@ -151,7 +144,6 @@ export function renderWebsite() {
           to { transform: translateY(0); opacity: 1; } 
       }
 
-      /* --- Details Page (Dark Theme) --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
           background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
@@ -188,9 +180,10 @@ export function renderWebsite() {
       
       .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
       
+      /* Red Play Button */
       .btn-play { 
           width: 100%; padding: 16px; border-radius: 50px; border: none; 
-          background: #ff4757; color: white; /* Red Play Button */
+          background: #ff4757; color: white;
           font-weight: 700; font-size: 16px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
           box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2);
@@ -679,7 +672,7 @@ export function renderWebsite() {
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
       async function openFavorites(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "MY LIST"; const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res);} else document.getElementById('mainGrid').innerHTML="Empty";}
       
-      // 🔥 FIX: Search Logic
+      // 🔥 FIX: Improved Search Logic
       async function executeSearch(){
           const q=document.getElementById('searchInput').value.trim(); 
           if(!q) return; 
@@ -695,11 +688,19 @@ export function renderWebsite() {
           
           try {
               const res = await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);
+              
+              // 🔥 Handle 404 as "No Results" instead of Error
+              if (res.status === 404) {
+                  grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found for "' + q + '"</div>';
+                  hideLoader();
+                  return;
+              }
+
               if (!res.ok) throw new Error("Server Error");
               
               const json = await res.json();
               
-              // Handle mixed response types
+              // Robust data handling
               let results = [];
               if (Array.isArray(json)) {
                   results = json;
