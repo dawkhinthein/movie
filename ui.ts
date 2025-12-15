@@ -1,3 +1,4 @@
+
 export function renderWebsite() {
   function getServerSkeleton() { 
     return Array(6).fill(`
@@ -21,6 +22,7 @@ export function renderWebsite() {
     <style>
       :root {
         --primary: #00b894;
+        --red-btn: #ff4757;
         --bg-body: #121212;
         --bg-card: #1e1e1e;
         --text-main: #ffffff;
@@ -180,10 +182,9 @@ export function renderWebsite() {
       
       .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
       
-      /* Red Play Button */
       .btn-play { 
           width: 100%; padding: 16px; border-radius: 50px; border: none; 
-          background: #ff4757; color: white;
+          background: var(--red-btn); color: white;
           font-weight: 700; font-size: 16px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
           box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2);
@@ -353,6 +354,9 @@ export function renderWebsite() {
       let currentMovieId = "";
       let activeVideoLink = ""; 
       let activeIsPremium = false;
+      
+      // Global Cache for Client-Side Search
+      let globalMovieCache = [];
       
       let currentCat = '';
       let pageNum = 1;
@@ -529,6 +533,11 @@ export function renderWebsite() {
               if(json.data.length === 0) {
                   hasMore = false;
               } else {
+                  // Add to Global Cache for Search
+                  globalMovieCache = [...globalMovieCache, ...json.data];
+                  // Unique filter
+                  globalMovieCache = [...new Map(globalMovieCache.map(item => [item.id, item])).values()];
+
                   const html = json.data.map(m => createCardHtml(m)).join('');
                   if(append) {
                       document.getElementById('mainGrid').innerHTML += html;
@@ -542,7 +551,21 @@ export function renderWebsite() {
           document.getElementById('scroll-loader').style.display = 'none';
       }
       
-      async function fetchRow(c,id){try{const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);const json=await res.json();document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');}catch(e){}}
+      // 🔥 Populate Global Cache on Home Load
+      async function fetchRow(c,id){
+          try{
+              const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);
+              const json=await res.json();
+              
+              if(json.data && json.data.length > 0) {
+                  globalMovieCache = [...globalMovieCache, ...json.data];
+                  // Unique filter
+                  globalMovieCache = [...new Map(globalMovieCache.map(item => [item.id, item])).values()];
+                  
+                  document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');
+              }
+          }catch(e){}
+      }
 
       function createCardHtml(m) { 
           const tag = m.isPremium ? '<div class="prem-tag">VIP</div>' : '';
@@ -672,7 +695,11 @@ export function renderWebsite() {
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
       async function openFavorites(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "MY LIST"; const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res);} else document.getElementById('mainGrid').innerHTML="Empty";}
       
-      // 🔥 FIX: Improved Search Logic
+      // 🔥 FIX: Hybrid Client + Server Search
+      function renderGrid(data) { 
+          document.getElementById('mainGrid').innerHTML = data.map(m => createCardHtml(m)).join(''); 
+      }
+
       async function executeSearch(){
           const q=document.getElementById('searchInput').value.trim(); 
           if(!q) return; 
@@ -682,40 +709,37 @@ export function renderWebsite() {
           document.getElementById('gridViewContainer').style.display='block';
           document.getElementById('backNav').style.display='flex'; 
           document.getElementById('gridTitle').innerText = "SEARCH: " + q.toUpperCase();
-          
           const grid = document.getElementById('mainGrid');
           grid.innerHTML = ""; 
           
+          // 1. Client Side First
+          const qLower = q.toLowerCase();
+          const localResults = globalMovieCache.filter(m => m.title.toLowerCase().includes(qLower));
+          
+          if(localResults.length > 0) {
+              renderGrid(localResults);
+              hideLoader();
+              return;
+          }
+
+          // 2. Server Side Fallback
           try {
               const res = await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);
-              
-              // 🔥 Handle 404 as "No Results" instead of Error
-              if (res.status === 404) {
-                  grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found for "' + q + '"</div>';
-                  hideLoader();
-                  return;
-              }
-
               if (!res.ok) throw new Error("Server Error");
               
               const json = await res.json();
-              
-              // Robust data handling
               let results = [];
-              if (Array.isArray(json)) {
-                  results = json;
-              } else if (json.data && Array.isArray(json.data)) {
-                  results = json.data;
-              }
+              if (Array.isArray(json)) results = json;
+              else if (json.data && Array.isArray(json.data)) results = json.data;
 
               if (results.length === 0) {
-                  grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found for "' + q + '"</div>';
+                  grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>';
               } else {
                   renderGrid(results);
               }
           } catch(e) { 
-              console.error(e); 
-              grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#ff4757;">Search failed. Please try again.</div>';
+              // Silent fail - show no results instead of error
+              grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>';
           }
           
           hideLoader();
