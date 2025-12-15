@@ -28,6 +28,7 @@ export function renderWebsite() {
         --text-sec: #b3b3b3;
         --border-color: #333;
         --shadow: 0 4px 12px rgba(0,0,0,0.3);
+        --nav-height: 65px;
       }
 
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -38,7 +39,7 @@ export function renderWebsite() {
           color: var(--text-main); 
           font-family: 'Padauk', 'Inter', sans-serif; 
           margin:0; 
-          padding-bottom: 70px; 
+          padding-bottom: var(--nav-height); /* Space for Bottom Nav */
           user-select: none;
           -webkit-user-select: none;
           overflow-x: hidden; 
@@ -46,66 +47,77 @@ export function renderWebsite() {
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
+      /* --- Simple Top Header --- */
       header { 
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
         padding: 15px 20px; position: sticky; top:0; z-index:50; 
         border-bottom: 1px solid rgba(255,255,255,0.1); 
-        display:flex; justify-content: space-between; align-items: center; 
+        display:flex; justify-content: center; align-items: center; 
       }
-      .brand { color: var(--primary); font-weight: 900; font-size: 24px; cursor:pointer; }
-      .search-box { display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 50px; padding: 8px 15px; width: 50%; }
-      .search-input { background: transparent; border: none; color: white; width: 100%; font-size: 14px; font-family: inherit; }
-      .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
+      .brand { color: var(--primary); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
+      /* --- BOTTOM NAVIGATION BAR (NEW) --- */
+      .bottom-nav {
+          position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
+          background: #1a1a1a; border-top: 1px solid #333;
+          display: flex; justify-content: space-around; align-items: center;
+          z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+      }
+      .nav-item {
+          background: none; border: none; color: #777;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          font-size: 10px; font-weight: 600; width: 25%; height: 100%;
+          cursor: pointer; transition: color 0.2s;
+      }
+      .nav-icon { font-size: 20px; margin-bottom: 4px; }
+      .nav-item.active { color: var(--primary); }
+      .nav-item.active .nav-icon { transform: scale(1.1); transition: transform 0.2s; }
+
+      /* --- Loader --- */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
+      /* --- Home Layout --- */
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
-      .section-title { color: #fff; font-size: 18px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
+      .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
       
       .see-more { 
-          color: var(--primary); font-size: 12px; cursor: pointer; font-weight: 600; 
-          border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px;
-          transition: background 0.2s;
+          color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; 
+          border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px;
       }
-      .see-more:active { background: rgba(0, 184, 148, 0.2); }
       
-      .scroll-row { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
+      .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
       
-      .card { position: relative; background: var(--bg-card); border-radius: 10px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
+      .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
       .card:active { transform: scale(0.97); }
-      .scroll-row .card { min-width: 120px; max-width: 120px; }
+      .scroll-row .card { min-width: 110px; max-width: 110px; }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
-      .title { padding: 10px 5px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; font-weight: 600; }
+      .title { padding: 8px 5px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; font-weight: 600; }
       
-      .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 4px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-      .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
+      .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
+      .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
+      /* --- User Panel (Side Menu) --- */
       .user-panel { 
-        position: fixed; top: 0; right: 0; width: 320px; height: 100%; 
-        background: #1a1a1a; z-index: 100; transform: translateX(100%); 
+        position: fixed; top: 0; right: 0; width: 100%; height: 100%; 
+        background: #1a1a1a; z-index: 200; transform: translateY(100%); 
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 0; 
-        box-shadow: -10px 0 40px rgba(0,0,0,0.5); display: flex; flex-direction: column;
-        border-left: 1px solid #333;
+        display: flex; flex-direction: column; padding-bottom: 80px;
       }
-      .user-panel.open { transform: translateX(0); }
+      .user-panel.open { transform: translateY(0); }
       
       .panel-header { padding: 20px; border-bottom: 1px solid #333; display:flex; justify-content:space-between; align-items:center; }
       .panel-header h3 { margin:0; font-size:18px; color: #fff; }
       
       .profile-card {
-          margin: 20px;
-          padding: 25px;
+          margin: 20px; padding: 25px;
           background: linear-gradient(135deg, var(--primary), #00b894, #006266);
-          border-radius: 20px;
-          color: white;
-          text-align: center;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 20px; color: white; text-align: center;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
       }
       .profile-avatar {
           width: 70px; height: 70px; background: rgba(0,0,0,0.2); 
@@ -113,41 +125,29 @@ export function renderWebsite() {
           align-items:center; justify-content:center; font-size:30px;
           border: 2px solid rgba(255,255,255,0.3);
       }
-      .profile-name { font-size: 20px; font-weight: bold; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-      .profile-status { font-size: 13px; opacity: 0.9; margin-top: 5px; font-weight: 500; }
-
       .panel-body { padding: 0 20px; }
       .auth-input { width: 100%; padding: 15px; margin-bottom: 15px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 12px; font-size: 14px; font-family: inherit; }
-      
       .menu-btn {
           width: 100%; padding: 15px; border-radius: 12px; border: none;
           background: #2a2a2a; color: #ddd; text-align: left;
           font-weight: 600; font-size: 14px; margin-bottom: 10px; cursor: pointer;
-          display: flex; align-items: center; gap: 10px;
-          border: 1px solid #333;
+          display: flex; align-items: center; gap: 10px; border: 1px solid #333;
       }
-      .menu-btn:active { transform: scale(0.98); background: #333; }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
-      #custom-alert { 
-          display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-          background: rgba(0,0,0,0.6); z-index: 10000; 
-          align-items: flex-start; justify-content: center; padding-top: 20px;
-      }
-      .alert-box { 
-          background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; 
-          width: 90%; max-width: 350px; 
-          box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444;
-          animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      }
-      @keyframes slideDown { 
-          from { transform: translateY(-100%); opacity: 0; } 
-          to { transform: translateY(0); opacity: 1; } 
-      }
+      /* --- Search View --- */
+      #searchView { display: none; padding: 20px; padding-bottom: 80px; }
+      .search-bar-large { width: 100%; padding: 15px 20px; background: #2a2a2a; border: 1px solid #444; border-radius: 30px; color: white; font-size: 16px; margin-bottom: 20px; outline:none; }
 
+      #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: flex-start; justify-content: center; padding-top: 20px; }
+      .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
+      @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+      /* --- Details Page --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
           background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
+          padding-bottom: 80px; /* Space for scrolling */
       }
       
       .details-header { 
@@ -157,72 +157,61 @@ export function renderWebsite() {
       }
       
       .nav-circle-btn {
-          width: 45px; height: 45px; border-radius: 50%;
-          background: rgba(40, 40, 40, 0.8); 
-          backdrop-filter: blur(5px);
-          border: 1px solid #444;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 20px; color: #fff;
-          cursor: pointer; transition: transform 0.2s;
+          width: 40px; height: 40px; border-radius: 50%;
+          background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px);
+          border: 1px solid #444; display: flex; align-items: center; justify-content: center;
+          font-size: 18px; color: #fff; cursor: pointer;
       }
-      .nav-circle-btn:active { transform: scale(0.9); }
 
       .modal-body-content { padding: 10px 20px 40px 20px; }
-
-      .top-info-section { display: flex; gap: 20px; margin-bottom: 30px; align-items: flex-start; }
-      .poster-img-sidebar { 
-          width: 120px; height: 180px; border-radius: 12px; object-fit: cover; 
-          box-shadow: 0 8px 20px rgba(0,0,0,0.5); flex-shrink: 0; background: #222; 
-      }
+      .top-info-section { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; }
+      .poster-img-sidebar { width: 110px; height: 160px; border-radius: 10px; object-fit: cover; box-shadow: 0 8px 20px rgba(0,0,0,0.5); flex-shrink: 0; background: #222; }
       
       .meta-col-sidebar { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
-      .movie-title { font-size: 22px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
-      .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
+      .movie-title { font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
+      .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 12px; margin-bottom: 15px; }
       
-      .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+      .actions-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
       
       .btn-play { 
-          width: 100%; padding: 16px; border-radius: 50px; border: none; 
+          width: 100%; padding: 14px; border-radius: 50px; border: none; 
           background: var(--red-btn); color: white;
-          font-weight: 700; font-size: 16px; cursor: pointer; 
+          font-weight: 700; font-size: 15px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
           box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2);
-          transition: transform 0.1s;
       }
       .btn-dl { 
-          width: 100%; padding: 15px; border-radius: 50px; 
-          background: transparent; color: var(--primary);
-          border: 2px solid var(--primary);
-          font-weight: 700; font-size: 16px; cursor: pointer; 
+          width: 100%; padding: 14px; border-radius: 50px; 
+          background: #2a2a2a; color: white;
+          border: 1px solid #444;
+          font-weight: 600; font-size: 14px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
       }
-      .btn-play:active, .btn-dl:active { transform: scale(0.97); }
+      /* 🔥 New Fav Button Style */
+      .btn-fav {
+          width: 100%; padding: 14px; border-radius: 50px; 
+          background: transparent; color: #bbb;
+          border: 1px solid #444;
+          font-weight: 600; font-size: 14px; cursor: pointer; 
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+      }
+      .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
 
-      .desc-text { color: #ccc; font-size: 15px; line-height: 1.8; margin-bottom: 30px; opacity: 0.9; }
+      .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
 
-      .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
-      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+      .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid #333; }
+      .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #333; }
 
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
-      .small-spinner { width: 30px; height: 30px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+      .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
       .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
-      
-      /* 🔥 FORCE FULLSCREEN STYLE */
-      .force-fullscreen-mode {
-          position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
-          z-index: 2147483647 !important; background: black !important;
-          display: flex !important; justify-content: center; align-items: center;
-      }
+      .force-fullscreen-mode { position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; z-index: 2147483647 !important; background: black !important; display: flex !important; justify-content: center; align-items: center; }
       .force-fullscreen-mode video { object-fit: contain; width: 100%; height: 100%; }
-
       .video-wrapper { width: 100%; aspect-ratio: 16/9; background: black; margin: auto 0; position: relative; }
       video { width: 100%; height: 100%; }
-      
-      .close-video-btn { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5); border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 310; backdrop-filter: blur(5px); }
-      
       .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
       .big-play-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.5); animation: pulse 2s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -230,11 +219,9 @@ export function renderWebsite() {
       .accordion { background-color: #1e1e1e; color: #eee; padding: 15px; width: 100%; border: none; text-align: left; font-weight: 700; border-radius: 12px; display: flex; justify-content: space-between; margin-top:10px; border-bottom: 1px solid #333; }
       .panel { padding: 0 5px; background-color: transparent; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; padding: 15px 5px; }
-      .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-size: 13px; font-weight: 600; }
+      .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-size: 12px; font-weight: 600; }
       .ep-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-      
-      .genre-tag { background: #222; color: #ccc; font-size: 11px; padding: 5px 10px; border-radius: 8px; font-weight: 600; border: 1px solid #444; margin-right:5px; margin-bottom:5px; display:inline-block; }
-      
+      .genre-tag { background: #222; color: #ccc; font-size: 10px; padding: 4px 10px; border-radius: 8px; font-weight: 600; border: 1px solid #444; margin-right:5px; margin-bottom:5px; display:inline-block; }
       .skeleton-card { background: transparent; pointer-events: none; }
       .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
       .poster-ratio { width: 100%; aspect-ratio: 2/3; margin-bottom: 8px; }
@@ -253,34 +240,12 @@ export function renderWebsite() {
     <div id="global-loader"><div class="spinner"></div></div>
 
     <header>
-      <div class="brand" onclick="goHome()">Stream X</div>
-      <div class="search-box"><input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeypress="handleSearchKey(event)"><button class="icon-btn" onclick="executeSearch()">🔍</button></div>
-      <button class="icon-btn" onclick="toggleUserPanel()">👤</button>
+      <div class="brand" onclick="switchTab('home')">Stream X</div>
     </header>
 
-    <div id="userPanel" class="user-panel">
-        <div class="panel-header"><h3>Account</h3><button class="icon-btn" onclick="toggleUserPanel()" style="font-size:18px;">✕</button></div>
-        <div id="loginForm" class="panel-body" style="padding-top:20px;">
-            <input type="text" id="reg_user" class="auth-input" placeholder="Username">
-            <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
-            <button class="auth-btn-solid" onclick="doLogin()">Log In</button>
-            <button class="auth-btn-solid" style="background:#555;" onclick="doRegister()">Create Account</button>
-        </div>
-        <div id="profileView" style="display:none; flex-direction:column; height:100%;">
-            <div class="profile-card">
-                <div class="profile-avatar">👤</div>
-                <h3 id="u_name" class="profile-name">User</h3>
-                <p id="u_status" class="profile-status">Free Plan</p>
-            </div>
-            <div class="panel-body">
-                <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <input type="text" id="vip_code" class="auth-input" style="margin:0;" placeholder="Redeem Code">
-                    <button class="auth-btn-solid" style="margin:0; width:auto; border-radius:12px;" onclick="doRedeem()">Go</button>
-                </div>
-                <button class="menu-btn" onclick="openFavorites(); toggleUserPanel();">❤️ &nbsp; My Favorites</button>
-                <button class="menu-btn" onclick="doLogout()" style="color:#ff4757; border-color:#ff4757;">🚪 &nbsp; Log Out</button>
-            </div>
-        </div>
+    <div id="searchView">
+        <input type="text" id="searchInput" class="search-bar-large" placeholder="Search movies..." onkeypress="handleSearchKey(event)">
+        <div class="grid" id="searchGrid"></div>
     </div>
 
     <div id="homeView">
@@ -290,20 +255,64 @@ export function renderWebsite() {
     </div>
 
     <div class="back-nav" id="backNav">
-        <button class="nav-circle-btn" onclick="goHome()" style="width:35px; height:35px; border:none; box-shadow:none; font-size:18px;">⬅</button>
+        <button class="nav-circle-btn" onclick="switchTab('home')" style="border:none;">⬅</button>
         <span id="gridTitle" style="color:white; font-weight:bold; margin-left:10px;">MOVIES</span>
     </div>
     <div class="container" id="gridViewContainer">
         <div class="grid" id="mainGrid"></div>
         <div id="scroll-loader"><div class="small-spinner"></div></div>
-        <div style="height:50px;"></div>
+    </div>
+
+    <div id="userPanel" class="user-panel">
+        <div class="panel-header"><h3>Account</h3></div>
+        
+        <div id="loginForm" class="panel-body" style="padding-top:20px;">
+            <input type="text" id="reg_user" class="auth-input" placeholder="Username">
+            <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
+            <button class="auth-btn-solid" onclick="doLogin()">Log In</button>
+            <button class="auth-btn-solid" style="background:#555;" onclick="doRegister()">Create Account</button>
+        </div>
+
+        <div id="profileView" style="display:none; flex-direction:column; height:100%;">
+            <div class="profile-card">
+                <div class="profile-avatar">👤</div>
+                <h3 id="u_name" class="profile-name">User</h3>
+                <p id="u_status" class="profile-status">Free Plan</p>
+            </div>
+            
+            <div class="panel-body">
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <input type="text" id="vip_code" class="auth-input" style="margin:0;" placeholder="Redeem Code">
+                    <button class="auth-btn-solid" style="margin:0; width:auto; border-radius:12px;" onclick="doRedeem()">Go</button>
+                </div>
+                <button class="menu-btn" onclick="doLogout()" style="color:#ff4757; border-color:#ff4757;">🚪 &nbsp; Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('home')" id="nav_home">
+            <span class="nav-icon">🏠</span>
+            Home
+        </button>
+        <button class="nav-item" onclick="switchTab('search')" id="nav_search">
+            <span class="nav-icon">🔍</span>
+            Search
+        </button>
+        <button class="nav-item" onclick="switchTab('fav')" id="nav_fav">
+            <span class="nav-icon">❤️</span>
+            Favorites
+        </button>
+        <button class="nav-item" onclick="switchTab('profile')" id="nav_profile">
+            <span class="nav-icon">👤</span>
+            Account
+        </button>
     </div>
 
     <div id="playerModal">
       <div class="details-header">
         <button class="nav-circle-btn" onclick="closePlayer()">⬅</button>
-        <button class="nav-circle-btn" id="favBtn" onclick="toggleFavorite()">🤍</button>
-      </div>
+        </div>
 
       <div class="modal-body-content">
           <div class="top-info-section">
@@ -321,9 +330,15 @@ export function renderWebsite() {
               <button class="btn-play" onclick="launchVideo()">
                   ▶ Play Video
               </button>
-              <a id="dt_dl_link" href="#" target="_blank" class="btn-dl">
-                  ⬇ Download
-              </a>
+              
+              <div style="display:flex; gap:10px;">
+                  <a id="dt_dl_link" href="#" target="_blank" class="btn-dl" style="flex:1;">
+                      ⬇ Download
+                  </a>
+                  <button id="favBtn" class="btn-fav" onclick="toggleFavorite()" style="flex:1;">
+                      🤍 Add to List
+                  </button>
+              </div>
           </div>
 
           <div id="ep_section"></div>
@@ -387,11 +402,10 @@ export function renderWebsite() {
         loadSession(); updateProfileUI(); 
         await Promise.all([fetchRow('movies', 'row_movies'), fetchRow('series', 'row_series'), fetchRow('Adult', 'row_18')]);
         hideLoader();
+        
+        // Handle URL params
         const p = new URLSearchParams(window.location.search);
-        const movieId = p.get('id');
-        const view = p.get('view');
-        const cat = p.get('cat');
-        if (movieId) { fetchSingleMovie(movieId); } else if (view === 'grid' && cat) { openCategory(cat); }
+        if (p.get('id')) fetchSingleMovie(p.get('id'));
         
         window.addEventListener('scroll', () => {
             if(document.getElementById('gridViewContainer').style.display === 'block') {
@@ -402,26 +416,45 @@ export function renderWebsite() {
         });
       };
 
-      window.onpopstate = function() {
-          const p = new URLSearchParams(window.location.search);
-          if(!p.get('id')) closePlayerInternal();
-          if(!p.get('view')) { goHomeInternal(); } else { const cat = p.get('cat'); if(cat) openCategory(cat, false); }
-      };
+      // 🔥 Navigation Logic
+      function switchTab(tab) {
+          // Reset Icons
+          document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+          document.getElementById('nav_' + tab).classList.add('active');
 
-      function goHome(){ const u = window.location.pathname; window.history.pushState({path:u},'',u); goHomeInternal(); }
-      function goHomeInternal(){ document.getElementById('homeView').style.display='block'; document.getElementById('gridViewContainer').style.display='none'; document.getElementById('backNav').style.display='none'; }
+          // Hide Everything First
+          document.getElementById('homeView').style.display='none';
+          document.getElementById('searchView').style.display='none';
+          document.getElementById('gridViewContainer').style.display='none';
+          document.getElementById('userPanel').classList.remove('open');
+          document.getElementById('backNav').style.display='none';
+
+          if(tab === 'home') {
+              document.getElementById('homeView').style.display='block';
+          } else if(tab === 'search') {
+              document.getElementById('searchView').style.display='block';
+              document.getElementById('searchInput').focus();
+          } else if(tab === 'fav') {
+              openFavorites();
+          } else if(tab === 'profile') {
+              document.getElementById('userPanel').classList.add('open');
+          }
+      }
+
+      function goHome(){ switchTab('home'); }
       
-      async function openCategory(c, pushState = true){
+      async function openCategory(c){
           currentCat = c; pageNum = 1; hasMore = true;
           document.getElementById('mainGrid').innerHTML = ""; 
           showLoader(); 
-          document.getElementById('homeView').style.display='none'; document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='flex'; 
+          document.getElementById('homeView').style.display='none'; 
+          document.getElementById('gridViewContainer').style.display='block'; 
+          document.getElementById('backNav').style.display='flex'; 
           document.getElementById('gridTitle').innerText = c.toUpperCase();
-          if(pushState) { const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`; window.history.pushState({path:u},'',u); }
           await fetchMovies(1,c, true); hideLoader();
       }
 
-      function closePlayer() { closePlayerInternal(); const p = new URLSearchParams(window.location.search); const cat = p.get('cat'); if(cat) { const u = \`?view=grid&cat=\${encodeURIComponent(cat)}\`; window.history.pushState({path:u},'',u); } else { window.history.pushState(null, '', window.location.pathname); } }
+      function closePlayer() { closePlayerInternal(); window.history.pushState(null, '', window.location.pathname); }
       function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
 
       function launchVideo() {
@@ -433,29 +466,15 @@ export function renderWebsite() {
           playViaSecureToken(activeVideoLink);
       }
       
-      // 🔥 SUPER FORCE FULLSCREEN LOGIC (APK COMPATIBLE)
       function toggleFullScreen() {
           const wrapper = document.getElementById('videoOverlay');
           const video = document.getElementById('video');
-          const isForce = wrapper.classList.contains('force-fullscreen-mode');
-
-          if (!isForce) {
-              // 1. Try Native
-              if (wrapper.requestFullscreen) wrapper.requestFullscreen().catch(()=>{});
-              else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
-              
-              // 2. Apply CSS Force (The Nuclear Option)
+          
+          if (!wrapper.classList.contains('force-fullscreen-mode')) {
               wrapper.classList.add('force-fullscreen-mode');
-              
-              // 3. Try Native Android Video Player Hook
-              if (video.webkitEnterFullScreen) {
-                  video.webkitEnterFullScreen();
-              }
-              
-              // 4. Try Orientation Lock
+              if (wrapper.requestFullscreen) wrapper.requestFullscreen().catch(()=>{});
               try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } catch(e){}
           } else {
-              // Exit
               wrapper.classList.remove('force-fullscreen-mode');
               if (document.exitFullscreen) document.exitFullscreen();
               try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
@@ -467,7 +486,7 @@ export function renderWebsite() {
           if(window.hlsInstance) { window.hlsInstance.destroy(); window.hlsInstance = null; }
           const wrapper = document.getElementById('videoOverlay');
           wrapper.style.display='none';
-          wrapper.classList.remove('force-fullscreen-mode'); // Reset
+          wrapper.classList.remove('force-fullscreen-mode'); 
           if (document.fullscreenElement) document.exitFullscreen();
           try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
       }
@@ -568,10 +587,23 @@ export function renderWebsite() {
       function toggleFavorite(){
           if(!currentMovieId)return; let f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.includes(currentMovieId))f=f.filter(x=>x!==currentMovieId); else f.push(currentMovieId); localStorage.setItem('my_favs',JSON.stringify(f)); updateFavBtnState();
       }
-      function updateFavBtnState(){ const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); document.getElementById('favBtn').innerText=f.includes(currentMovieId)?"❤️":"🤍"; }
+      function updateFavBtnState(){ 
+          const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
+          const btn = document.getElementById('favBtn');
+          if(f.includes(currentMovieId)) {
+              btn.innerHTML = '❤️ Saved';
+              btn.classList.add('active');
+          } else {
+              btn.innerHTML = '🤍 Add to List';
+              btn.classList.remove('active');
+          }
+      }
 
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
-      function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
+      function toggleUserPanel(){
+          // Only used for close button now, nav handles open
+          document.getElementById('userPanel').classList.toggle('open');
+      }
       
       function updateProfileUI(){
          if(currentUser){
@@ -586,28 +618,46 @@ export function renderWebsite() {
       async function doLogin(){const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; showLoader(); const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})}); hideLoader(); if(res.ok){ const user=await res.json(); user.vipExpiry=user.vipExpiry||0; currentUser=user; localStorage.setItem('user_session',JSON.stringify(user)); updateProfileUI(); } else showAlert("Error","Fail");}
       function doLogout(){localStorage.removeItem('user_session'); currentUser=null; updateProfileUI();}
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
-      async function openFavorites(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "MY LIST"; const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res);} else document.getElementById('mainGrid').innerHTML="Empty";}
       
-      function renderGrid(data) { document.getElementById('mainGrid').innerHTML = data.map(m => createCardHtml(m)).join(''); }
+      async function openFavorites(){
+          // Used by nav button
+          document.getElementById('mainGrid').innerHTML = "";
+          document.getElementById('homeView').style.display='none'; document.getElementById('searchView').style.display='none';
+          document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='none';
+          document.getElementById('userPanel').classList.remove('open');
+          
+          const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
+          if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res, 'mainGrid');} 
+          else document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No favorites yet.</p>';
+      }
+      
+      function renderGrid(data, id = 'mainGrid') { document.getElementById(id).innerHTML = data.map(m => createCardHtml(m)).join(''); }
 
       async function executeSearch(){
           const q=document.getElementById('searchInput').value.trim(); 
           if(!q) return; 
-          showLoader(); document.getElementById('homeView').style.display='none'; document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "SEARCH: " + q.toUpperCase();
-          const grid = document.getElementById('mainGrid'); grid.innerHTML = ""; 
+          
+          const grid = document.getElementById('searchGrid');
+          grid.innerHTML = '<div class="small-spinner"></div>';
+          
           const qLower = q.toLowerCase();
           const localResults = globalMovieCache.filter(m => m.title.toLowerCase().includes(qLower));
-          if(localResults.length > 0) { renderGrid(localResults); hideLoader(); return; }
+          
+          if(localResults.length > 0) { 
+              renderGrid(localResults, 'searchGrid'); 
+              return; 
+          }
+
           try {
               const res = await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);
-              if (res.status === 404) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; hideLoader(); return; }
-              if (!res.ok) throw new Error("Server Error");
+              if (res.status === 404) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No results found.</div>'; return; }
               const json = await res.json();
               let results = [];
               if (Array.isArray(json)) results = json; else if (json.data && Array.isArray(json.data)) results = json.data;
-              if (results.length === 0) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; } else { renderGrid(results); }
-          } catch(e) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; }
-          hideLoader();
+              if (results.length === 0) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No results found.</div>'; } else { renderGrid(results, 'searchGrid'); }
+          } catch(e) { 
+              grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No results found.</div>'; 
+          }
       }
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
     </script>
