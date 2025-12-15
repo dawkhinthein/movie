@@ -20,21 +20,22 @@ export function renderWebsite() {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        --primary: #00b894; /* Green/Teal color */
-        --bg-main: #f8f9fa; /* Light Gray Background */
-        --bg-card: #ffffff; /* White Card Background */
-        --text-main: #333333; /* Dark Text */
-        --text-sec: #666666; /* Secondary Text */
-        --border-color: #e9ecef;
+        --primary: #00b894; /* Screenshot Teal Color */
+        --primary-dark: #00a884;
+        --bg-body: #f7f9fc;
+        --bg-card: #ffffff;
+        --text-main: #2d3436;
+        --text-light: #636e72;
+        --shadow: 0 4px 12px rgba(0,0,0,0.08);
       }
 
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
       
       html, body { 
           overscroll-behavior-y: none; 
-          background: var(--bg-main); 
+          background: var(--bg-body); 
           color: var(--text-main); 
-          font-family: 'Padauk', 'Inter', sans-serif; /* Padauk First */
+          font-family: 'Padauk', 'Inter', sans-serif; 
           margin:0; 
           padding-bottom: 70px; 
           user-select: none;
@@ -44,154 +45,175 @@ export function renderWebsite() {
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
-      /* --- Light Theme Header --- */
+      /* --- Modern Header --- */
       header { 
         background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-        padding: 15px 20px; position: sticky; top:0; z-index:50; 
-        border-bottom: 1px solid var(--border-color); 
+        padding: 12px 20px; position: sticky; top:0; z-index:50; 
+        border-bottom: 1px solid #eee; 
         display:flex; justify-content: space-between; align-items: center; 
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
       }
-      .brand { color: var(--primary); font-weight: 900; font-size: 24px; cursor:pointer; }
-      .search-box { display: flex; align-items: center; background: #f1f3f5; border-radius: 50px; padding: 6px 15px; width: 50%; border: 1px solid var(--border-color); }
+      .brand { color: var(--primary); font-weight: 800; font-size: 24px; cursor:pointer; letter-spacing: -0.5px; }
+      .search-box { display: flex; align-items: center; background: #f1f2f6; border-radius: 50px; padding: 8px 15px; width: 50%; }
       .search-input { background: transparent; border: none; color: var(--text-main); width: 100%; font-size: 14px; font-family: inherit; }
       .icon-btn { background: none; border: none; color: var(--text-main); font-size: 22px; cursor: pointer; padding: 5px; }
 
-      /* --- Loader (Light Theme) --- */
-      #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
-      .spinner { width: 40px; height: 40px; border: 3px solid #e9ecef; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      .hidden-loader { opacity: 0; pointer-events: none; }
-
-      /* --- Home Section --- */
-      .home-section { padding: 20px 0 10px 20px; }
+      /* --- Cards & Layout --- */
+      .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
-      .section-title { color: var(--text-main); font-size: 18px; font-weight: 700; border-left: 3px solid var(--primary); padding-left: 10px; }
+      .section-title { color: var(--text-main); font-size: 18px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
       .see-more { color: var(--primary); font-size: 13px; cursor: pointer; font-weight: 600; }
-      .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; padding-right: 20px; scroll-behavior: smooth; }
+      
+      .scroll-row { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
       
-      /* --- Cards (Light Theme) --- */
-      .card { position: relative; background: var(--bg-card); border-radius: 10px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.1s; border: 1px solid var(--border-color); }
-      .card:active { transform: scale(0.98); }
-      .scroll-row .card { min-width: 115px; max-width: 115px; }
+      .card { position: relative; background: var(--bg-card); border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
+      .card:active { transform: scale(0.97); }
+      .scroll-row .card { min-width: 120px; max-width: 120px; }
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #eee; }
-      .title { padding: 8px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); font-weight: 600; }
+      .title { padding: 10px 5px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); font-weight: 600; }
       
-      .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-      .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(255,255,255,0.9); color: #000; font-size: 9px; font-weight: bold; padding: 3px 6px; border-radius: 4px; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+      .prem-tag { position: absolute; top: 8px; left: 8px; background: #ffeaa7; color: #d63031; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+      .year-tag { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3436; font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 6px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-      /* --- User Panel (Light Theme) --- */
+      /* --- Profile Panel (Cool Design) --- */
       .user-panel { 
-        position: fixed; top: 0; right: 0; width: 300px; height: 100%; 
-        background: var(--bg-card); z-index: 100; transform: translateX(100%); 
-        transition: transform 0.3s ease; padding: 25px; border-left: 1px solid var(--border-color);
-        box-shadow: -5px 0 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; color: var(--text-main);
+        position: fixed; top: 0; right: 0; width: 320px; height: 100%; 
+        background: #ffffff; z-index: 100; transform: translateX(100%); 
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 0; 
+        box-shadow: -10px 0 40px rgba(0,0,0,0.1); display: flex; flex-direction: column;
       }
       .user-panel.open { transform: translateX(0); }
-      .auth-input { width: 100%; padding: 14px; margin: 10px 0; background: #f8f9fa; border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; font-family: inherit; }
-      .auth-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 25px; margin-top: 15px; font-family: inherit; font-size: 15px; box-shadow: 0 4px 10px rgba(0, 184, 148, 0.2); }
-      .auth-btn.secondary { background: #e9ecef; color: var(--text-main); margin-top: 10px; box-shadow: none; border: 1px solid var(--border-color); }
+      
+      .panel-header { padding: 20px; border-bottom: 1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
+      .panel-header h3 { margin:0; font-size:18px; color: var(--text-main); }
+      
+      .profile-card {
+          margin: 20px;
+          padding: 25px;
+          background: linear-gradient(135deg, var(--primary), #00b894, #55efc4);
+          border-radius: 20px;
+          color: white;
+          text-align: center;
+          box-shadow: 0 10px 25px rgba(0, 184, 148, 0.3);
+      }
+      .profile-avatar {
+          width: 70px; height: 70px; background: rgba(255,255,255,0.3); 
+          border-radius: 50%; margin: 0 auto 10px; display:flex; 
+          align-items:center; justify-content:center; font-size:30px;
+          border: 2px solid rgba(255,255,255,0.5);
+      }
+      .profile-name { font-size: 20px; font-weight: bold; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+      .profile-status { font-size: 13px; opacity: 0.9; margin-top: 5px; font-weight: 500; }
 
-      /* --- Grid View --- */
-      .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
-      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-      @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      .back-nav { display: none; padding: 10px 20px; align-items: center; background: rgba(255,255,255,0.95); position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-      .back-nav-btn { background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+      .panel-body { padding: 0 20px; }
+      .auth-input { width: 100%; padding: 15px; margin-bottom: 15px; background: #f1f2f6; border: none; color: #333; border-radius: 12px; font-size: 14px; font-family: inherit; }
+      
+      .menu-btn {
+          width: 100%; padding: 15px; border-radius: 12px; border: none;
+          background: #fff; color: var(--text-main); text-align: left;
+          font-weight: 600; font-size: 14px; margin-bottom: 10px; cursor: pointer;
+          display: flex; align-items: center; gap: 10px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #f1f2f6;
+      }
+      .menu-btn:active { transform: scale(0.98); }
+      .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
-      /* --- Infinite Scroll Spinner --- */
-      #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
-      .small-spinner { width: 25px; height: 25px; border: 3px solid #eee; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
-
-      /* ===============================
-         NEW LIGHT THEME DETAILS PAGE 
-      =============================== */
+      /* --- New Details Page UI --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
-          background: var(--bg-card); /* White background */
-          z-index:200; overflow-y: auto; overscroll-behavior: contain; 
+          background: #ffffff; z-index:200; overflow-y: auto; overscroll-behavior: contain; 
       }
       
-      /* Header with dark icons for light background */
+      /* Stylish Circle Buttons for Back/Fav */
       .details-header { 
-          position: sticky; top: 0; left: 0; width: 100%; padding: 10px 15px; 
+          position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
           display: flex; justify-content: space-between; z-index: 20; 
-          background: rgba(255,255,255,0.9); backdrop-filter: blur(5px);
-          border-bottom: 1px solid var(--border-color);
+          /* Gradient fade for header */
+          background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 80%, rgba(255,255,255,0) 100%);
       }
-      .details-header button { 
-          background: transparent; border: none; color: var(--text-main); 
-          width: 40px; height: 40px; border-radius: 50%; font-size: 22px; 
-          display: flex; align-items: center; justify-content: center; cursor: pointer; 
-      }
-
-      /* Content Body - Removed Backdrop */
-      .modal-body-content { padding: 25px 20px; }
-
-      /* New Top Section: Side-by-Side Layout */
-      .top-info-section { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; }
       
-      /* Sidebar Poster */
+      .nav-circle-btn {
+          width: 45px; height: 45px; border-radius: 50%;
+          background: #ffffff; 
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          border: 1px solid #f1f1f1;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 20px; color: var(--text-main);
+          cursor: pointer; transition: transform 0.2s;
+      }
+      .nav-circle-btn:active { transform: scale(0.9); }
+
+      .modal-body-content { padding: 10px 20px 40px 20px; }
+
+      /* Side-by-Side Layout */
+      .top-info-section { display: flex; gap: 20px; margin-bottom: 30px; align-items: flex-start; }
       .poster-img-sidebar { 
-          width: 130px; height: 195px; border-radius: 12px; object-fit: cover; 
-          box-shadow: 0 5px 15px rgba(0,0,0,0.15); flex-shrink: 0; background: #eee; 
+          width: 120px; height: 180px; border-radius: 12px; object-fit: cover; 
+          box-shadow: 0 8px 20px rgba(0,0,0,0.15); flex-shrink: 0; background: #eee; 
       }
       
-      /* Sidebar Metadata */
-      .meta-col-sidebar { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-      .movie-title { font-size: 22px; font-weight: bold; color: var(--text-main); margin: 0 0 10px 0; line-height: 1.3; }
-      .stats-row { display: flex; align-items: center; gap: 15px; color: var(--text-sec); font-size: 13px; margin-bottom: 12px; font-weight: 500; }
-      .stats-item { display: flex; align-items: center; gap: 5px; }
-      .genre-row { display: flex; flex-wrap: wrap; gap: 8px; }
-      .genre-tag { background: #f1f3f5; color: var(--text-sec); font-size: 11px; padding: 5px 12px; border-radius: 15px; font-weight: 600; }
-
-      /* Buttons - Stacked like example */
-      .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-      .action-btn { 
-          width: 100%; padding: 15px; border-radius: 12px; border: none; 
-          font-weight: bold; font-size: 16px; cursor: pointer; 
+      .meta-col-sidebar { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
+      .movie-title { font-size: 22px; font-weight: 800; color: #2d3436; margin: 0 0 10px 0; line-height: 1.2; }
+      .stats-row { display: flex; align-items: center; gap: 15px; color: #636e72; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
+      
+      /* Play & Download Buttons (Exact Match) */
+      .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+      
+      .btn-play { 
+          width: 100%; padding: 16px; border-radius: 50px; border: none; 
+          background: var(--primary); color: white;
+          font-weight: 700; font-size: 16px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          color: white; font-family: inherit; transition: transform 0.1s;
+          box-shadow: 0 6px 20px rgba(0, 184, 148, 0.25);
+          transition: transform 0.1s;
       }
-      .action-btn:active { transform: scale(0.98); }
-      .btn-play { background: var(--primary); box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3); }
-      .btn-dl { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+      .btn-dl { 
+          width: 100%; padding: 15px; border-radius: 50px; 
+          background: transparent; color: var(--primary);
+          border: 2px solid var(--primary);
+          font-weight: 700; font-size: 16px; cursor: pointer; 
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+      }
+      .btn-play:active, .btn-dl:active { transform: scale(0.97); }
 
-      /* Description text */
-      .desc-text { color: var(--text-main); font-size: 15px; line-height: 1.7; margin-bottom: 30px; }
+      .desc-text { color: #2d3436; font-size: 15px; line-height: 1.8; margin-bottom: 30px; opacity: 0.9; }
 
-      /* Video Player Overlay (Dark) */
+      /* Grid & Others */
+      .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+      @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
+      .back-nav { display: none; padding: 15px 20px; align-items: center; background: #fff; position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid #eee; }
+
+      /* Loader */
+      #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
+      .small-spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+
+      /* Video Overlay */
       .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       .video-wrapper { width: 100%; aspect-ratio: 16/9; background: black; margin: auto 0; position: relative; }
       video { width: 100%; height: 100%; }
-      .close-video-btn { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5); border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; z-index: 310; }
+      .close-video-btn { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5); border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 310; backdrop-filter: blur(5px); }
       
       .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
-      .big-play-btn { width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 184, 148, 0.9); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.5); animation: pulse 2s infinite; }
+      .big-play-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.5); animation: pulse 2s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-      /* Episodes (Light Theme) */
-      .accordion { background-color: #f8f9fa; color: var(--text-main); padding: 15px; width: 100%; border: none; text-align: left; font-weight: 700; border-bottom: 1px solid var(--border-color); margin-top: 8px; border-radius: 8px; display: flex; justify-content: space-between; font-family: inherit; }
-      .panel { padding: 0 5px; background-color: #ffffff; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+      .accordion { background-color: #f1f2f6; color: #2d3436; padding: 15px; width: 100%; border: none; text-align: left; font-weight: 700; border-radius: 12px; display: flex; justify-content: space-between; margin-top:10px; }
+      .panel { padding: 0 5px; background-color: transparent; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; padding: 15px 5px; }
-      .ep-btn { background: #f1f3f5; border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 5px; cursor: pointer; border-radius: 8px; font-size: 13px; font-weight: 600; }
+      .ep-btn { background: #fff; border: 1px solid #ddd; color: #2d3436; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
       .ep-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
       
-      /* Skeleton (Light Theme) */
-      .skeleton-card { background: transparent; pointer-events: none; }
-      .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #eee 4%, #ddd 25%, #eee 36%); background-size: 1000px 100%; border-radius: 6px; }
-      .poster-ratio { width: 100%; aspect-ratio: 2/3; margin-bottom: 8px; }
-      .text-line { height: 12px; border-radius: 4px; }
-      @keyframes shimmer { 0% { background-position: -500px 0; } 100% { background-position: 500px 0; } }
+      .genre-tag { background: #f1f2f6; color: #636e72; font-size: 11px; padding: 5px 10px; border-radius: 8px; font-weight: 600; border: 1px solid #e1e1e1; margin-right:5px; margin-bottom:5px; display:inline-block; }
     </style>
   </head>
   <body>
 
     <div id="custom-alert" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center;">
-        <div style="background:var(--bg-card); padding:30px; border-radius:12px; text-align:center; width:80%; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            <h3 id="alert-title" style="color:var(--text-main);"></h3><p id="alert-msg" style="color:var(--text-sec);"></p>
-            <button onclick="document.getElementById('custom-alert').style.display='none'" class="auth-btn">OK</button>
+        <div style="background:#fff; padding:30px; border-radius:20px; text-align:center; width:80%; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
+            <h3 id="alert-title" style="color:#2d3436; margin-top:0;"></h3><p id="alert-msg" style="color:#636e72; margin-bottom:20px;"></p>
+            <button onclick="document.getElementById('custom-alert').style.display='none'" class="auth-btn-solid">OK</button>
         </div>
     </div>
     <div id="global-loader"><div class="spinner"></div></div>
@@ -203,18 +225,31 @@ export function renderWebsite() {
     </header>
 
     <div id="userPanel" class="user-panel">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="margin:0;">Account</h3><button class="icon-btn" onclick="toggleUserPanel()" style="color:var(--text-main);">✕</button></div>
-        <div id="loginForm">
+        <div class="panel-header"><h3>Account</h3><button class="icon-btn" onclick="toggleUserPanel()" style="font-size:18px;">✕</button></div>
+        
+        <div id="loginForm" class="panel-body" style="padding-top:20px;">
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
-            <button class="auth-btn" onclick="doLogin()">Log In</button><button class="auth-btn secondary" onclick="doRegister()">Register</button>
+            <button class="auth-btn-solid" onclick="doLogin()">Log In</button>
+            <button class="auth-btn-solid" style="background:#b2bec3;" onclick="doRegister()">Create Account</button>
         </div>
-        <div id="profileView" style="display:none;">
-            <h3 id="u_name">User</h3>
-            <p id="u_status" style="color:var(--text-sec); font-size:13px;">Free Plan</p>
-            <div style="display:flex; gap:8px; margin-top:10px;"><input type="text" id="vip_code" class="auth-input" style="margin:0;" placeholder="Code"><button class="auth-btn" style="margin:0; width:auto;" onclick="doRedeem()">Go</button></div>
-            <button class="auth-btn secondary" onclick="openFavorites(); toggleUserPanel();">❤️ My List</button>
-            <button class="auth-btn secondary" onclick="doLogout()" style="color:#ff4b55; border-color:#ff4b55;">Log Out</button>
+
+        <div id="profileView" style="display:none; flex-direction:column; height:100%;">
+            <div class="profile-card">
+                <div class="profile-avatar">👤</div>
+                <h3 id="u_name" class="profile-name">User</h3>
+                <p id="u_status" class="profile-status">Free Plan</p>
+            </div>
+            
+            <div class="panel-body">
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <input type="text" id="vip_code" class="auth-input" style="margin:0;" placeholder="Redeem Code">
+                    <button class="auth-btn-solid" style="margin:0; width:auto; border-radius:12px;" onclick="doRedeem()">Go</button>
+                </div>
+
+                <button class="menu-btn" onclick="openFavorites(); toggleUserPanel();">❤️ &nbsp; My Favorites</button>
+                <button class="menu-btn" onclick="doLogout()" style="color:#ff4757; border-color:#ff4757;">🚪 &nbsp; Log Out</button>
+            </div>
         </div>
     </div>
 
@@ -225,7 +260,7 @@ export function renderWebsite() {
     </div>
 
     <div class="back-nav" id="backNav">
-        <button class="back-nav-btn" onclick="goHome()">⬅</button>
+        <button class="nav-circle-btn" onclick="goHome()" style="width:35px; height:35px; border:none; box-shadow:none; font-size:18px;">⬅</button>
         <span id="gridTitle" style="color:var(--text-main); font-weight:bold; margin-left:10px;">MOVIES</span>
     </div>
     <div class="container" id="gridViewContainer">
@@ -236,8 +271,8 @@ export function renderWebsite() {
 
     <div id="playerModal">
       <div class="details-header">
-        <button onclick="closePlayer()">⬅</button>
-        <button id="favBtn" onclick="toggleFavorite()">🤍</button>
+        <button class="nav-circle-btn" onclick="closePlayer()">⬅</button>
+        <button class="nav-circle-btn" id="favBtn" onclick="toggleFavorite()">🤍</button>
       </div>
 
       <div class="modal-body-content">
@@ -247,16 +282,16 @@ export function renderWebsite() {
                   <h1 id="dt_title" class="movie-title">Loading...</h1>
                   <div class="stats-row">
                       <div class="stats-item">📅 <span id="dt_year">...</span></div>
-                      </div>
+                  </div>
                   <div id="dt_genres" class="genre-row"></div>
               </div>
           </div>
 
           <div class="actions-container">
-              <button class="action-btn btn-play" onclick="launchVideo()">
+              <button class="btn-play" onclick="launchVideo()">
                   ▶ Play Video
               </button>
-              <a id="dt_dl_link" href="#" target="_blank" class="action-btn btn-dl">
+              <a id="dt_dl_link" href="#" target="_blank" class="btn-dl">
                   ⬇ Download
               </a>
           </div>
@@ -270,11 +305,11 @@ export function renderWebsite() {
       </div>
 
       <div id="videoOverlay" class="video-overlay">
-         <button class="close-video-btn" onclick="closeVideo()">✕ Close</button>
+         <button class="close-video-btn" onclick="closeVideo()">✕ Close Player</button>
          <div class="video-wrapper">
             <div id="vip-lock" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; align-items:center; justify-content:center; flex-direction:column; z-index:10;">
                 <div style="font-size:40px;">👑</div><p style="color:#ffd700;">VIP Required</p>
-                <button class="auth-btn" style="width:auto; padding:8px 20px;" onclick="closeVideo(); toggleUserPanel();">Unlock</button>
+                <button class="auth-btn-solid" style="width:auto; padding:8px 30px;" onclick="closeVideo(); toggleUserPanel();">Unlock</button>
             </div>
             
             <div id="fallback-box" class="fallback-box">
@@ -493,7 +528,6 @@ export function renderWebsite() {
 
       function resetDetailsUI() {
            const spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-           // Removed backdrop reset
            document.getElementById('dt_poster').src = spacer;
            document.getElementById('dt_title').innerText = "Loading...";
            document.getElementById('dt_year').innerText = "...";
@@ -514,7 +548,6 @@ export function renderWebsite() {
       function setupDetailsPage(m){
           currentMovieId=m.id;
           
-          // Removed backdrop loading logic
           document.getElementById('dt_poster').src = m.image;
           document.getElementById('dt_title').innerText = m.title;
           document.getElementById('dt_desc').innerText = m.description || "No description available.";
@@ -590,12 +623,12 @@ export function renderWebsite() {
       
       function updateProfileUI(){
          if(currentUser){
-            document.getElementById('loginForm').style.display='none'; document.getElementById('profileView').style.display='block';
+            document.getElementById('loginForm').style.display='none'; document.getElementById('profileView').style.display='flex';
             document.getElementById('u_name').innerText=currentUser.username;
             if(currentUser.vipExpiry > Date.now()) {
                 const d = new Date(currentUser.vipExpiry);
                 const dStr = d.getDate().toString().padStart(2,'0') + "/" + (d.getMonth()+1).toString().padStart(2,'0') + "/" + d.getFullYear();
-                document.getElementById('u_status').innerHTML = '<span style="color:#ffd700">VIP Until: ' + dStr + '</span>';
+                document.getElementById('u_status').innerHTML = 'VIP Ends: ' + dStr;
             } else {
                 document.getElementById('u_status').innerText = "Free Plan";
             }
