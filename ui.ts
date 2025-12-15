@@ -34,17 +34,12 @@ export function renderWebsite() {
           font-family: 'Inter', 'Padauk', sans-serif; 
           margin:0; 
           padding-bottom: 70px; 
-          user-select: none; /* Text selection off */
+          user-select: none;
           -webkit-user-select: none;
           overflow-x: hidden; 
       }
       
-      /* 🔥 FIX: Image Saving Prevention */
-      img { 
-          pointer-events: none; /* Disables right click/long press context menu on images */
-          -webkit-user-drag: none; /* Prevents dragging */
-          user-select: none;
-      }
+      img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
       header { 
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
@@ -71,9 +66,13 @@ export function renderWebsite() {
       
       .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; }
       .scroll-row .card { min-width: 110px; max-width: 110px; }
-      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
+      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
       .title { padding: 8px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
+      
+      /* Tags on Poster */
       .prem-tag { position: absolute; top: 5px; left: 5px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
+      /* 🔥 NEW: Year Tag on Poster */
+      .year-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
       .user-panel { 
         position: fixed; top: 0; right: 0; width: 300px; height: 100%; 
@@ -100,8 +99,8 @@ export function renderWebsite() {
       .details-header { position: absolute; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
       .details-header button { pointer-events: auto; background: rgba(0,0,0,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); cursor: pointer; }
 
-      .backdrop-container { position: relative; width: 100%; height: 260px; }
-      .backdrop-img { width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
+      .backdrop-container { position: relative; width: 100%; height: 260px; background: #000; }
+      .backdrop-img { width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%); transition: opacity 0.3s; }
       
       .info-container { padding: 0 20px; position: relative; display: flex; flex-direction: column; }
       
@@ -127,6 +126,8 @@ export function renderWebsite() {
       .video-wrapper { width: 100%; aspect-ratio: 16/9; background: black; margin: auto 0; position: relative; }
       video { width: 100%; height: 100%; }
       .close-video-btn { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5); border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; z-index: 310; }
+      
+      .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:black; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
 
       .accordion { background-color: #1e1e1e; color: #eee; padding: 15px; width: 100%; border: none; text-align: left; font-weight: 600; border-bottom: 1px solid #333; margin-top: 8px; border-radius: 8px; display: flex; justify-content: space-between; }
       .panel { padding: 0 5px; background-color: #121212; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
@@ -192,17 +193,17 @@ export function renderWebsite() {
       </div>
 
       <div class="backdrop-container">
-        <img id="dt_backdrop" class="backdrop-img" src="">
+        <img id="dt_backdrop" class="backdrop-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
       </div>
 
       <div class="info-container">
           <div class="top-info-row">
-              <img id="dt_poster" class="poster-img-large" src="">
+              <img id="dt_poster" class="poster-img-large" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
               <div class="meta-col">
-                  <h1 id="dt_title" class="movie-title">Title</h1>
+                  <h1 id="dt_title" class="movie-title">Loading...</h1>
                   <div class="stats-row">
-                      <div class="stats-item">⏱ <span id="dt_year">2025</span></div>
-                      <div class="stats-item">⭐️ <span id="dt_rate">0.0</span></div>
+                      <div class="stats-item">⏱ <span id="dt_year">...</span></div>
+                      <div class="stats-item">⭐️ <span id="dt_rate">...</span></div>
                   </div>
                   <div id="dt_genres" class="genre-row"></div>
               </div>
@@ -232,6 +233,12 @@ export function renderWebsite() {
                 <div style="font-size:40px;">👑</div><p style="color:#ffd700;">VIP Required</p>
                 <button class="auth-btn" style="width:auto; padding:8px 20px;" onclick="closeVideo(); toggleUserPanel();">Unlock</button>
             </div>
+            
+            <div id="fallback-box" class="fallback-box">
+                <p style="color:white; margin-bottom:10px;">Playback Error (Source Restricted)</p>
+                <a id="fallback-link" href="#" target="_blank" class="action-btn btn-dl" style="width:auto; padding:8px 20px;">▶ Play External</a>
+            </div>
+
             <video id="video" controls playsinline controlsList="nodownload"></video>
          </div>
       </div>
@@ -250,54 +257,80 @@ export function renderWebsite() {
       function hideLoader() { loader.classList.add('hidden-loader'); }
       function showAlert(t, m) { document.getElementById('custom-alert').style.display='flex'; document.getElementById('alert-title').innerText=t; document.getElementById('alert-msg').innerText=m; }
 
-      window.onpopstate = function() {
-          const p = new URLSearchParams(window.location.search);
-          if(!p.get('id')) closePlayerInternal();
-          if(!p.get('view')) goHomeInternal();
-      };
-
+      // 🔥 FIX: Refresh Logic - Handle URL params on load
       window.onload = async () => {
         loadSession(); updateProfileUI(); 
         await Promise.all([fetchRow('movies', 'row_movies'), fetchRow('series', 'row_series'), fetchRow('Adult', 'row_18')]);
         hideLoader();
+        
         const p = new URLSearchParams(window.location.search);
-        if(p.get('id')) fetchSingleMovie(p.get('id'));
+        const movieId = p.get('id');
+        const view = p.get('view');
+        const cat = p.get('cat');
+        
+        if (movieId) {
+             fetchSingleMovie(movieId);
+        } else if (view === 'grid' && cat) {
+             openCategory(cat); // Stay in category
+        }
       };
 
-      // --- Navigation ---
-      function goHome(){ goHomeInternal(); }
+      window.onpopstate = function() {
+          const p = new URLSearchParams(window.location.search);
+          if(!p.get('id')) closePlayerInternal();
+          if(!p.get('view')) {
+              goHomeInternal();
+          } else {
+              // Handle back button for categories
+              const cat = p.get('cat');
+              if(cat) openCategory(cat, false);
+          }
+      };
+
+      function goHome(){ 
+          const u = window.location.pathname;
+          window.history.pushState({path:u},'',u);
+          goHomeInternal(); 
+      }
       function goHomeInternal(){
           document.getElementById('homeView').style.display='block';
           document.getElementById('gridViewContainer').style.display='none';
           document.getElementById('backNav').style.display='none';
       }
       
-      // 🔥 FIX: Loading Animation & Title Change
-      async function openCategory(c){
-          showLoader(); // Start spinner
-          
+      async function openCategory(c, pushState = true){
+          showLoader(); 
           document.getElementById('homeView').style.display='none';
           document.getElementById('gridViewContainer').style.display='block';
           document.getElementById('backNav').style.display='flex'; 
           
-          // Update Title
           document.getElementById('gridTitle').innerText = c.toUpperCase();
-          
-          // Wait for data then hide loader
+          if(pushState) {
+              const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`;
+              window.history.pushState({path:u},'',u);
+          }
           await fetchMovies(1,c);
           hideLoader();
       }
 
       function closePlayer() {
           closePlayerInternal();
-          window.history.pushState(null, '', window.location.pathname);
+          // Return to previous state logic
+          const p = new URLSearchParams(window.location.search);
+          const cat = p.get('cat');
+          if(cat) {
+              // If we were in a category, URL should still reflect that, just remove ID
+              const u = \`?view=grid&cat=\${encodeURIComponent(cat)}\`;
+              window.history.pushState({path:u},'',u);
+          } else {
+              window.history.pushState(null, '', window.location.pathname);
+          }
       }
       function closePlayerInternal(){
           closeVideo();
           document.getElementById('playerModal').style.display='none';
       }
 
-      // --- Video Logic ---
       function launchVideo() {
           if(!activeVideoLink) return showAlert("Error", "No video source");
           if(activeIsPremium && (!currentUser || currentUser.vipExpiry < Date.now())) {
@@ -308,19 +341,47 @@ export function renderWebsite() {
           }
           document.getElementById('videoOverlay').style.display='flex';
           document.getElementById('vip-lock').style.display='none';
+          document.getElementById('fallback-box').style.display='none';
           document.getElementById('video').style.display='block';
           playViaSecureToken(activeVideoLink);
       }
+      
       function closeVideo() {
           const v = document.getElementById('video'); v.pause(); v.src="";
+          if(window.hlsInstance) { window.hlsInstance.destroy(); window.hlsInstance = null; }
           document.getElementById('videoOverlay').style.display='none';
       }
+      
       async function playViaSecureToken(u){
           const v=document.getElementById('video');
+          
+          // Error Handler for HLS
+          const onError = () => {
+              v.style.display = 'none';
+              document.getElementById('fallback-box').style.display = 'flex';
+              document.getElementById('fallback-link').href = u;
+          };
+
           if(u.includes('.m3u8')){
              if(Hls.isSupported()){
-                 const h=new Hls(); h.loadSource(u); h.attachMedia(v); h.on(Hls.Events.MANIFEST_PARSED,()=>v.play());
-             } else { v.src=u; v.play(); }
+                 if(window.hlsInstance) window.hlsInstance.destroy();
+                 const h=new Hls();
+                 window.hlsInstance = h;
+                 h.loadSource(u); 
+                 h.attachMedia(v); 
+                 h.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(()=>{}));
+                 h.on(Hls.Events.ERROR, (event, data) => {
+                     if(data.fatal) {
+                         console.log("HLS Error", data);
+                         onError(); // Show fallback on CORS/Network error
+                         h.destroy();
+                     }
+                 });
+             } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+                 v.src=u; 
+                 v.play();
+                 v.onerror = onError;
+             }
              return;
           }
           try{
@@ -330,14 +391,19 @@ export function renderWebsite() {
           }catch(e){ v.src=u; }
       }
 
-      // --- Data Fetching ---
       async function fetchMovies(page, cat) { 
           const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodeURIComponent(cat)}\`); 
           const json = await res.json(); renderGrid(json.data); 
       }
       function renderGrid(data) { document.getElementById('mainGrid').innerHTML = data.map(m => createCardHtml(m)).join(''); }
+      
+      // 🔥 FIX: Year Logic & Year Tag
       function createCardHtml(m) { 
-          return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy"><div class="prem-tag">\${m.isPremium?'VIP':''}</div><div class="title">\${m.title}</div></div>\`; 
+          const tag = m.isPremium ? '<div class="prem-tag">VIP</div>' : '';
+          const yearNum = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; 
+          const yearHtml = yearNum ? \`<div class="year-tag">\${yearNum}</div>\` : '';
+          
+          return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; 
       }
 
       function openModalById(id) {
@@ -345,8 +411,21 @@ export function renderWebsite() {
           const u = \`?id=\${id}\`; window.history.pushState({path:u},'',u);
       }
 
+      // 🔥 FIX: Reset UI to prevent flashing
+      function resetDetailsUI() {
+           const spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+           document.getElementById('dt_backdrop').src = spacer;
+           document.getElementById('dt_poster').src = spacer;
+           document.getElementById('dt_title').innerText = "Loading...";
+           document.getElementById('dt_year').innerText = "";
+           document.getElementById('dt_desc').innerText = "";
+           document.getElementById('dt_genres').innerHTML = "";
+           document.getElementById('ep_section').innerHTML = "";
+      }
+
       async function fetchSingleMovie(id){
           showLoader(); 
+          resetDetailsUI(); // Clear old data
           document.getElementById('playerModal').style.display='block';
           const res=await fetch(\`/api/get_movie?id=\${id}\`); const m=await res.json();
           hideLoader();
@@ -361,13 +440,11 @@ export function renderWebsite() {
           document.getElementById('dt_title').innerText = m.title;
           document.getElementById('dt_desc').innerText = m.description || "No description available.";
           
-          // 🔥 FIX: Year Display Logic (Finds 4-digit number in tags)
           const year = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || "2025";
           document.getElementById('dt_year').innerText = year;
           document.getElementById('dt_rate').innerText = "8.5"; 
           
           if(m.tags) {
-              // Show only non-number tags as genre
               document.getElementById('dt_genres').innerHTML = m.tags.filter(t => !/^\\d{4}$/.test(t)).map(t=>\`<span class="genre-tag">\${t}</span>\`).join('');
           }
 
@@ -434,12 +511,10 @@ export function renderWebsite() {
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
       
-      // 🔥 FIX: VIP Date Display
       function updateProfileUI(){
          if(currentUser){
             document.getElementById('loginForm').style.display='none'; document.getElementById('profileView').style.display='block';
             document.getElementById('u_name').innerText=currentUser.username;
-            
             if(currentUser.vipExpiry > Date.now()) {
                 const d = new Date(currentUser.vipExpiry);
                 const dStr = d.getDate().toString().padStart(2,'0') + "/" + (d.getMonth()+1).toString().padStart(2,'0') + "/" + d.getFullYear();
