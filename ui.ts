@@ -19,7 +19,7 @@ export function renderWebsite() {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        --primary: #00b894; /* Teal color matching screenshot */
+        --primary: #00b894;
         --bg-main: #121212;
         --bg-card: #1e1e1e;
         --text-main: #ffffff;
@@ -27,7 +27,18 @@ export function renderWebsite() {
       }
 
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-      body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', 'Padauk', sans-serif; margin:0; padding-bottom: 70px; user-select: none; overflow-x: hidden; }
+      
+      /* 🔥 FIX: ဒီနှစ်ကြောင်းက တစ်မျက်နှာလုံးကို ငြိမ်အောင်လုပ်ပေးပါလိမ့်မယ် */
+      html, body { 
+          overscroll-behavior-y: none; /* Disables pull-to-refresh bounce */
+          background: var(--bg-main); 
+          color: var(--text-main); 
+          font-family: 'Inter', 'Padauk', sans-serif; 
+          margin:0; 
+          padding-bottom: 70px; 
+          user-select: none; 
+          overflow-x: hidden; 
+      }
       
       /* --- Header --- */
       header { 
@@ -80,7 +91,7 @@ export function renderWebsite() {
       .back-nav { display: none; padding: 10px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid #333; }
       .back-nav-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
 
-      /* --- NEW DETAILS PAGE STYLE (Matching Screenshot) --- */
+      /* --- NEW DETAILS PAGE STYLE --- */
       #playerModal { 
           display: none; 
           position: fixed; 
@@ -88,11 +99,10 @@ export function renderWebsite() {
           left:0; 
           width:100%; 
           height:100%; 
-          background:#121212; 
+          background: #121212; /* Opaque background */
           z-index:200; 
           overflow-y: auto;
-          /* 🔥 FIX: ဒါက Scroll ဆွဲရင် အောက်ခံမပေါ်အောင် တားပေးပါတယ် */
-          overscroll-behavior: contain; 
+          overscroll-behavior: contain; /* Prevents scroll chaining */
       }
       
       .details-header { position: absolute; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
@@ -103,7 +113,6 @@ export function renderWebsite() {
       
       .info-container { padding: 0 20px; position: relative; display: flex; flex-direction: column; }
       
-      /* Overlapping Layout */
       .top-info-row { display: flex; gap: 15px; margin-top: -50px; position: relative; z-index: 5; margin-bottom: 20px; }
       .poster-img-large { width: 110px; height: 160px; border-radius: 8px; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.6); flex-shrink: 0; background: #222; }
       
@@ -118,7 +127,6 @@ export function renderWebsite() {
 
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
 
-      /* Action Buttons - Green/Teal */
       .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
       .action-btn { 
         width: 100%; padding: 14px; border-radius: 30px; border: none; 
@@ -129,7 +137,6 @@ export function renderWebsite() {
       .btn-play { background: var(--primary); box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3); }
       .btn-dl { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
 
-      /* Video Player Styles */
       .video-overlay { 
           position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
           background: black; z-index: 300; display: none; 
@@ -139,7 +146,6 @@ export function renderWebsite() {
       video { width: 100%; height: 100%; }
       .close-video-btn { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5); border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; z-index: 310; }
 
-      /* Episodes Accordion */
       .accordion { background-color: #1e1e1e; color: #eee; padding: 15px; width: 100%; border: none; text-align: left; font-weight: 600; border-bottom: 1px solid #333; margin-top: 8px; border-radius: 8px; display: flex; justify-content: space-between; }
       .panel { padding: 0 5px; background-color: #121212; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; padding: 15px 5px; }
@@ -293,7 +299,7 @@ export function renderWebsite() {
       function closePlayerInternal(){
           closeVideo();
           document.getElementById('playerModal').style.display='none';
-          document.body.style.overflow='auto';
+          // Re-enable scrolling on body if needed (but we disabled it globally anyway)
       }
 
       // --- Video Logic ---
@@ -347,7 +353,7 @@ export function renderWebsite() {
       async function fetchSingleMovie(id){
           showLoader(); 
           document.getElementById('playerModal').style.display='block';
-          document.body.style.overflow='hidden';
+          // We don't need body.overflow hidden anymore because of global overscroll fix
           
           const res=await fetch(\`/api/get_movie?id=\${id}\`); const m=await res.json();
           hideLoader();
@@ -358,22 +364,19 @@ export function renderWebsite() {
       function setupDetailsPage(m){
           currentMovieId=m.id;
           
-          // Set Images
           document.getElementById('dt_backdrop').src = m.cover || m.image;
           document.getElementById('dt_poster').src = m.image;
           document.getElementById('dt_title').innerText = m.title;
           document.getElementById('dt_desc').innerText = m.description || "No description available.";
           
-          // Set Meta
           const year = (m.tags && m.tags.find(t=>!isNaN(t))) || "2025";
           document.getElementById('dt_year').innerText = year;
-          document.getElementById('dt_rate').innerText = "8.5"; // Placeholder or m.rating
+          document.getElementById('dt_rate').innerText = "8.5"; 
           
           if(m.tags) {
               document.getElementById('dt_genres').innerHTML = m.tags.filter(t=>isNaN(t)).map(t=>\`<span class="genre-tag">\${t}</span>\`).join('');
           }
 
-          // Set Download
           const dlBtn = document.getElementById('dt_dl_link');
           if(m.downloadLink) {
               dlBtn.href = m.downloadLink; dlBtn.style.display = "flex";
@@ -381,18 +384,15 @@ export function renderWebsite() {
               dlBtn.style.display = "none";
           }
 
-          // Set Episodes / Play
           const epSec = document.getElementById('ep_section');
           epSec.innerHTML = "";
           
           if(!m.episodes || m.episodes.length <= 1) {
-              // Movie Mode
               const link = (m.episodes && m.episodes[0]) ? m.episodes[0].link : m.link;
               activeVideoLink = link;
               activeIsPremium = m.isPremium;
           } else {
-              // Series Mode
-              activeVideoLink = m.episodes[0].link; // Default to Ep 1
+              activeVideoLink = m.episodes[0].link; 
               activeIsPremium = m.isPremium;
               renderAccordion(m.episodes, m.isPremium);
           }
@@ -423,7 +423,7 @@ export function renderWebsite() {
           btn.classList.add('active');
           activeVideoLink = link;
           activeIsPremium = isPrem;
-          launchVideo(); // Auto play when ep clicked
+          launchVideo();
       }
 
       // --- Favorites & Auth ---
@@ -438,7 +438,6 @@ export function renderWebsite() {
           document.getElementById('favBtn').innerText=f.includes(currentMovieId)?"❤️":"🤍";
       }
 
-      // Basic Auth helpers
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
       function updateProfileUI(){
