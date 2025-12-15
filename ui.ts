@@ -33,7 +33,6 @@ export function renderWebsite() {
         --header-height: 60px;
       }
 
-      /* 🔥 GLOBAL FIX: Disable ALL Overscroll Glows */
       * { 
           box-sizing: border-box; 
           -webkit-tap-highlight-color: transparent; 
@@ -50,13 +49,13 @@ export function renderWebsite() {
           font-family: 'Padauk', 'Inter', sans-serif; 
           margin:0; padding:0;
           width: 100%; height: 100%;
-          overflow: hidden; position: fixed; /* Lock Body */
+          overflow: hidden; position: fixed;
           user-select: none; -webkit-user-select: none;
       }
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
-      /* --- Headers --- */
+      /* Headers */
       header { 
         position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
         background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px);
@@ -66,26 +65,27 @@ export function renderWebsite() {
       }
       .brand { color: var(--primary); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
-      /* Back Navigation Header */
       .back-nav { 
           position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
           background: rgba(18, 18, 18, 0.98); backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(255,255,255,0.1); 
-          display: none; /* Hidden by default */
-          align-items: center; padding: 0 20px;
-          z-index: 60; /* Higher than main header */
+          display: none; align-items: center; padding: 0 20px;
+          z-index: 60;
       }
 
-      /* --- Scrollable Views --- */
+      /* Views - 🔥 Added Solid Background to prevent overlap transparency */
       .scroll-view, .full-view {
           position: absolute; top: var(--header-height); left: 0; width: 100%; bottom: var(--nav-height);
           overflow-y: auto; overflow-x: hidden;
-          background: var(--bg-body);
+          background: var(--bg-body); /* Solid Background Fix */
           -webkit-overflow-scrolling: touch;
-          padding-top: 10px; /* Space for posters */
+          padding-top: 10px;
+          display: none; /* Hide all by default */
       }
+      /* Home is active by default in HTML only for fallback, JS will handle logic */
+      #homeView { display: block; }
 
-      /* --- Bottom Nav --- */
+      /* Bottom Nav */
       .bottom-nav {
           position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
           background: #1a1a1a; border-top: 1px solid #333;
@@ -110,10 +110,7 @@ export function renderWebsite() {
       .home-section { padding: 10px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
-      .see-more { 
-          color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; 
-          border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px;
-      }
+      .see-more { color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px; }
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
       .card:active { transform: scale(0.97); }
@@ -123,7 +120,7 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* Profiles & Forms */
+      /* Profiles */
       .profile-card { margin: 20px; padding: 25px; background: linear-gradient(135deg, var(--primary), #00b894, #006266); border-radius: 20px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); }
       .profile-avatar { width: 70px; height: 70px; background: rgba(0,0,0,0.2); border-radius: 50%; margin: 0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:30px; border: 2px solid rgba(255,255,255,0.3); }
       .panel-body { padding: 0 20px; }
@@ -139,7 +136,7 @@ export function renderWebsite() {
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-      /* Details Page */
+      /* Details */
       #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: none !important; padding-bottom: 80px; }
       .details-header { position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 20; background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%); }
       .nav-circle-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px); border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; cursor: pointer; }
@@ -155,7 +152,6 @@ export function renderWebsite() {
       .btn-fav { width: 100%; padding: 14px; border-radius: 50px; background: transparent; color: #bbb; border: 1px solid #444; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
       .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
-      
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
@@ -203,7 +199,7 @@ export function renderWebsite() {
         <span id="gridTitle" style="color:white; font-weight:bold; margin-left:10px;">MOVIES</span>
     </div>
 
-    <div id="homeView" class="scroll-view">
+    <div id="homeView" class="scroll-view" style="display:block;">
         <div class="home-section"><div class="section-head"><span class="section-title">Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
         <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">See All</a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
         <div style="height:20px;"></div>
@@ -351,11 +347,13 @@ export function renderWebsite() {
         const movieId = p.get('id');
         const view = p.get('view');
         
+        // 🔥 FORCE UI RESET
         if (movieId) { fetchSingleMovie(movieId); } 
         else if (view === 'profile') { switchTab('profile', false); }
         else if (view === 'search') { switchTab('search', false); }
         else if (view === 'fav') { switchTab('fav', false); }
         else if (view === 'grid') { openCategory(p.get('cat') || 'movies', false); }
+        else { switchTab('home', false); } // Explicitly set Home
         
         document.querySelectorAll('.scroll-view, .full-view').forEach(el => {
             el.addEventListener('scroll', (e) => {
@@ -374,13 +372,18 @@ export function renderWebsite() {
           const view = p.get('view');
           const cat = p.get('cat');
           
-          if (!id) closePlayerInternal(); 
-          else if(document.getElementById('playerModal').style.display === 'none') fetchSingleMovie(id);
+          if (!id) {
+              closePlayerInternal();
+          } else if(document.getElementById('playerModal').style.display === 'none') {
+              fetchSingleMovie(id);
+          }
 
           if(view === 'profile') switchTabInternal('profile');
           else if(view === 'search') switchTabInternal('search');
           else if(view === 'fav') switchTabInternal('fav');
-          else if(view === 'grid' && cat) openCategory(cat, false);
+          else if(view === 'grid') {
+              if (cat) openCategory(cat, false);
+          }
           else if(!id) switchTabInternal('home');
       };
 
@@ -397,10 +400,11 @@ export function renderWebsite() {
           const btn = document.getElementById('nav_' + tab);
           if(btn) btn.classList.add('active');
 
-          // Reset Header
+          // Reset Header State
           document.getElementById('mainHeader').style.display = 'flex';
           document.getElementById('backNav').style.display = 'none';
 
+          // Hide All Views
           document.getElementById('homeView').style.display='none';
           document.getElementById('searchView').style.display='none';
           document.getElementById('gridViewContainer').style.display='none';
@@ -422,11 +426,11 @@ export function renderWebsite() {
           document.getElementById('mainGrid').innerHTML = ""; 
           showLoader(); 
           
-          // 🔥 UI Toggle for Category
-          document.getElementById('mainHeader').style.display = 'none';
-          document.getElementById('backNav').style.display = 'flex'; // Show Back Header
+          // 🔥 UI SWITCH
           document.getElementById('homeView').style.display='none'; 
           document.getElementById('gridViewContainer').style.display='block'; 
+          document.getElementById('mainHeader').style.display='none';
+          document.getElementById('backNav').style.display='flex';
           
           document.getElementById('gridTitle').innerText = c.toUpperCase();
           if(pushState) { const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`; window.history.pushState({path:u},'',u); }
@@ -612,12 +616,13 @@ export function renderWebsite() {
       
       function openFavoritesInternal(){
           document.getElementById('mainGrid').innerHTML = "";
-          document.getElementById('homeView').style.display='none'; document.getElementById('searchView').style.display='none';
-          document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='none';
-          
           // Reset Headers for Fav
           document.getElementById('mainHeader').style.display = 'none';
           document.getElementById('backNav').style.display = 'flex';
+          
+          document.getElementById('homeView').style.display='none'; document.getElementById('searchView').style.display='none';
+          document.getElementById('gridViewContainer').style.display='block'; 
+          
           document.getElementById('gridTitle').innerText = "MY LIST";
 
           const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
