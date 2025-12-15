@@ -16,7 +16,7 @@ export function renderWebsite() {
     <title>Stream X</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#121212">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -194,7 +194,6 @@ export function renderWebsite() {
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
       .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
-      /* ArtPlayer Styles */
       .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       .video-wrapper { width: 100%; height: 100%; background: black; position: relative; }
       .artplayer-app { width: 100%; height: 100%; display: block; }
@@ -355,7 +354,8 @@ export function renderWebsite() {
 
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
-      function hideLoader() { loader.classList.add('hidden-loader'); }
+      // 🔥 FIX: Ensure hideLoader is global and safe
+      window.hideLoader = function() { if(loader) loader.classList.add('hidden-loader'); }
       function showAlert(t, m) { 
           const alert = document.getElementById('custom-alert');
           document.getElementById('alert-title').innerText=t; 
@@ -363,14 +363,31 @@ export function renderWebsite() {
           alert.style.display='flex';
       }
 
+      // 🔥 FIX: Safe Initialization with Timeout to prevent stuck spinner
       window.onload = async () => {
-        loadSession(); updateProfileUI(); 
-        await Promise.all([fetchRow('movies', 'row_movies'), fetchRow('series', 'row_series'), fetchRow('Adult', 'row_18')]);
-        hideLoader();
+        // Safety: Force hide loader after 3 seconds no matter what
+        setTimeout(() => window.hideLoader(), 3000);
+
+        try {
+            loadSession(); 
+            updateProfileUI(); 
+            // Attempt to load all rows, catch errors silently
+            await Promise.allSettled([
+                fetchRow('movies', 'row_movies'), 
+                fetchRow('series', 'row_series'), 
+                fetchRow('Adult', 'row_18')
+            ]);
+        } catch(e) {
+            console.error("Init Error", e);
+        } finally {
+            window.hideLoader(); // Success path hide
+        }
+        
         const p = new URLSearchParams(window.location.search);
         const movieId = p.get('id');
         const view = p.get('view');
         const cat = p.get('cat');
+        
         if (movieId) { fetchSingleMovie(movieId); } 
         else if (view === 'profile') { switchTab('profile', false); }
         else if (view === 'search') { switchTab('search', false); }
@@ -448,6 +465,7 @@ export function renderWebsite() {
              document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='flex'; return;
           }
           document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='none'; document.getElementById('fallback-box').style.display='none';
+          
           playViaArtPlayer(activeVideoLink);
       }
       
@@ -460,6 +478,8 @@ export function renderWebsite() {
       
       function playViaArtPlayer(url) {
           if(art) art.destroy(false);
+          
+          // 🔥 Fix: ArtPlayer config
           art = new Artplayer({
               container: '#artplayer-app',
               url: url,
@@ -613,6 +633,8 @@ export function renderWebsite() {
           } catch(e) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No results found.</div>'; }
       }
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
+      
+      function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
     </script>
   </body>
   </html>
