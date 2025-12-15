@@ -1,4 +1,4 @@
-export function renderWebsite() i
+export function renderWebsite() {
   function getServerSkeleton() { 
     return Array(6).fill(`
       <div class="card skeleton-card">
@@ -208,30 +208,19 @@ export function renderWebsite() i
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
       .small-spinner { width: 30px; height: 30px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
-      /* 🔥 FIX: Force Fullscreen Logic */
-      .video-overlay { 
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-          background: black; z-index: 300; display: none; 
-          flex-direction: column; 
-      }
+      .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       
-      /* This class effectively makes the video go fullscreen in APKs */
-      .force-full-screen {
-          position: fixed !important;
-          top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-          width: 100vw !important; height: 100vh !important;
-          z-index: 99999 !important;
-          background: black !important;
-          display: flex !important; align-items: center !important; justify-content: center !important;
+      /* 🔥 FORCE FULLSCREEN STYLE */
+      .force-fullscreen-mode {
+          position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
+          z-index: 2147483647 !important; background: black !important;
+          display: flex !important; justify-content: center; align-items: center;
       }
-      
+      .force-fullscreen-mode video { object-fit: contain; width: 100%; height: 100%; }
+
       .video-wrapper { width: 100%; aspect-ratio: 16/9; background: black; margin: auto 0; position: relative; }
-      /* In force mode, we stretch the video wrapper */
-      .force-full-screen .video-wrapper {
-          width: 100% !important; height: 100% !important; aspect-ratio: unset !important;
-      }
-      
       video { width: 100%; height: 100%; }
+      
       .close-video-btn { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5); border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 310; backdrop-filter: blur(5px); }
       
       .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
@@ -444,21 +433,33 @@ export function renderWebsite() i
           playViaSecureToken(activeVideoLink);
       }
       
-      // 🔥 CSS FORCE FULLSCREEN TOGGLE
+      // 🔥 SUPER FORCE FULLSCREEN LOGIC (APK COMPATIBLE)
       function toggleFullScreen() {
           const wrapper = document.getElementById('videoOverlay');
-          
-          // Try standard API first
-          if (!document.fullscreenElement) {
-              if(wrapper.requestFullscreen) wrapper.requestFullscreen().catch(()=>{});
-              else if(wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+          const video = document.getElementById('video');
+          const isForce = wrapper.classList.contains('force-fullscreen-mode');
+
+          if (!isForce) {
+              // 1. Try Native
+              if (wrapper.requestFullscreen) wrapper.requestFullscreen().catch(()=>{});
+              else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+              
+              // 2. Apply CSS Force (The Nuclear Option)
+              wrapper.classList.add('force-fullscreen-mode');
+              
+              // 3. Try Native Android Video Player Hook
+              if (video.webkitEnterFullScreen) {
+                  video.webkitEnterFullScreen();
+              }
+              
+              // 4. Try Orientation Lock
+              try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } catch(e){}
+          } else {
+              // Exit
+              wrapper.classList.remove('force-fullscreen-mode');
+              if (document.exitFullscreen) document.exitFullscreen();
+              try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
           }
-          
-          // Force CSS Method (Works on APKs that block native API)
-          wrapper.classList.toggle('force-full-screen');
-          
-          // Try Screen Lock
-          try { if(screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } catch(e){}
       }
 
       function closeVideo() {
@@ -466,8 +467,7 @@ export function renderWebsite() i
           if(window.hlsInstance) { window.hlsInstance.destroy(); window.hlsInstance = null; }
           const wrapper = document.getElementById('videoOverlay');
           wrapper.style.display='none';
-          wrapper.classList.remove('force-full-screen'); // Remove force class
-          
+          wrapper.classList.remove('force-fullscreen-mode'); // Reset
           if (document.fullscreenElement) document.exitFullscreen();
           try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
       }
@@ -595,12 +595,9 @@ export function renderWebsite() i
           if(!q) return; 
           showLoader(); document.getElementById('homeView').style.display='none'; document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "SEARCH: " + q.toUpperCase();
           const grid = document.getElementById('mainGrid'); grid.innerHTML = ""; 
-          
           const qLower = q.toLowerCase();
           const localResults = globalMovieCache.filter(m => m.title.toLowerCase().includes(qLower));
-          
           if(localResults.length > 0) { renderGrid(localResults); hideLoader(); return; }
-
           try {
               const res = await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);
               if (res.status === 404) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; hideLoader(); return; }
@@ -609,9 +606,7 @@ export function renderWebsite() i
               let results = [];
               if (Array.isArray(json)) results = json; else if (json.data && Array.isArray(json.data)) results = json.data;
               if (results.length === 0) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; } else { renderGrid(results); }
-          } catch(e) { 
-              grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; 
-          }
+          } catch(e) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; }
           hideLoader();
       }
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
