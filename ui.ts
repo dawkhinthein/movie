@@ -327,10 +327,10 @@ export function renderWebsite() {
 
       <div id="videoOverlay" class="video-overlay">
          <div style="position:absolute; top:20px; right:20px; z-index:310; display:flex; gap:10px;">
-             <button class="nav-circle-btn" onclick="toggleFullScreen()" style="background:rgba(255,255,255,0.2); border:none; color:white;">
+             <button class="nav-circle-btn" onclick="toggleFullScreen()" ontouchstart="toggleFullScreen()" style="background:rgba(255,255,255,0.2); border:none; color:white;">
                 ⛶
              </button>
-             <button class="nav-circle-btn" onclick="closeVideo()" style="background:rgba(255,255,255,0.2); border:none; color:white;">
+             <button class="nav-circle-btn" onclick="closeVideo()" ontouchstart="closeVideo()" style="background:rgba(255,255,255,0.2); border:none; color:white;">
                 ✕
              </button>
          </div>
@@ -423,13 +423,18 @@ export function renderWebsite() {
           playViaSecureToken(activeVideoLink);
       }
       
+      // 🔥 FIX: Improved FullScreen Logic
       function toggleFullScreen() {
-          const videoContainer = document.getElementById('videoWrapper'); 
+          const wrapper = document.querySelector('.video-wrapper');
           const video = document.getElementById('video');
+          const el = wrapper || video;
+
           if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-              if (videoContainer.requestFullscreen) videoContainer.requestFullscreen();
-              else if (videoContainer.webkitRequestFullscreen) videoContainer.webkitRequestFullscreen();
+              if (el.requestFullscreen) el.requestFullscreen();
+              else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
               else if (video.webkitEnterFullScreen) video.webkitEnterFullScreen();
+              
+              // Force Landscape
               try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } catch(e){}
           } else {
               if (document.exitFullscreen) document.exitFullscreen();
@@ -596,4 +601,4 @@ export function renderWebsite() {
   </body>
   </html>
   `;
-          }
+}
