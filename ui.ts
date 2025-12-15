@@ -117,6 +117,11 @@ export function renderWebsite() {
       }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
+      /* Checkbox Style */
+      .checkbox-container { display: flex; align-items: center; margin-bottom: 20px; }
+      .custom-checkbox { width: 18px; height: 18px; accent-color: var(--primary); margin-right: 10px; cursor: pointer; }
+      .checkbox-label { color: #ccc; font-size: 13px; cursor: pointer; }
+
       #searchView { display: none; padding: 20px; padding-bottom: 80px; }
       .search-bar-large { width: 100%; padding: 15px 20px; background: #2a2a2a; border: 1px solid #444; border-radius: 30px; color: white; font-size: 16px; margin-bottom: 20px; outline:none; }
 
@@ -124,22 +129,9 @@ export function renderWebsite() {
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-      #playerModal { 
-          display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
-          background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
-          padding-bottom: 80px; 
-      }
-      .details-header { 
-          position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
-          display: flex; justify-content: space-between; z-index: 20; 
-          background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%);
-      }
-      .nav-circle-btn {
-          width: 40px; height: 40px; border-radius: 50%;
-          background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px);
-          border: 1px solid #444; display: flex; align-items: center; justify-content: center;
-          font-size: 18px; color: #fff; cursor: pointer;
-      }
+      #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; padding-bottom: 80px; }
+      .details-header { position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 20; background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%); }
+      .nav-circle-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px); border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; cursor: pointer; }
 
       .modal-body-content { padding: 10px 20px 40px 20px; }
       .top-info-section { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; }
@@ -148,25 +140,9 @@ export function renderWebsite() {
       .movie-title { font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 12px; margin-bottom: 15px; }
       .actions-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-      .btn-play { 
-          width: 100%; padding: 14px; border-radius: 50px; border: none; 
-          background: var(--red-btn); color: white;
-          font-weight: 700; font-size: 15px; cursor: pointer; 
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-          box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2);
-      }
-      .btn-dl { 
-          width: 100%; padding: 14px; border-radius: 50px; 
-          background: #2a2a2a; color: white; border: 1px solid #444;
-          font-weight: 600; font-size: 14px; cursor: pointer; 
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-      }
-      .btn-fav {
-          width: 100%; padding: 14px; border-radius: 50px; 
-          background: transparent; color: #bbb; border: 1px solid #444;
-          font-weight: 600; font-size: 14px; cursor: pointer; 
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-      }
+      .btn-play { width: 100%; padding: 14px; border-radius: 50px; border: none; background: var(--red-btn); color: white; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 20px rgba(255, 71, 87, 0.2); }
+      .btn-dl { width: 100%; padding: 14px; border-radius: 50px; background: #2a2a2a; color: white; border: 1px solid #444; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+      .btn-fav { width: 100%; padding: 14px; border-radius: 50px; background: transparent; color: #bbb; border: 1px solid #444; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
       .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
@@ -235,6 +211,12 @@ export function renderWebsite() {
             <h3 style="color:white; margin-bottom:20px;">Login</h3>
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
+            
+            <div class="checkbox-container">
+                <input type="checkbox" id="remember_me" class="custom-checkbox">
+                <label for="remember_me" class="checkbox-label">Remember Me</label>
+            </div>
+
             <button class="auth-btn-solid" onclick="doLogin()">Log In</button>
             <button class="auth-btn-solid" style="background:#555;" onclick="doRegister()">Create Account</button>
         </div>
@@ -333,7 +315,6 @@ export function renderWebsite() {
 
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
-      // Auto-hide loader safety
       window.hideLoader = function() { if(loader) loader.classList.add('hidden-loader'); }
       function showAlert(t, m) { 
           const alert = document.getElementById('custom-alert');
@@ -346,7 +327,7 @@ export function renderWebsite() {
         setTimeout(() => window.hideLoader(), 3000);
 
         try {
-            loadSession(); 
+            loadSession(); // Check 15 days expiry here
             updateProfileUI(); 
             await Promise.allSettled([
                 fetchRow('movies', 'row_movies'), 
@@ -380,7 +361,7 @@ export function renderWebsite() {
           const view = p.get('view');
           
           if (!id) {
-              closePlayerInternal(); // Ensure video cleanup on back
+              closePlayerInternal(); // Ensure cleanup
           } else if(document.getElementById('playerModal').style.display === 'none') {
               fetchSingleMovie(id);
           }
@@ -443,19 +424,9 @@ export function renderWebsite() {
           playViaArtPlayer(activeVideoLink);
       }
       
-      // 🔥 FIX: Nuclear Stop Video Function
       function closeVideo() {
-          if (art) {
-              art.pause(); // Pause first
-              art.destroy(false); // Destroy logic
-              art = null;
-          }
-          // Double kill: Find any video tag and kill it
-          document.querySelectorAll('video').forEach(v => {
-              v.pause();
-              v.src = "";
-              v.load();
-          });
+          if (art) { art.destroy(false); art = null; }
+          document.querySelectorAll('video').forEach(v => { v.pause(); v.src = ""; });
           document.getElementById('videoOverlay').style.display='none';
       }
       
@@ -468,15 +439,14 @@ export function renderWebsite() {
               container: '#artplayer-app',
               url: url,
               type: url.includes('.m3u8') ? 'm3u8' : 'auto',
-              autoplay: true, // 🔥 FORCE AUTOPLAY
-              muted: false, // Ensure sound is on
+              autoplay: true,
+              muted: false,
               customType: {
                   m3u8: function (video, url) {
                       if (Hls.isSupported()) {
                           const hls = new Hls();
                           hls.loadSource(url);
                           hls.attachMedia(video);
-                          // 🔥 FORCE PLAY ON M3U8 LOAD
                           hls.on(Hls.Events.MANIFEST_PARSED, function() {
                               video.play().catch(() => {
                                   video.muted = true;
@@ -581,12 +551,23 @@ export function renderWebsite() {
       function toggleFavorite(){
           if(!currentMovieId)return; let f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.includes(currentMovieId))f=f.filter(x=>x!==currentMovieId); else f.push(currentMovieId); localStorage.setItem('my_favs',JSON.stringify(f)); updateFavBtnState();
       }
-      function updateFavBtnState(){ 
-          const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
-          const btn = document.getElementById('favBtn');
-          if(f.includes(currentMovieId)) { btn.innerHTML = '❤️ Saved'; btn.classList.add('active'); } else { btn.innerHTML = '🤍 Add to List'; btn.classList.remove('active'); }
+      function updateFavBtnState(){ const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); document.getElementById('favBtn').innerText=f.includes(currentMovieId)?"❤️ Saved":"🤍 Add to List"; }
+
+      function loadSession(){
+          const s = localStorage.getItem('user_session');
+          if (s) {
+              const user = JSON.parse(s);
+              // 🔥 15 Days / 1 Day Expiry Logic
+              if (user.sessionExpiry && Date.now() > user.sessionExpiry) {
+                  doLogout(); // Expired
+                  return;
+              }
+              currentUser = user;
+          }
       }
 
+      function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
+      
       function updateProfileUI(){
          if(currentUser){
             document.getElementById('loginForm').style.display='none'; document.getElementById('profileView').style.display='flex';
@@ -597,7 +578,27 @@ export function renderWebsite() {
          } else { document.getElementById('loginForm').style.display='block'; document.getElementById('profileView').style.display='none'; }
       }
       async function doRegister(){const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; if(!u||!p)return; showLoader(); await fetch('/api/auth/register',{method:'POST',body:JSON.stringify({username:u,password:p})}); hideLoader(); showAlert("Success","Created");}
-      async function doLogin(){const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; showLoader(); const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})}); hideLoader(); if(res.ok){ const user=await res.json(); user.vipExpiry=user.vipExpiry||0; currentUser=user; localStorage.setItem('user_session',JSON.stringify(user)); updateProfileUI(); } else showAlert("Error","Fail");}
+      
+      async function doLogin(){
+          const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; 
+          showLoader(); 
+          const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})}); 
+          hideLoader(); 
+          if(res.ok){ 
+              const user=await res.json(); 
+              user.vipExpiry=user.vipExpiry||0; 
+              
+              // 🔥 Remember Me Logic
+              const remember = document.getElementById('remember_me').checked;
+              const days = remember ? 15 : 1;
+              user.sessionExpiry = Date.now() + (days * 24 * 60 * 60 * 1000);
+
+              currentUser=user; 
+              localStorage.setItem('user_session',JSON.stringify(user)); 
+              updateProfileUI(); 
+          } else showAlert("Error","Fail");
+      }
+
       function doLogout(){localStorage.removeItem('user_session'); currentUser=null; updateProfileUI();}
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
       
@@ -629,8 +630,6 @@ export function renderWebsite() {
           } catch(e) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No results found.</div>'; }
       }
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
-      
-      function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
     </script>
   </body>
   </html>
