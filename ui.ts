@@ -1,4 +1,3 @@
-
 export function renderWebsite() {
   function getServerSkeleton() { 
     return Array(6).fill(`
@@ -251,27 +250,23 @@ export function renderWebsite() {
 
     <div id="userPanel" class="user-panel">
         <div class="panel-header"><h3>Account</h3><button class="icon-btn" onclick="toggleUserPanel()" style="font-size:18px;">✕</button></div>
-        
         <div id="loginForm" class="panel-body" style="padding-top:20px;">
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
             <button class="auth-btn-solid" onclick="doLogin()">Log In</button>
             <button class="auth-btn-solid" style="background:#555;" onclick="doRegister()">Create Account</button>
         </div>
-
         <div id="profileView" style="display:none; flex-direction:column; height:100%;">
             <div class="profile-card">
                 <div class="profile-avatar">👤</div>
                 <h3 id="u_name" class="profile-name">User</h3>
                 <p id="u_status" class="profile-status">Free Plan</p>
             </div>
-            
             <div class="panel-body">
                 <div style="display:flex; gap:10px; margin-bottom:20px;">
                     <input type="text" id="vip_code" class="auth-input" style="margin:0;" placeholder="Redeem Code">
                     <button class="auth-btn-solid" style="margin:0; width:auto; border-radius:12px;" onclick="doRedeem()">Go</button>
                 </div>
-
                 <button class="menu-btn" onclick="openFavorites(); toggleUserPanel();">❤️ &nbsp; My Favorites</button>
                 <button class="menu-btn" onclick="doLogout()" style="color:#ff4757; border-color:#ff4757;">🚪 &nbsp; Log Out</button>
             </div>
@@ -331,7 +326,15 @@ export function renderWebsite() {
       </div>
 
       <div id="videoOverlay" class="video-overlay">
-         <button class="close-video-btn" onclick="closeVideo()">✕ Close</button>
+         <div style="position:absolute; top:20px; right:20px; z-index:310; display:flex; gap:10px;">
+             <button class="nav-circle-btn" onclick="toggleFullScreen()" style="background:rgba(255,255,255,0.2); border:none; color:white;">
+                ⛶
+             </button>
+             <button class="nav-circle-btn" onclick="closeVideo()" style="background:rgba(255,255,255,0.2); border:none; color:white;">
+                ✕
+             </button>
+         </div>
+
          <div class="video-wrapper">
             <div id="vip-lock" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; align-items:center; justify-content:center; flex-direction:column; z-index:10;">
                 <div style="font-size:40px;">👑</div><p style="color:#ffd700;">VIP Required</p>
@@ -354,10 +357,7 @@ export function renderWebsite() {
       let currentMovieId = "";
       let activeVideoLink = ""; 
       let activeIsPremium = false;
-      
-      // Global Cache for Client-Side Search
       let globalMovieCache = [];
-      
       let currentCat = '';
       let pageNum = 1;
       let isLoading = false;
@@ -377,25 +377,16 @@ export function renderWebsite() {
         loadSession(); updateProfileUI(); 
         await Promise.all([fetchRow('movies', 'row_movies'), fetchRow('series', 'row_series'), fetchRow('Adult', 'row_18')]);
         hideLoader();
-        
         const p = new URLSearchParams(window.location.search);
         const movieId = p.get('id');
         const view = p.get('view');
         const cat = p.get('cat');
-        
-        if (movieId) {
-             fetchSingleMovie(movieId);
-        } else if (view === 'grid' && cat) {
-             openCategory(cat); 
-        }
+        if (movieId) { fetchSingleMovie(movieId); } else if (view === 'grid' && cat) { openCategory(cat); }
         
         window.addEventListener('scroll', () => {
             if(document.getElementById('gridViewContainer').style.display === 'block') {
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                    if(!isLoading && hasMore) {
-                        pageNum++;
-                        fetchMovies(pageNum, currentCat, true);
-                    }
+                    if(!isLoading && hasMore) { pageNum++; fetchMovies(pageNum, currentCat, true); }
                 }
             }
         });
@@ -404,114 +395,73 @@ export function renderWebsite() {
       window.onpopstate = function() {
           const p = new URLSearchParams(window.location.search);
           if(!p.get('id')) closePlayerInternal();
-          if(!p.get('view')) {
-              goHomeInternal();
-          } else {
-              const cat = p.get('cat');
-              if(cat) openCategory(cat, false);
-          }
+          if(!p.get('view')) { goHomeInternal(); } else { const cat = p.get('cat'); if(cat) openCategory(cat, false); }
       };
 
-      function goHome(){ 
-          const u = window.location.pathname;
-          window.history.pushState({path:u},'',u);
-          goHomeInternal(); 
-      }
-      function goHomeInternal(){
-          document.getElementById('homeView').style.display='block';
-          document.getElementById('gridViewContainer').style.display='none';
-          document.getElementById('backNav').style.display='none';
-      }
+      function goHome(){ const u = window.location.pathname; window.history.pushState({path:u},'',u); goHomeInternal(); }
+      function goHomeInternal(){ document.getElementById('homeView').style.display='block'; document.getElementById('gridViewContainer').style.display='none'; document.getElementById('backNav').style.display='none'; }
       
       async function openCategory(c, pushState = true){
-          currentCat = c;
-          pageNum = 1;
-          hasMore = true;
+          currentCat = c; pageNum = 1; hasMore = true;
           document.getElementById('mainGrid').innerHTML = ""; 
-          
           showLoader(); 
-          document.getElementById('homeView').style.display='none';
-          document.getElementById('gridViewContainer').style.display='block';
-          document.getElementById('backNav').style.display='flex'; 
+          document.getElementById('homeView').style.display='none'; document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='flex'; 
           document.getElementById('gridTitle').innerText = c.toUpperCase();
-          
-          if(pushState) {
-              const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`;
-              window.history.pushState({path:u},'',u);
-          }
-          await fetchMovies(1,c, true); 
-          hideLoader();
+          if(pushState) { const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`; window.history.pushState({path:u},'',u); }
+          await fetchMovies(1,c, true); hideLoader();
       }
 
-      function closePlayer() {
-          closePlayerInternal();
-          const p = new URLSearchParams(window.location.search);
-          const cat = p.get('cat');
-          if(cat) {
-              const u = \`?view=grid&cat=\${encodeURIComponent(cat)}\`;
-              window.history.pushState({path:u},'',u);
-          } else {
-              window.history.pushState(null, '', window.location.pathname);
-          }
-      }
-      function closePlayerInternal(){
-          closeVideo();
-          document.getElementById('playerModal').style.display='none';
-      }
+      function closePlayer() { closePlayerInternal(); const p = new URLSearchParams(window.location.search); const cat = p.get('cat'); if(cat) { const u = \`?view=grid&cat=\${encodeURIComponent(cat)}\`; window.history.pushState({path:u},'',u); } else { window.history.pushState(null, '', window.location.pathname); } }
+      function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
 
       function launchVideo() {
           if(!activeVideoLink) return showAlert("Error", "No video source");
           if(activeIsPremium && (!currentUser || currentUser.vipExpiry < Date.now())) {
-             document.getElementById('videoOverlay').style.display='flex';
-             document.getElementById('vip-lock').style.display='flex';
-             document.getElementById('video').style.display='none';
-             return;
+             document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='flex'; document.getElementById('video').style.display='none'; return;
           }
-          document.getElementById('videoOverlay').style.display='flex';
-          document.getElementById('vip-lock').style.display='none';
-          document.getElementById('fallback-box').style.display='none';
-          document.getElementById('video').style.display='block';
+          document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='none'; document.getElementById('fallback-box').style.display='none'; document.getElementById('video').style.display='block';
           playViaSecureToken(activeVideoLink);
       }
       
+      function toggleFullScreen() {
+          const videoContainer = document.getElementById('videoWrapper'); 
+          const video = document.getElementById('video');
+          if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+              if (videoContainer.requestFullscreen) videoContainer.requestFullscreen();
+              else if (videoContainer.webkitRequestFullscreen) videoContainer.webkitRequestFullscreen();
+              else if (video.webkitEnterFullScreen) video.webkitEnterFullScreen();
+              try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{}); } catch(e){}
+          } else {
+              if (document.exitFullscreen) document.exitFullscreen();
+              else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+              try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
+          }
+      }
+
       function closeVideo() {
           const v = document.getElementById('video'); v.pause(); v.src="";
           if(window.hlsInstance) { window.hlsInstance.destroy(); window.hlsInstance = null; }
           document.getElementById('videoOverlay').style.display='none';
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+              if (document.exitFullscreen) document.exitFullscreen();
+              else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          }
+          try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
       }
       
-      function openExternalLink() {
-          if(activeVideoLink) window.open(activeVideoLink, '_blank');
-      }
+      function openExternalLink() { if(activeVideoLink) window.open(activeVideoLink, '_blank'); }
       
       async function playViaSecureToken(u){
           const v=document.getElementById('video');
-          const onFail = () => {
-              v.style.display = 'none';
-              document.getElementById('fallback-box').style.display = 'flex'; 
-          };
-
+          const onFail = () => { v.style.display = 'none'; document.getElementById('fallback-box').style.display = 'flex'; };
           if(u.includes('.m3u8')){
              if(Hls.isSupported()){
                  if(window.hlsInstance) window.hlsInstance.destroy();
-                 const h=new Hls();
-                 window.hlsInstance = h;
-                 h.loadSource(u); 
-                 h.attachMedia(v); 
+                 const h=new Hls(); window.hlsInstance = h;
+                 h.loadSource(u); h.attachMedia(v); 
                  h.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(onFail));
-                 h.on(Hls.Events.ERROR, (event, data) => {
-                     if(data.fatal) {
-                         h.destroy();
-                         onFail(); 
-                     }
-                 });
-             } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-                 v.src=u; 
-                 v.play().catch(onFail);
-                 v.onerror = onFail;
-             } else {
-                 onFail();
-             }
+                 h.on(Hls.Events.ERROR, (event, data) => { if(data.fatal) { h.destroy(); onFail(); } });
+             } else if (v.canPlayType('application/vnd.apple.mpegurl')) { v.src=u; v.play().catch(onFail); v.onerror = onFail; } else { onFail(); }
              return;
           }
           try{
@@ -522,46 +472,29 @@ export function renderWebsite() {
       }
 
       async function fetchMovies(page, cat, append = false) { 
-          if(isLoading) return;
-          isLoading = true;
+          if(isLoading) return; isLoading = true;
           if(page > 1) document.getElementById('scroll-loader').style.display = 'block';
-
           try {
               const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodeURIComponent(cat)}\`); 
               const json = await res.json(); 
-              
-              if(json.data.length === 0) {
-                  hasMore = false;
-              } else {
-                  // Add to Global Cache for Search
+              if(json.data.length === 0) { hasMore = false; } else {
                   globalMovieCache = [...globalMovieCache, ...json.data];
-                  // Unique filter
                   globalMovieCache = [...new Map(globalMovieCache.map(item => [item.id, item])).values()];
-
                   const html = json.data.map(m => createCardHtml(m)).join('');
-                  if(append) {
-                      document.getElementById('mainGrid').innerHTML += html;
-                  } else {
-                      document.getElementById('mainGrid').innerHTML = html;
-                  }
+                  if(append) document.getElementById('mainGrid').innerHTML += html;
+                  else document.getElementById('mainGrid').innerHTML = html;
               }
           } catch(e) { console.error(e); }
-          
-          isLoading = false;
-          document.getElementById('scroll-loader').style.display = 'none';
+          isLoading = false; document.getElementById('scroll-loader').style.display = 'none';
       }
       
-      // 🔥 Populate Global Cache on Home Load
       async function fetchRow(c,id){
           try{
               const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);
               const json=await res.json();
-              
               if(json.data && json.data.length > 0) {
                   globalMovieCache = [...globalMovieCache, ...json.data];
-                  // Unique filter
                   globalMovieCache = [...new Map(globalMovieCache.map(item => [item.id, item])).values()];
-                  
                   document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');
               }
           }catch(e){}
@@ -574,102 +507,45 @@ export function renderWebsite() {
           return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; 
       }
 
-      function openModalById(id) {
-          fetchSingleMovie(id);
-          const u = \`?id=\${id}\`; window.history.pushState({path:u},'',u);
-      }
+      function openModalById(id) { fetchSingleMovie(id); const u = \`?id=\${id}\`; window.history.pushState({path:u},'',u); }
 
       function resetDetailsUI() {
            const spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-           document.getElementById('dt_poster').src = spacer;
-           document.getElementById('dt_title').innerText = "Loading...";
-           document.getElementById('dt_year').innerText = "...";
-           document.getElementById('dt_desc').innerText = "";
-           document.getElementById('dt_genres').innerHTML = "";
-           document.getElementById('ep_section').innerHTML = "";
+           document.getElementById('dt_poster').src = spacer; document.getElementById('dt_title').innerText = "Loading..."; document.getElementById('dt_year').innerText = "..."; document.getElementById('dt_desc').innerText = ""; document.getElementById('dt_genres').innerHTML = ""; document.getElementById('ep_section').innerHTML = "";
       }
 
       async function fetchSingleMovie(id){
-          showLoader(); 
-          resetDetailsUI(); 
-          document.getElementById('playerModal').style.display='block';
+          showLoader(); resetDetailsUI(); document.getElementById('playerModal').style.display='block';
           const res=await fetch(\`/api/get_movie?id=\${id}\`); const m=await res.json();
-          hideLoader();
-          if(m&&m.title) setupDetailsPage(m);
+          hideLoader(); if(m&&m.title) setupDetailsPage(m);
       }
 
       function setupDetailsPage(m){
           currentMovieId=m.id;
-          
-          document.getElementById('dt_poster').src = m.image;
-          document.getElementById('dt_title').innerText = m.title;
-          document.getElementById('dt_desc').innerText = m.description || "No description available.";
-          
-          const year = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || "N/A";
-          document.getElementById('dt_year').innerText = year;
-          
-          if(m.tags) {
-              document.getElementById('dt_genres').innerHTML = m.tags.filter(t => !/^\\d{4}$/.test(t)).map(t=>\`<span class="genre-tag">\${t}</span>\`).join('');
-          }
-
+          document.getElementById('dt_poster').src = m.image; document.getElementById('dt_title').innerText = m.title; document.getElementById('dt_desc').innerText = m.description || "No description available.";
+          const year = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || "N/A"; document.getElementById('dt_year').innerText = year;
+          if(m.tags) document.getElementById('dt_genres').innerHTML = m.tags.filter(t => !/^\\d{4}$/.test(t)).map(t=>\`<span class="genre-tag">\${t}</span>\`).join('');
           const dlBtn = document.getElementById('dt_dl_link');
-          if(m.downloadLink) {
-              dlBtn.href = m.downloadLink; dlBtn.style.display = "flex";
-          } else {
-              dlBtn.style.display = "none";
-          }
-
-          const epSec = document.getElementById('ep_section');
-          epSec.innerHTML = "";
-          
-          if(!m.episodes || m.episodes.length <= 1) {
-              const link = (m.episodes && m.episodes[0]) ? m.episodes[0].link : m.link;
-              activeVideoLink = link;
-              activeIsPremium = m.isPremium;
-          } else {
-              activeVideoLink = m.episodes[0].link; 
-              activeIsPremium = m.isPremium;
-              renderAccordion(m.episodes, m.isPremium);
-          }
+          if(m.downloadLink) { dlBtn.href = m.downloadLink; dlBtn.style.display = "flex"; } else { dlBtn.style.display = "none"; }
+          const epSec = document.getElementById('ep_section'); epSec.innerHTML = "";
+          if(!m.episodes || m.episodes.length <= 1) { const link = (m.episodes && m.episodes[0]) ? m.episodes[0].link : m.link; activeVideoLink = link; activeIsPremium = m.isPremium; } else { activeVideoLink = m.episodes[0].link; activeIsPremium = m.isPremium; renderAccordion(m.episodes, m.isPremium); }
           updateFavBtnState();
       }
 
       function renderAccordion(episodes, isPremium) { 
-        const container = document.getElementById('ep_section'); 
-        const seasons = {}; 
-        episodes.forEach(ep => { 
-            let g = "Episodes"; 
-            if(ep.label.includes("Season")) g = ep.label.split(" ")[0] + " " + ep.label.split(" ")[1];
-            if(!seasons[g]) seasons[g] = []; seasons[g].push(ep); 
-        }); 
-        Object.keys(seasons).forEach(key => { 
-            const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = key + ' <span>▼</span>'; 
-            const panel = document.createElement('div'); panel.className = "panel"; 
-            const grid = document.createElement('div'); grid.className = "episode-grid"; 
-            grid.innerHTML = seasons[key].map(ep => \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${ep.label.replace(key,'').trim() || ep.label}</button>\`).join(''); 
-            panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel); 
-            btn.onclick = () => { panel.style.maxHeight = panel.style.maxHeight ? null : "400px"; }; 
-        }); 
+        const container = document.getElementById('ep_section'); const seasons = {}; 
+        episodes.forEach(ep => { let g = "Episodes"; if(ep.label.includes("Season")) g = ep.label.split(" ")[0] + " " + ep.label.split(" ")[1]; if(!seasons[g]) seasons[g] = []; seasons[g].push(ep); }); 
+        Object.keys(seasons).forEach(key => { const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = key + ' <span>▼</span>'; const panel = document.createElement('div'); panel.className = "panel"; const grid = document.createElement('div'); grid.className = "episode-grid"; grid.innerHTML = seasons[key].map(ep => \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${ep.label.replace(key,'').trim() || ep.label}</button>\`).join(''); panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel); btn.onclick = () => { panel.style.maxHeight = panel.style.maxHeight ? null : "400px"; }; }); 
       }
 
       window.switchEpisode = function(btn, link, isPrem) {
-          document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          activeVideoLink = link;
-          activeIsPremium = isPrem;
-          launchVideo();
+          document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeVideoLink = link; activeIsPremium = isPrem; launchVideo();
       }
 
       function toggleFavorite(){
-          if(!currentMovieId)return; 
-          let f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
-          if(f.includes(currentMovieId))f=f.filter(x=>x!==currentMovieId); else f.push(currentMovieId); 
-          localStorage.setItem('my_favs',JSON.stringify(f)); updateFavBtnState();
+          if(!currentMovieId)return; let f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.includes(currentMovieId))f=f.filter(x=>x!==currentMovieId); else f.push(currentMovieId); localStorage.setItem('my_favs',JSON.stringify(f)); updateFavBtnState();
       }
-      function updateFavBtnState(){
-          const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
-          document.getElementById('favBtn').innerText=f.includes(currentMovieId)?"❤️":"🤍";
-      }
+      function updateFavBtnState(){ const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); document.getElementById('favBtn').innerText=f.includes(currentMovieId)?"❤️":"🤍"; }
 
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
@@ -679,15 +555,9 @@ export function renderWebsite() {
             document.getElementById('loginForm').style.display='none'; document.getElementById('profileView').style.display='flex';
             document.getElementById('u_name').innerText=currentUser.username;
             if(currentUser.vipExpiry > Date.now()) {
-                const d = new Date(currentUser.vipExpiry);
-                const dStr = d.getDate().toString().padStart(2,'0') + "/" + (d.getMonth()+1).toString().padStart(2,'0') + "/" + d.getFullYear();
-                document.getElementById('u_status').innerHTML = 'VIP Ends: ' + dStr;
-            } else {
-                document.getElementById('u_status').innerText = "Free Plan";
-            }
-         } else {
-            document.getElementById('loginForm').style.display='block'; document.getElementById('profileView').style.display='none';
-         }
+                const d = new Date(currentUser.vipExpiry); const dStr = d.getDate().toString().padStart(2,'0') + "/" + (d.getMonth()+1).toString().padStart(2,'0') + "/" + d.getFullYear(); document.getElementById('u_status').innerHTML = 'VIP Ends: ' + dStr;
+            } else { document.getElementById('u_status').innerText = "Free Plan"; }
+         } else { document.getElementById('loginForm').style.display='block'; document.getElementById('profileView').style.display='none'; }
       }
       async function doRegister(){const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; if(!u||!p)return; showLoader(); await fetch('/api/auth/register',{method:'POST',body:JSON.stringify({username:u,password:p})}); hideLoader(); showAlert("Success","Created");}
       async function doLogin(){const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; showLoader(); const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})}); hideLoader(); if(res.ok){ const user=await res.json(); user.vipExpiry=user.vipExpiry||0; currentUser=user; localStorage.setItem('user_session',JSON.stringify(user)); updateProfileUI(); } else showAlert("Error","Fail");}
@@ -695,53 +565,30 @@ export function renderWebsite() {
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
       async function openFavorites(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "MY LIST"; const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res);} else document.getElementById('mainGrid').innerHTML="Empty";}
       
-      // 🔥 FIX: Hybrid Client + Server Search
-      function renderGrid(data) { 
-          document.getElementById('mainGrid').innerHTML = data.map(m => createCardHtml(m)).join(''); 
-      }
+      function renderGrid(data) { document.getElementById('mainGrid').innerHTML = data.map(m => createCardHtml(m)).join(''); }
 
       async function executeSearch(){
           const q=document.getElementById('searchInput').value.trim(); 
           if(!q) return; 
+          showLoader(); document.getElementById('homeView').style.display='none'; document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "SEARCH: " + q.toUpperCase();
+          const grid = document.getElementById('mainGrid'); grid.innerHTML = ""; 
           
-          showLoader();
-          document.getElementById('homeView').style.display='none';
-          document.getElementById('gridViewContainer').style.display='block';
-          document.getElementById('backNav').style.display='flex'; 
-          document.getElementById('gridTitle').innerText = "SEARCH: " + q.toUpperCase();
-          const grid = document.getElementById('mainGrid');
-          grid.innerHTML = ""; 
-          
-          // 1. Client Side First
           const qLower = q.toLowerCase();
           const localResults = globalMovieCache.filter(m => m.title.toLowerCase().includes(qLower));
           
-          if(localResults.length > 0) {
-              renderGrid(localResults);
-              hideLoader();
-              return;
-          }
+          if(localResults.length > 0) { renderGrid(localResults); hideLoader(); return; }
 
-          // 2. Server Side Fallback
           try {
               const res = await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);
+              if (res.status === 404) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; hideLoader(); return; }
               if (!res.ok) throw new Error("Server Error");
-              
               const json = await res.json();
               let results = [];
-              if (Array.isArray(json)) results = json;
-              else if (json.data && Array.isArray(json.data)) results = json.data;
-
-              if (results.length === 0) {
-                  grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>';
-              } else {
-                  renderGrid(results);
-              }
+              if (Array.isArray(json)) results = json; else if (json.data && Array.isArray(json.data)) results = json.data;
+              if (results.length === 0) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; } else { renderGrid(results); }
           } catch(e) { 
-              // Silent fail - show no results instead of error
-              grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>';
+              grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">No results found.</div>'; 
           }
-          
           hideLoader();
       }
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
@@ -749,4 +596,4 @@ export function renderWebsite() {
   </body>
   </html>
   `;
-}
+          }
