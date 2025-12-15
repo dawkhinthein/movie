@@ -32,29 +32,13 @@ export function renderWebsite() {
         --nav-height: 65px;
       }
 
-      /* 🔥 GLOBAL FIX: Disable ALL Overscroll Glows */
-      * { 
-          box-sizing: border-box; 
-          -webkit-tap-highlight-color: transparent; 
-          outline: none;
-          overscroll-behavior: none !important; /* The Magic Kill Switch */
-          -ms-overflow-style: none; 
-          scrollbar-width: none; 
-      }
-      
-      /* Hide Scrollbar Globally */
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; overscroll-behavior: none !important; -ms-overflow-style: none; scrollbar-width: none; }
       ::-webkit-scrollbar { display: none; }
       
       html, body { 
-          background: var(--bg-body); 
-          color: var(--text-main); 
-          font-family: 'Padauk', 'Inter', sans-serif; 
-          margin:0; 
-          padding-bottom: var(--nav-height);
-          user-select: none;
-          -webkit-user-select: none;
-          overflow-x: hidden;
-          width: 100%; height: 100%; /* Ensure full height */
+          background: var(--bg-body); color: var(--text-main); font-family: 'Padauk', 'Inter', sans-serif; 
+          margin:0; padding-bottom: var(--nav-height); 
+          user-select: none; -webkit-user-select: none; overflow-x: hidden; width: 100%; height: 100%;
       }
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
@@ -67,7 +51,6 @@ export function renderWebsite() {
       }
       .brand { color: var(--primary); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
-      /* --- Bottom Nav --- */
       .bottom-nav {
           position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
           background: #1a1a1a; border-top: 1px solid #333;
@@ -92,12 +75,10 @@ export function renderWebsite() {
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
-      
       .see-more { 
           color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; 
           border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px;
       }
-      
       .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       
       .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
@@ -131,8 +112,6 @@ export function renderWebsite() {
           display: flex; align-items: center; gap: 10px; border: 1px solid #333;
       }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
-
-      /* Checkbox Style */
       .checkbox-container { display: flex; align-items: center; margin-bottom: 20px; }
       .custom-checkbox { width: 18px; height: 18px; accent-color: var(--primary); margin-right: 10px; cursor: pointer; }
       .checkbox-label { color: #ccc; font-size: 13px; cursor: pointer; }
@@ -144,20 +123,15 @@ export function renderWebsite() {
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-      /* --- Details Page --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
-          background: var(--bg-body); z-index:200; overflow-y: auto; 
-          overscroll-behavior: none !important; /* 🔥 Fix for Review Section */
-          padding-bottom: 80px; 
+          background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: none !important; padding-bottom: 80px; 
       }
-      
       .details-header { 
           position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
           display: flex; justify-content: space-between; z-index: 20; 
           background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%);
       }
-      
       .nav-circle-btn {
           width: 40px; height: 40px; border-radius: 50%;
           background: rgba(40, 40, 40, 0.8); backdrop-filter: blur(5px);
@@ -171,9 +145,7 @@ export function renderWebsite() {
       .meta-col-sidebar { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
       .movie-title { font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 12px; margin-bottom: 15px; }
-      
       .actions-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-      
       .btn-play { 
           width: 100%; padding: 14px; border-radius: 50px; border: none; 
           background: var(--red-btn); color: white;
@@ -183,36 +155,30 @@ export function renderWebsite() {
       }
       .btn-dl { 
           width: 100%; padding: 14px; border-radius: 50px; 
-          background: #2a2a2a; color: white;
-          border: 1px solid #444;
+          background: #2a2a2a; color: white; border: 1px solid #444;
           font-weight: 600; font-size: 14px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
       }
       .btn-fav {
           width: 100%; padding: 14px; border-radius: 50px; 
-          background: transparent; color: #bbb;
-          border: 1px solid #444;
+          background: transparent; color: #bbb; border: 1px solid #444;
           font-weight: 600; font-size: 14px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
       }
       .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
-
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
-
+      
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
       .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #333; }
-
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
       .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
       .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       .video-wrapper { width: 100%; height: 100%; background: black; position: relative; }
       .artplayer-app { width: 100%; height: 100%; display: block; }
-      
       .close-video-btn { position: absolute; top: 20px; right: 20px; z-index: 310; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); color:white; border:none; font-size:18px; cursor:pointer; }
-      
       .fallback-box { position:absolute; top:0; left:0; width:100%; height:100%; background:#000; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
       .big-play-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.5); animation: pulse 2s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -372,7 +338,6 @@ export function renderWebsite() {
 
       const loader = document.getElementById('global-loader');
       function showLoader() { loader.classList.remove('hidden-loader'); }
-      // Auto-hide loader safety
       window.hideLoader = function() { if(loader) loader.classList.add('hidden-loader'); }
       function showAlert(t, m) { 
           const alert = document.getElementById('custom-alert');
@@ -413,13 +378,15 @@ export function renderWebsite() {
         });
       };
 
+      // 🔥 FIXED BACK LOGIC
       window.onpopstate = function() {
           const p = new URLSearchParams(window.location.search);
           const id = p.get('id');
           const view = p.get('view');
+          const cat = p.get('cat');
           
           if (!id) {
-              closePlayerInternal(); // Ensure cleanup
+              closePlayerInternal();
           } else if(document.getElementById('playerModal').style.display === 'none') {
               fetchSingleMovie(id);
           }
@@ -427,6 +394,10 @@ export function renderWebsite() {
           if(view === 'profile') switchTabInternal('profile');
           else if(view === 'search') switchTabInternal('search');
           else if(view === 'fav') switchTabInternal('fav');
+          // 🔥 Fix: Handle Grid View on Back
+          else if(view === 'grid') {
+              if (cat) openCategory(cat, false);
+          }
           else if(!id) switchTabInternal('home');
       };
 
@@ -497,7 +468,7 @@ export function renderWebsite() {
               container: '#artplayer-app',
               url: url,
               type: url.includes('.m3u8') ? 'm3u8' : 'auto',
-              autoplay: true, // 🔥 FORCE AUTO PLAY
+              autoplay: true,
               muted: false,
               customType: {
                   m3u8: function (video, url) {
@@ -505,7 +476,6 @@ export function renderWebsite() {
                           const hls = new Hls();
                           hls.loadSource(url);
                           hls.attachMedia(video);
-                          // 🔥 FORCE PLAY ON M3U8 LOAD
                           hls.on(Hls.Events.MANIFEST_PARSED, function() {
                               video.play().catch(() => {
                                   video.muted = true;
