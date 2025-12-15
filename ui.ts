@@ -19,7 +19,7 @@ export function renderWebsite() {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        --primary: #00b894; /* Teal color like screenshot */
+        --primary: #00b894; /* Teal color matching screenshot */
         --bg-main: #121212;
         --bg-card: #1e1e1e;
         --text-main: #ffffff;
@@ -29,7 +29,7 @@ export function renderWebsite() {
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
       body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', 'Padauk', sans-serif; margin:0; padding-bottom: 70px; user-select: none; overflow-x: hidden; }
       
-      /* --- Global Header (Home) --- */
+      /* --- Header --- */
       header { 
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
         padding: 15px 20px; position: sticky; top:0; z-index:50; 
@@ -40,6 +40,12 @@ export function renderWebsite() {
       .search-box { display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 50px; padding: 6px 15px; width: 50%; }
       .search-input { background: transparent; border: none; color: white; width: 100%; font-size: 14px; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
+
+      /* --- Loader --- */
+      #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
+      .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      .hidden-loader { opacity: 0; pointer-events: none; }
 
       /* --- Home Layout --- */
       .home-section { padding: 20px 0 10px 20px; }
@@ -54,12 +60,6 @@ export function renderWebsite() {
       .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; }
       .title { padding: 8px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 5px; left: 5px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
-
-      /* --- Loader --- */
-      #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
-      .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      .hidden-loader { opacity: 0; pointer-events: none; }
 
       /* --- User Panel --- */
       .user-panel { 
@@ -80,8 +80,20 @@ export function renderWebsite() {
       .back-nav { display: none; padding: 10px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid #333; }
       .back-nav-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
 
-      /* --- NEW DETAILS PAGE STYLE (Similar to Screenshot) --- */
-      #playerModal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:#121212; z-index:200; overflow-y: auto; }
+      /* --- NEW DETAILS PAGE STYLE (Matching Screenshot) --- */
+      #playerModal { 
+          display: none; 
+          position: fixed; 
+          top:0; 
+          left:0; 
+          width:100%; 
+          height:100%; 
+          background:#121212; 
+          z-index:200; 
+          overflow-y: auto;
+          /* 🔥 FIX: ဒါက Scroll ဆွဲရင် အောက်ခံမပေါ်အောင် တားပေးပါတယ် */
+          overscroll-behavior: contain; 
+      }
       
       .details-header { position: absolute; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
       .details-header button { pointer-events: auto; background: rgba(0,0,0,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); cursor: pointer; }
@@ -105,9 +117,8 @@ export function renderWebsite() {
       .genre-tag { border: 1px solid #444; color: #ccc; font-size: 10px; padding: 4px 10px; border-radius: 20px; }
 
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
-      .read-more { color: var(--primary); cursor: pointer; margin-left: 5px; font-size: 13px; }
 
-      /* Action Buttons like Screenshot */
+      /* Action Buttons - Green/Teal */
       .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
       .action-btn { 
         width: 100%; padding: 14px; border-radius: 30px; border: none; 
@@ -199,7 +210,7 @@ export function renderWebsite() {
               <div class="meta-col">
                   <h1 id="dt_title" class="movie-title">Title</h1>
                   <div class="stats-row">
-                      <div class="stats-item">⏱ <span id="dt_year">2024</span></div>
+                      <div class="stats-item">⏱ <span id="dt_year">2025</span></div>
                       <div class="stats-item">⭐️ <span id="dt_rate">0.0</span></div>
                   </div>
                   <div id="dt_genres" class="genre-row"></div>
@@ -354,7 +365,7 @@ export function renderWebsite() {
           document.getElementById('dt_desc').innerText = m.description || "No description available.";
           
           // Set Meta
-          const year = (m.tags && m.tags.find(t=>!isNaN(t))) || "2024";
+          const year = (m.tags && m.tags.find(t=>!isNaN(t))) || "2025";
           document.getElementById('dt_year').innerText = year;
           document.getElementById('dt_rate').innerText = "8.5"; // Placeholder or m.rating
           
@@ -415,7 +426,7 @@ export function renderWebsite() {
           launchVideo(); // Auto play when ep clicked
       }
 
-      // --- Favorites & Auth (Same as before) ---
+      // --- Favorites & Auth ---
       function toggleFavorite(){
           if(!currentMovieId)return; 
           let f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
