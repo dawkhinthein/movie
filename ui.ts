@@ -32,25 +32,51 @@ export function renderWebsite() {
         --nav-height: 65px;
       }
 
-      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; overscroll-behavior: none !important; -ms-overflow-style: none; scrollbar-width: none; }
+      /* 🔥 APP SHELL LOCK (The Key Fix) */
+      * { 
+          box-sizing: border-box; 
+          -webkit-tap-highlight-color: transparent; 
+          outline: none;
+          -ms-overflow-style: none; scrollbar-width: none; /* Hide Scrollbars */
+      }
       ::-webkit-scrollbar { display: none; }
-      
+
       html, body { 
-          background: var(--bg-body); color: var(--text-main); font-family: 'Padauk', 'Inter', sans-serif; 
-          margin:0; padding-bottom: var(--nav-height); 
-          user-select: none; -webkit-user-select: none; overflow-x: hidden; width: 100%; height: 100%;
+          background: var(--bg-body); 
+          color: var(--text-main); 
+          font-family: 'Padauk', 'Inter', sans-serif; 
+          margin: 0; padding: 0;
+          width: 100%; height: 100%; /* Force Full Screen */
+          overflow: hidden; /* ⛔ STOP BODY SCROLL */
+          position: fixed; /* ⛔ LOCK SCREEN POSITION */
+          overscroll-behavior: none;
+          touch-action: none; /* Disable browser gestures on body */
       }
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
+      /* Fixed Header */
       header { 
+        position: fixed; top: 0; left: 0; width: 100%; height: 60px;
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
-        padding: 15px 20px; position: sticky; top:0; z-index:50; 
         border-bottom: 1px solid rgba(255,255,255,0.1); 
         display:flex; justify-content: center; align-items: center; 
+        z-index:50;
       }
       .brand { color: var(--primary); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
+      /* 🔥 SCROLLABLE VIEW CONTAINER */
+      /* This allows inner content to scroll while body stays fixed */
+      .scroll-view {
+          position: absolute; top: 60px; left: 0; width: 100%; bottom: var(--nav-height);
+          overflow-y: auto; /* Allow vertical scroll inside */
+          overflow-x: hidden;
+          -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
+          overscroll-behavior: contain;
+          touch-action: pan-y; /* Allow vertical drag only here */
+      }
+
+      /* Bottom Nav */
       .bottom-nav {
           position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
           background: #1a1a1a; border-top: 1px solid #333;
@@ -72,14 +98,16 @@ export function renderWebsite() {
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
-      .home-section { padding: 25px 0 10px 20px; }
+      .home-section { padding: 20px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
+      
       .see-more { 
           color: var(--primary); font-size: 11px; cursor: pointer; font-weight: 600; 
           border: 1px solid var(--primary); padding: 4px 10px; border-radius: 20px;
       }
-      .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
+      
+      .scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; touch-action: pan-x; }
       
       .card { position: relative; background: var(--bg-card); border-radius: 8px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
       .card:active { transform: scale(0.97); }
@@ -90,7 +118,14 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      #profileViewContainer { display: none; padding-bottom: 80px; }
+      /* Full Screen Views (Profile, Search, Grid) */
+      .full-view {
+          display: none;
+          position: absolute; top: 60px; left: 0; width: 100%; bottom: var(--nav-height);
+          overflow-y: auto; background: var(--bg-body);
+          -webkit-overflow-scrolling: touch;
+      }
+
       .profile-card {
           margin: 20px; padding: 25px;
           background: linear-gradient(135deg, var(--primary), #00b894, #006266);
@@ -116,16 +151,18 @@ export function renderWebsite() {
       .custom-checkbox { width: 18px; height: 18px; accent-color: var(--primary); margin-right: 10px; cursor: pointer; }
       .checkbox-label { color: #ccc; font-size: 13px; cursor: pointer; }
 
-      #searchView { display: none; padding: 20px; padding-bottom: 80px; }
-      .search-bar-large { width: 100%; padding: 15px 20px; background: #2a2a2a; border: 1px solid #444; border-radius: 30px; color: white; font-size: 16px; margin-bottom: 20px; outline:none; }
+      .search-bar-large { width: 90%; margin: 20px 5%; padding: 15px 20px; background: #2a2a2a; border: 1px solid #444; border-radius: 30px; color: white; font-size: 16px; outline:none; }
 
       #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: flex-start; justify-content: center; padding-top: 20px; }
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+      /* --- Details Page --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
-          background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: none !important; padding-bottom: 80px; 
+          background: var(--bg-body); z-index:200; overflow-y: auto; 
+          overscroll-behavior: none !important;
+          padding-bottom: 80px; 
       }
       .details-header { 
           position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
@@ -167,9 +204,8 @@ export function renderWebsite() {
       }
       .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
-      
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
-      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
       .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #333; }
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
@@ -210,26 +246,27 @@ export function renderWebsite() {
       <div class="brand" onclick="switchTab('home')">Stream X</div>
     </header>
 
-    <div id="searchView">
-        <input type="text" id="searchInput" class="search-bar-large" placeholder="Search movies..." onkeypress="handleSearchKey(event)">
-        <div class="grid" id="searchGrid"></div>
-    </div>
-
-    <div id="homeView">
+    <div id="homeView" class="scroll-view">
         <div class="home-section"><div class="section-head"><span class="section-title">Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
         <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">See All</a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
+        <div style="height:20px;"></div>
+    </div>
+
+    <div id="searchView" class="full-view">
+        <input type="text" id="searchInput" class="search-bar-large" placeholder="Search movies..." onkeypress="handleSearchKey(event)">
+        <div class="grid" id="searchGrid"></div>
     </div>
 
     <div class="back-nav" id="backNav">
         <button class="nav-circle-btn" onclick="switchTab('home')" style="border:none;">⬅</button>
         <span id="gridTitle" style="color:white; font-weight:bold; margin-left:10px;">MOVIES</span>
     </div>
-    <div class="container" id="gridViewContainer">
+    <div class="full-view" id="gridViewContainer" style="top:60px;">
         <div class="grid" id="mainGrid"></div>
         <div id="scroll-loader"><div class="small-spinner"></div></div>
     </div>
 
-    <div id="profileViewContainer">
+    <div id="profileViewContainer" class="full-view">
         <div id="loginForm" class="panel-body" style="padding-top:20px;">
             <h3 style="color:white; margin-bottom:20px;">Login</h3>
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
@@ -369,16 +406,18 @@ export function renderWebsite() {
         else if (view === 'fav') { switchTab('fav', false); }
         else if (view === 'grid') { openCategory(p.get('cat') || 'movies', false); }
         
-        window.addEventListener('scroll', () => {
-            if(document.getElementById('gridViewContainer').style.display === 'block') {
-                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                    if(!isLoading && hasMore) { pageNum++; fetchMovies(pageNum, currentCat, true); }
+        // Dynamic Scroll Listener
+        document.querySelectorAll('.scroll-view, .full-view').forEach(el => {
+            el.addEventListener('scroll', (e) => {
+                if(e.target.id === 'gridViewContainer') {
+                    if ((e.target.scrollTop + e.target.clientHeight) >= e.target.scrollHeight - 300) {
+                        if(!isLoading && hasMore) { pageNum++; fetchMovies(pageNum, currentCat, true); }
+                    }
                 }
-            }
+            });
         });
       };
 
-      // 🔥 FIXED BACK LOGIC
       window.onpopstate = function() {
           const p = new URLSearchParams(window.location.search);
           const id = p.get('id');
@@ -394,7 +433,6 @@ export function renderWebsite() {
           if(view === 'profile') switchTabInternal('profile');
           else if(view === 'search') switchTabInternal('search');
           else if(view === 'fav') switchTabInternal('fav');
-          // 🔥 Fix: Handle Grid View on Back
           else if(view === 'grid') {
               if (cat) openCategory(cat, false);
           }
@@ -414,6 +452,7 @@ export function renderWebsite() {
           const btn = document.getElementById('nav_' + tab);
           if(btn) btn.classList.add('active');
 
+          // Hide all views first
           document.getElementById('homeView').style.display='none';
           document.getElementById('searchView').style.display='none';
           document.getElementById('gridViewContainer').style.display='none';
@@ -435,8 +474,12 @@ export function renderWebsite() {
           currentCat = c; pageNum = 1; hasMore = true;
           document.getElementById('mainGrid').innerHTML = ""; 
           showLoader(); 
-          document.getElementById('homeView').style.display='none'; document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='flex'; 
+          
+          document.getElementById('homeView').style.display='none'; 
+          document.getElementById('gridViewContainer').style.display='block'; 
+          document.getElementById('backNav').style.display='flex'; 
           document.getElementById('gridTitle').innerText = c.toUpperCase();
+          
           if(pushState) { const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`; window.history.pushState({path:u},'',u); }
           await fetchMovies(1,c, true); hideLoader();
       }
@@ -463,7 +506,6 @@ export function renderWebsite() {
       
       function playViaArtPlayer(url) {
           if(art) art.destroy(false);
-          
           art = new Artplayer({
               container: '#artplayer-app',
               url: url,
@@ -477,14 +519,10 @@ export function renderWebsite() {
                           hls.loadSource(url);
                           hls.attachMedia(video);
                           hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                              video.play().catch(() => {
-                                  video.muted = true;
-                                  video.play();
-                              });
+                              video.play().catch(() => { video.muted = true; video.play(); });
                           });
                       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                          video.src = url;
-                          video.play();
+                          video.src = url; video.play();
                       } else {
                           art.notice.show = 'Unsupported M3U8';
                           document.getElementById('fallback-box').style.display = 'flex';
@@ -501,7 +539,6 @@ export function renderWebsite() {
               autoOrientation: true,
               theme: '#00b894',
           });
-          
           art.on('ready', () => { art.play(); });
           art.on('error', () => { document.getElementById('fallback-box').style.display = 'flex'; });
       }
@@ -586,11 +623,7 @@ export function renderWebsite() {
           const s = localStorage.getItem('user_session');
           if (s) {
               const user = JSON.parse(s);
-              // 🔥 15 Days / 1 Day Expiry Logic
-              if (user.sessionExpiry && Date.now() > user.sessionExpiry) {
-                  doLogout(); // Expired
-                  return;
-              }
+              if (user.sessionExpiry && Date.now() > user.sessionExpiry) { doLogout(); return; }
               currentUser = user;
           }
       }
@@ -616,12 +649,9 @@ export function renderWebsite() {
           if(res.ok){ 
               const user=await res.json(); 
               user.vipExpiry=user.vipExpiry||0; 
-              
-              // 🔥 Remember Me Logic
               const remember = document.getElementById('remember_me').checked;
               const days = remember ? 15 : 1;
               user.sessionExpiry = Date.now() + (days * 24 * 60 * 60 * 1000);
-
               currentUser=user; 
               localStorage.setItem('user_session',JSON.stringify(user)); 
               updateProfileUI(); 
