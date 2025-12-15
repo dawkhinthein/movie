@@ -39,7 +39,7 @@ export function renderWebsite() {
           color: var(--text-main); 
           font-family: 'Padauk', 'Inter', sans-serif; 
           margin:0; 
-          padding-bottom: var(--nav-height); /* Space for Bottom Nav */
+          padding-bottom: var(--nav-height);
           user-select: none;
           -webkit-user-select: none;
           overflow-x: hidden; 
@@ -47,7 +47,6 @@ export function renderWebsite() {
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
-      /* --- Simple Top Header --- */
       header { 
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
         padding: 15px 20px; position: sticky; top:0; z-index:50; 
@@ -56,7 +55,7 @@ export function renderWebsite() {
       }
       .brand { color: var(--primary); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
-      /* --- BOTTOM NAVIGATION BAR (NEW) --- */
+      /* Bottom Nav */
       .bottom-nav {
           position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
           background: #1a1a1a; border-top: 1px solid #333;
@@ -73,13 +72,11 @@ export function renderWebsite() {
       .nav-item.active { color: var(--primary); }
       .nav-item.active .nav-icon { transform: scale(1.1); transition: transform 0.2s; }
 
-      /* --- Loader --- */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
-      /* --- Home Layout --- */
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
@@ -101,17 +98,8 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* --- User Panel (Side Menu) --- */
-      .user-panel { 
-        position: fixed; top: 0; right: 0; width: 100%; height: 100%; 
-        background: #1a1a1a; z-index: 200; transform: translateY(100%); 
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 0; 
-        display: flex; flex-direction: column; padding-bottom: 80px;
-      }
-      .user-panel.open { transform: translateY(0); }
-      
-      .panel-header { padding: 20px; border-bottom: 1px solid #333; display:flex; justify-content:space-between; align-items:center; }
-      .panel-header h3 { margin:0; font-size:18px; color: #fff; }
+      /* User Profile as a View, not overlay */
+      #profileViewContainer { display: none; padding-bottom: 80px; }
       
       .profile-card {
           margin: 20px; padding: 25px;
@@ -135,7 +123,6 @@ export function renderWebsite() {
       }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
-      /* --- Search View --- */
       #searchView { display: none; padding: 20px; padding-bottom: 80px; }
       .search-bar-large { width: 100%; padding: 15px 20px; background: #2a2a2a; border: 1px solid #444; border-radius: 30px; color: white; font-size: 16px; margin-bottom: 20px; outline:none; }
 
@@ -143,11 +130,10 @@ export function renderWebsite() {
       .alert-box { background: #222; padding: 20px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #444; animation: slideDown 0.4s; }
       @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-      /* --- Details Page --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
           background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
-          padding-bottom: 80px; /* Space for scrolling */
+          padding-bottom: 80px; 
       }
       
       .details-header { 
@@ -187,7 +173,6 @@ export function renderWebsite() {
           font-weight: 600; font-size: 14px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
       }
-      /* 🔥 New Fav Button Style */
       .btn-fav {
           width: 100%; padding: 14px; border-radius: 50px; 
           background: transparent; color: #bbb;
@@ -263,28 +248,27 @@ export function renderWebsite() {
         <div id="scroll-loader"><div class="small-spinner"></div></div>
     </div>
 
-    <div id="userPanel" class="user-panel">
-        <div class="panel-header"><h3>Account</h3></div>
-        
+    <div id="profileViewContainer">
         <div id="loginForm" class="panel-body" style="padding-top:20px;">
+            <h3 style="color:white; margin-bottom:20px;">Login</h3>
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
             <button class="auth-btn-solid" onclick="doLogin()">Log In</button>
             <button class="auth-btn-solid" style="background:#555;" onclick="doRegister()">Create Account</button>
         </div>
 
-        <div id="profileView" style="display:none; flex-direction:column; height:100%;">
+        <div id="profileView" style="display:none; flex-direction:column;">
             <div class="profile-card">
                 <div class="profile-avatar">👤</div>
                 <h3 id="u_name" class="profile-name">User</h3>
                 <p id="u_status" class="profile-status">Free Plan</p>
             </div>
-            
             <div class="panel-body">
                 <div style="display:flex; gap:10px; margin-bottom:20px;">
                     <input type="text" id="vip_code" class="auth-input" style="margin:0;" placeholder="Redeem Code">
                     <button class="auth-btn-solid" style="margin:0; width:auto; border-radius:12px;" onclick="doRedeem()">Go</button>
                 </div>
+                <button class="menu-btn" onclick="switchTab('fav')">❤️ &nbsp; My Favorites</button>
                 <button class="menu-btn" onclick="doLogout()" style="color:#ff4757; border-color:#ff4757;">🚪 &nbsp; Log Out</button>
             </div>
         </div>
@@ -292,27 +276,23 @@ export function renderWebsite() {
 
     <div class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('home')" id="nav_home">
-            <span class="nav-icon">🏠</span>
-            Home
+            <span class="nav-icon">🏠</span>Home
         </button>
         <button class="nav-item" onclick="switchTab('search')" id="nav_search">
-            <span class="nav-icon">🔍</span>
-            Search
+            <span class="nav-icon">🔍</span>Search
         </button>
         <button class="nav-item" onclick="switchTab('fav')" id="nav_fav">
-            <span class="nav-icon">❤️</span>
-            Favorites
+            <span class="nav-icon">❤️</span>Favs
         </button>
         <button class="nav-item" onclick="switchTab('profile')" id="nav_profile">
-            <span class="nav-icon">👤</span>
-            Account
+            <span class="nav-icon">👤</span>Account
         </button>
     </div>
 
     <div id="playerModal">
       <div class="details-header">
         <button class="nav-circle-btn" onclick="closePlayer()">⬅</button>
-        </div>
+      </div>
 
       <div class="modal-body-content">
           <div class="top-info-section">
@@ -327,54 +307,35 @@ export function renderWebsite() {
           </div>
 
           <div class="actions-container">
-              <button class="btn-play" onclick="launchVideo()">
-                  ▶ Play Video
-              </button>
-              
+              <button class="btn-play" onclick="launchVideo()">▶ Play Video</button>
               <div style="display:flex; gap:10px;">
-                  <a id="dt_dl_link" href="#" target="_blank" class="btn-dl" style="flex:1;">
-                      ⬇ Download
-                  </a>
-                  <button id="favBtn" class="btn-fav" onclick="toggleFavorite()" style="flex:1;">
-                      🤍 Add to List
-                  </button>
+                  <a id="dt_dl_link" href="#" target="_blank" class="btn-dl" style="flex:1;">⬇ Download</a>
+                  <button id="favBtn" class="btn-fav" onclick="toggleFavorite()" style="flex:1;">🤍 Add to List</button>
               </div>
           </div>
 
           <div id="ep_section"></div>
-
-          <div class="desc-text" style="margin-top:20px;">
-              <span id="dt_desc"></span>
-          </div>
-
+          <div class="desc-text" style="margin-top:20px;"><span id="dt_desc"></span></div>
           <div style="height:50px;"></div>
       </div>
 
       <div id="videoOverlay" class="video-overlay">
          <div style="position:absolute; top:20px; right:20px; z-index:310; display:flex; gap:10px;">
-             <button class="nav-circle-btn" onclick="toggleFullScreen()" ontouchstart="toggleFullScreen()" style="background:rgba(255,255,255,0.2); border:none; color:white;">
-                ⛶
-             </button>
-             <button class="nav-circle-btn" onclick="closeVideo()" ontouchstart="closeVideo()" style="background:rgba(255,255,255,0.2); border:none; color:white;">
-                ✕
-             </button>
+             <button class="nav-circle-btn" onclick="toggleFullScreen()" ontouchstart="toggleFullScreen()" style="background:rgba(255,255,255,0.2); border:none; color:white;">⛶</button>
+             <button class="nav-circle-btn" onclick="closeVideo()" ontouchstart="closeVideo()" style="background:rgba(255,255,255,0.2); border:none; color:white;">✕</button>
          </div>
-
          <div id="videoWrapper" class="video-wrapper">
             <div id="vip-lock" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; align-items:center; justify-content:center; flex-direction:column; z-index:10;">
                 <div style="font-size:40px;">👑</div><p style="color:#ffd700;">VIP Required</p>
                 <button class="auth-btn-solid" style="width:auto; padding:8px 30px;" onclick="closeVideo(); toggleUserPanel();">Unlock</button>
             </div>
-            
             <div id="fallback-box" class="fallback-box">
                 <div class="big-play-btn" onclick="openExternalLink()">▶</div>
                 <p style="color:#aaa; margin-top:15px; font-size:12px;">Tap to Start Video</p>
             </div>
-
             <video id="video" controls playsinline controlsList="nodownload"></video>
          </div>
       </div>
-
     </div>
 
     <script>
@@ -403,9 +364,16 @@ export function renderWebsite() {
         await Promise.all([fetchRow('movies', 'row_movies'), fetchRow('series', 'row_series'), fetchRow('Adult', 'row_18')]);
         hideLoader();
         
-        // Handle URL params
         const p = new URLSearchParams(window.location.search);
-        if (p.get('id')) fetchSingleMovie(p.get('id'));
+        const movieId = p.get('id');
+        const view = p.get('view');
+        const cat = p.get('cat');
+        
+        if (movieId) { fetchSingleMovie(movieId); } 
+        else if (view === 'profile') { switchTab('profile', false); }
+        else if (view === 'search') { switchTab('search', false); }
+        else if (view === 'fav') { switchTab('fav', false); }
+        else if (view === 'grid' && cat) { openCategory(cat, false); }
         
         window.addEventListener('scroll', () => {
             if(document.getElementById('gridViewContainer').style.display === 'block') {
@@ -416,46 +384,80 @@ export function renderWebsite() {
         });
       };
 
-      // 🔥 Navigation Logic
-      function switchTab(tab) {
-          // Reset Icons
-          document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-          document.getElementById('nav_' + tab).classList.add('active');
+      // 🔥 ROUTER LOGIC: The Heart of Back Button Fix
+      window.onpopstate = function() {
+          const p = new URLSearchParams(window.location.search);
+          const id = p.get('id');
+          const view = p.get('view');
+          
+          // 1. Handle Modal
+          if (!id) {
+              closePlayerInternal(); // Close movie if ID gone
+          } else {
+              // Open movie if ID exists but closed
+              if(document.getElementById('playerModal').style.display === 'none') fetchSingleMovie(id);
+          }
 
-          // Hide Everything First
+          // 2. Handle Tabs
+          if(view === 'profile') switchTabInternal('profile');
+          else if(view === 'search') switchTabInternal('search');
+          else if(view === 'fav') switchTabInternal('fav');
+          else if(view === 'grid') { /* handled by openCategory logic mostly */ }
+          else switchTabInternal('home');
+      };
+
+      function switchTab(tab, push = true) {
+          if(push) {
+              const u = tab === 'home' ? window.location.pathname : \`?view=\${tab}\`;
+              window.history.pushState({path:u},'',u);
+          }
+          switchTabInternal(tab);
+      }
+
+      function switchTabInternal(tab) {
+          document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+          const btn = document.getElementById('nav_' + tab);
+          if(btn) btn.classList.add('active');
+
           document.getElementById('homeView').style.display='none';
           document.getElementById('searchView').style.display='none';
           document.getElementById('gridViewContainer').style.display='none';
-          document.getElementById('userPanel').classList.remove('open');
+          document.getElementById('profileViewContainer').style.display='none';
           document.getElementById('backNav').style.display='none';
 
-          if(tab === 'home') {
-              document.getElementById('homeView').style.display='block';
-          } else if(tab === 'search') {
+          if(tab === 'home') document.getElementById('homeView').style.display='block';
+          else if(tab === 'search') { 
               document.getElementById('searchView').style.display='block';
               document.getElementById('searchInput').focus();
-          } else if(tab === 'fav') {
-              openFavorites();
-          } else if(tab === 'profile') {
-              document.getElementById('userPanel').classList.add('open');
           }
+          else if(tab === 'fav') openFavoritesInternal();
+          else if(tab === 'profile') document.getElementById('profileViewContainer').style.display='block';
       }
 
       function goHome(){ switchTab('home'); }
       
-      async function openCategory(c){
+      async function openCategory(c, pushState = true){
           currentCat = c; pageNum = 1; hasMore = true;
           document.getElementById('mainGrid').innerHTML = ""; 
           showLoader(); 
+          
           document.getElementById('homeView').style.display='none'; 
           document.getElementById('gridViewContainer').style.display='block'; 
           document.getElementById('backNav').style.display='flex'; 
           document.getElementById('gridTitle').innerText = c.toUpperCase();
+          
+          if(pushState) { const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`; window.history.pushState({path:u},'',u); }
           await fetchMovies(1,c, true); hideLoader();
       }
 
-      function closePlayer() { closePlayerInternal(); window.history.pushState(null, '', window.location.pathname); }
-      function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
+      function closePlayer() { 
+          // Just go back in history, let router handle UI update
+          window.history.back(); 
+      }
+      function closePlayerInternal(){ 
+          closeVideo(); 
+          document.getElementById('playerModal').style.display='none'; 
+      }
 
       function launchVideo() {
           if(!activeVideoLink) return showAlert("Error", "No video source");
@@ -468,8 +470,6 @@ export function renderWebsite() {
       
       function toggleFullScreen() {
           const wrapper = document.getElementById('videoOverlay');
-          const video = document.getElementById('video');
-          
           if (!wrapper.classList.contains('force-fullscreen-mode')) {
               wrapper.classList.add('force-fullscreen-mode');
               if (wrapper.requestFullscreen) wrapper.requestFullscreen().catch(()=>{});
@@ -600,10 +600,6 @@ export function renderWebsite() {
       }
 
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
-      function toggleUserPanel(){
-          // Only used for close button now, nav handles open
-          document.getElementById('userPanel').classList.toggle('open');
-      }
       
       function updateProfileUI(){
          if(currentUser){
@@ -619,15 +615,17 @@ export function renderWebsite() {
       function doLogout(){localStorage.removeItem('user_session'); currentUser=null; updateProfileUI();}
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
       
-      async function openFavorites(){
-          // Used by nav button
+      function openFavoritesInternal(){
           document.getElementById('mainGrid').innerHTML = "";
           document.getElementById('homeView').style.display='none'; document.getElementById('searchView').style.display='none';
           document.getElementById('gridViewContainer').style.display='block'; document.getElementById('backNav').style.display='none';
-          document.getElementById('userPanel').classList.remove('open');
           
           const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
-          if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res, 'mainGrid');} 
+          if(f.length){
+              // Just load from cache if possible, or fetch
+              // For robustness, simple fetch loop here
+              Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))).then(res => renderGrid(res, 'mainGrid'));
+          } 
           else document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No favorites yet.</p>';
       }
       
