@@ -123,17 +123,23 @@ export function renderWebsite() {
       .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
       .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* 🔥 Banner Box */
-      .banner-box {
-          margin: 20px 20px 30px 20px; padding: 20px;
-          background: linear-gradient(45deg, #6c5ce7, #a29bfe);
-          border-radius: 15px; color: white; text-align: center;
-          box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
-          cursor: pointer; transition: transform 0.1s;
+      /* 🔥 Contact Box */
+      .contact-box {
+          margin: 20px 20px 40px 20px; /* Spacing */
+          padding: 25px;
+          background: linear-gradient(135deg, #6c5ce7, #8e44ad);
+          border-radius: 16px;
+          color: white;
+          display: flex; align-items: center; justify-content: space-between;
+          box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+          cursor: pointer; position: relative; overflow: hidden;
+          border: 1px solid rgba(255,255,255,0.1);
       }
-      .banner-box:active { transform: scale(0.98); }
-      .banner-title { font-size: 18px; font-weight: 800; margin: 0 0 5px 0; }
-      .banner-desc { font-size: 13px; opacity: 0.9; margin: 0; }
+      .contact-box:active { transform: scale(0.98); transition: transform 0.1s; }
+      .contact-icon { font-size: 32px; margin-right: 15px; }
+      .contact-text h3 { margin: 0; font-size: 18px; font-weight: 800; }
+      .contact-text p { margin: 5px 0 0 0; font-size: 12px; opacity: 0.9; }
+      .contact-arrow { font-size: 24px; font-weight: bold; opacity: 0.8; }
 
       /* Profiles */
       .profile-card { margin: 20px; padding: 25px; background: linear-gradient(135deg, var(--primary), #00b894, #006266); border-radius: 20px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); }
@@ -166,11 +172,10 @@ export function renderWebsite() {
       .btn-fav { width: 100%; padding: 14px; border-radius: 50px; background: transparent; color: #bbb; border: 1px solid #444; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
       .btn-fav.active { color: var(--primary); border-color: var(--primary); background: rgba(0, 184, 148, 0.1); }
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
-      
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; padding-bottom: 80px; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      
+      .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 0; z-index: 40; border-bottom: 1px solid #333; }
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
       .small-spinner { width: 25px; height: 25px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
@@ -218,11 +223,15 @@ export function renderWebsite() {
         <div class="home-section"><div class="section-head"><span class="section-title">Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
         <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">See All</a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
         
-        <div class="home-section"><div class="section-head"><span class="section-title">Recommended</span></div><div class="scroll-row" id="row_recommended">${getServerSkeleton()}</div></div>
-
-        <div class="banner-box" onclick="window.open('https://t.me/YourChannelLink', '_blank')">
-            <div class="banner-title">🚀 Join Channel</div>
-            <div class="banner-desc">Request movies & get updates!</div>
+        <div class="contact-box" onclick="window.open('https://t.me/iqowoq', '_blank')">
+            <div style="display:flex; align-items:center;">
+                <div class="contact-icon">🎧</div>
+                <div class="contact-text">
+                    <h3>Contact Admin</h3>
+                    <p>Get VIP or Report Error</p>
+                </div>
+            </div>
+            <div class="contact-arrow">➜</div>
         </div>
 
         <div style="height:20px;"></div>
@@ -361,8 +370,7 @@ export function renderWebsite() {
             updateProfileUI(); 
             await Promise.allSettled([
                 fetchRow('movies', 'row_movies'), 
-                fetchRow('series', 'row_series'),
-                fetchRow('movies', 'row_recommended') // 🔥 Fetch movies again for Recommended
+                fetchRow('series', 'row_series')
             ]);
         } catch(e) { console.error("Init Error", e); } 
         finally { window.hideLoader(); }
@@ -395,13 +403,18 @@ export function renderWebsite() {
           const view = p.get('view');
           const cat = p.get('cat');
           
-          if (!id) closePlayerInternal(); 
-          else if(document.getElementById('playerModal').style.display === 'none') fetchSingleMovie(id);
+          if (!id) {
+              closePlayerInternal();
+          } else if(document.getElementById('playerModal').style.display === 'none') {
+              fetchSingleMovie(id);
+          }
 
           if(view === 'profile') switchTabInternal('profile');
           else if(view === 'search') switchTabInternal('search');
           else if(view === 'fav') switchTabInternal('fav');
-          else if(view === 'grid' && cat) openCategory(cat, false);
+          else if(view === 'grid') {
+              if (cat) openCategory(cat, false);
+          }
           else if(!id) switchTabInternal('home');
       };
 
