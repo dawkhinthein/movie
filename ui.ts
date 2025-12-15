@@ -23,24 +23,29 @@ export function renderWebsite() {
         --bg-main: #121212;
         --bg-card: #1e1e1e;
         --text-main: #ffffff;
-        --text-sec: #b3b3b3;
       }
 
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
       
-      /* 🔥 FIX: ဒီနှစ်ကြောင်းက တစ်မျက်နှာလုံးကို ငြိမ်အောင်လုပ်ပေးပါလိမ့်မယ် */
       html, body { 
-          overscroll-behavior-y: none; /* Disables pull-to-refresh bounce */
+          overscroll-behavior-y: none; 
           background: var(--bg-main); 
           color: var(--text-main); 
           font-family: 'Inter', 'Padauk', sans-serif; 
           margin:0; 
           padding-bottom: 70px; 
-          user-select: none; 
+          user-select: none; /* Text selection off */
+          -webkit-user-select: none;
           overflow-x: hidden; 
       }
       
-      /* --- Header --- */
+      /* 🔥 FIX: Image Saving Prevention */
+      img { 
+          pointer-events: none; /* Disables right click/long press context menu on images */
+          -webkit-user-drag: none; /* Prevents dragging */
+          user-select: none;
+      }
+
       header { 
         background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
         padding: 15px 20px; position: sticky; top:0; z-index:50; 
@@ -52,13 +57,11 @@ export function renderWebsite() {
       .search-input { background: transparent; border: none; color: white; width: 100%; font-size: 14px; }
       .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
 
-      /* --- Loader --- */
       #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
       .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       .hidden-loader { opacity: 0; pointer-events: none; }
 
-      /* --- Home Layout --- */
       .home-section { padding: 20px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
       .section-title { color: #fff; font-size: 17px; font-weight: 700; border-left: 3px solid var(--primary); padding-left: 10px; }
@@ -72,7 +75,6 @@ export function renderWebsite() {
       .title { padding: 8px; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
       .prem-tag { position: absolute; top: 5px; left: 5px; background: #ffd700; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2; }
 
-      /* --- User Panel --- */
       .user-panel { 
         position: fixed; top: 0; right: 0; width: 300px; height: 100%; 
         background: #1a1a1a; z-index: 100; transform: translateX(100%); 
@@ -84,25 +86,15 @@ export function renderWebsite() {
       .auth-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 25px; margin-top: 15px; }
       .auth-btn.secondary { background: #333; margin-top: 10px; }
 
-      /* --- Grid View --- */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
       .back-nav { display: none; padding: 10px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid #333; }
       .back-nav-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
 
-      /* --- NEW DETAILS PAGE STYLE --- */
       #playerModal { 
-          display: none; 
-          position: fixed; 
-          top:0; 
-          left:0; 
-          width:100%; 
-          height:100%; 
-          background: #121212; /* Opaque background */
-          z-index:200; 
-          overflow-y: auto;
-          overscroll-behavior: contain; /* Prevents scroll chaining */
+          display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
+          background: #121212; z-index:200; overflow-y: auto; overscroll-behavior: contain; 
       }
       
       .details-header { position: absolute; top: 0; left: 0; width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
@@ -120,7 +112,6 @@ export function renderWebsite() {
       .movie-title { font-size: 20px; font-weight: bold; color: white; margin: 0 0 8px 0; line-height: 1.2; }
       
       .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 12px; margin-bottom: 10px; }
-      .stats-item { display: flex; align-items: center; gap: 4px; }
       
       .genre-row { display: flex; flex-wrap: wrap; gap: 5px; }
       .genre-tag { border: 1px solid #444; color: #ccc; font-size: 10px; padding: 4px 10px; border-radius: 20px; }
@@ -128,20 +119,11 @@ export function renderWebsite() {
       .desc-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
 
       .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
-      .action-btn { 
-        width: 100%; padding: 14px; border-radius: 30px; border: none; 
-        font-weight: bold; font-size: 15px; cursor: pointer; 
-        display: flex; align-items: center; justify-content: center; gap: 10px;
-        color: white; 
-      }
+      .action-btn { width: 100%; padding: 14px; border-radius: 30px; border: none; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; }
       .btn-play { background: var(--primary); box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3); }
       .btn-dl { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
 
-      .video-overlay { 
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-          background: black; z-index: 300; display: none; 
-          flex-direction: column; 
-      }
+      .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       .video-wrapper { width: 100%; aspect-ratio: 16/9; background: black; margin: auto 0; position: relative; }
       video { width: 100%; height: 100%; }
       .close-video-btn { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.5); border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; z-index: 310; }
@@ -192,12 +174,15 @@ export function renderWebsite() {
     </div>
 
     <div id="homeView">
-        <div class="home-section"><div class="section-head"><span class="section-title">Trending Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
+        <div class="home-section"><div class="section-head"><span class="section-title">Movies</span><a class="see-more" onclick="openCategory('movies')">See All</a></div><div class="scroll-row" id="row_movies">${getServerSkeleton()}</div></div>
         <div class="home-section"><div class="section-head"><span class="section-title">Series</span><a class="see-more" onclick="openCategory('series')">See All</a></div><div class="scroll-row" id="row_series">${getServerSkeleton()}</div></div>
-        <div class="home-section"><div class="section-head"><span class="section-title">Adult 18+</span><a class="see-more" onclick="openCategory('Adult')">See All</a></div><div class="scroll-row" id="row_18">${getServerSkeleton()}</div></div>
+        <div class="home-section"><div class="section-head"><span class="section-title">Adult</span><a class="see-more" onclick="openCategory('Adult')">See All</a></div><div class="scroll-row" id="row_18">${getServerSkeleton()}</div></div>
     </div>
 
-    <div class="back-nav" id="backNav"><button class="back-nav-btn" onclick="goHome()">⬅</button><span style="color:white; font-weight:bold; margin-left:10px;">Browse</span></div>
+    <div class="back-nav" id="backNav">
+        <button class="back-nav-btn" onclick="goHome()">⬅</button>
+        <span id="gridTitle" style="color:white; font-weight:bold; margin-left:10px;">MOVIES</span>
+    </div>
     <div class="container" id="gridViewContainer"><div class="grid" id="mainGrid"></div><div style="height:50px;"></div></div>
 
     <div id="playerModal">
@@ -286,12 +271,23 @@ export function renderWebsite() {
           document.getElementById('gridViewContainer').style.display='none';
           document.getElementById('backNav').style.display='none';
       }
-      function openCategory(c){
+      
+      // 🔥 FIX: Loading Animation & Title Change
+      async function openCategory(c){
+          showLoader(); // Start spinner
+          
           document.getElementById('homeView').style.display='none';
           document.getElementById('gridViewContainer').style.display='block';
           document.getElementById('backNav').style.display='flex'; 
-          fetchMovies(1,c);
+          
+          // Update Title
+          document.getElementById('gridTitle').innerText = c.toUpperCase();
+          
+          // Wait for data then hide loader
+          await fetchMovies(1,c);
+          hideLoader();
       }
+
       function closePlayer() {
           closePlayerInternal();
           window.history.pushState(null, '', window.location.pathname);
@@ -299,7 +295,6 @@ export function renderWebsite() {
       function closePlayerInternal(){
           closeVideo();
           document.getElementById('playerModal').style.display='none';
-          // Re-enable scrolling on body if needed (but we disabled it globally anyway)
       }
 
       // --- Video Logic ---
@@ -353,11 +348,8 @@ export function renderWebsite() {
       async function fetchSingleMovie(id){
           showLoader(); 
           document.getElementById('playerModal').style.display='block';
-          // We don't need body.overflow hidden anymore because of global overscroll fix
-          
           const res=await fetch(\`/api/get_movie?id=\${id}\`); const m=await res.json();
           hideLoader();
-          
           if(m&&m.title) setupDetailsPage(m);
       }
 
@@ -369,12 +361,14 @@ export function renderWebsite() {
           document.getElementById('dt_title').innerText = m.title;
           document.getElementById('dt_desc').innerText = m.description || "No description available.";
           
-          const year = (m.tags && m.tags.find(t=>!isNaN(t))) || "2025";
+          // 🔥 FIX: Year Display Logic (Finds 4-digit number in tags)
+          const year = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || "2025";
           document.getElementById('dt_year').innerText = year;
           document.getElementById('dt_rate').innerText = "8.5"; 
           
           if(m.tags) {
-              document.getElementById('dt_genres').innerHTML = m.tags.filter(t=>isNaN(t)).map(t=>\`<span class="genre-tag">\${t}</span>\`).join('');
+              // Show only non-number tags as genre
+              document.getElementById('dt_genres').innerHTML = m.tags.filter(t => !/^\\d{4}$/.test(t)).map(t=>\`<span class="genre-tag">\${t}</span>\`).join('');
           }
 
           const dlBtn = document.getElementById('dt_dl_link');
@@ -426,7 +420,6 @@ export function renderWebsite() {
           launchVideo();
       }
 
-      // --- Favorites & Auth ---
       function toggleFavorite(){
           if(!currentMovieId)return; 
           let f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
@@ -440,11 +433,20 @@ export function renderWebsite() {
 
       function loadSession(){const s=localStorage.getItem('user_session');if(s) currentUser=JSON.parse(s);}
       function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
+      
+      // 🔥 FIX: VIP Date Display
       function updateProfileUI(){
          if(currentUser){
             document.getElementById('loginForm').style.display='none'; document.getElementById('profileView').style.display='block';
             document.getElementById('u_name').innerText=currentUser.username;
-            document.getElementById('u_status').innerText=currentUser.vipExpiry>Date.now()?"VIP Active":"Free Plan";
+            
+            if(currentUser.vipExpiry > Date.now()) {
+                const d = new Date(currentUser.vipExpiry);
+                const dStr = d.getDate().toString().padStart(2,'0') + "/" + (d.getMonth()+1).toString().padStart(2,'0') + "/" + d.getFullYear();
+                document.getElementById('u_status').innerHTML = '<span style="color:#ffd700">VIP Until: ' + dStr + '</span>';
+            } else {
+                document.getElementById('u_status').innerText = "Free Plan";
+            }
          } else {
             document.getElementById('loginForm').style.display='block'; document.getElementById('profileView').style.display='none';
          }
@@ -454,8 +456,8 @@ export function renderWebsite() {
       function doLogout(){localStorage.removeItem('user_session'); currentUser=null; updateProfileUI();}
       async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
       async function fetchRow(c,id){try{const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);const json=await res.json();document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');}catch(e){}}
-      async function openFavorites(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex'; const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res);} else document.getElementById('mainGrid').innerHTML="Empty";}
-      async function executeSearch(){const q=document.getElementById('searchInput').value; if(!q)return; openCategory('search'); const res=await fetch(\`/api/search?q=\${q}\`); const j=await res.json(); renderGrid(j);}
+      async function openFavorites(){document.getElementById('homeView').style.display='none';document.getElementById('gridViewContainer').style.display='block';document.getElementById('backNav').style.display='flex'; document.getElementById('gridTitle').innerText = "MY LIST"; const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.length){const res=await Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))); renderGrid(res);} else document.getElementById('mainGrid').innerHTML="Empty";}
+      async function executeSearch(){const q=document.getElementById('searchInput').value; if(!q)return; openCategory('search'); document.getElementById('gridTitle').innerText = "SEARCH"; const res=await fetch(\`/api/search?q=\${q}\`); const j=await res.json(); renderGrid(j);}
       function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
     </script>
   </body>
