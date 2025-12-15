@@ -15,18 +15,18 @@ export function renderWebsite() {
   <head>
     <title>Stream X</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#121212">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        --primary: #00b894; /* Screenshot Teal Color */
-        --primary-dark: #00a884;
-        --bg-body: #f7f9fc;
-        --bg-card: #ffffff;
-        --text-main: #2d3436;
-        --text-light: #636e72;
-        --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        --primary: #00b894;
+        --bg-body: #121212; /* Dark Background */
+        --bg-card: #1e1e1e; /* Dark Card */
+        --text-main: #ffffff;
+        --text-sec: #b3b3b3;
+        --border-color: #333;
+        --shadow: 0 4px 12px rgba(0,0,0,0.3);
       }
 
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -45,119 +45,124 @@ export function renderWebsite() {
       
       img { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
-      /* --- Modern Header --- */
+      /* --- Header --- */
       header { 
-        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-        padding: 12px 20px; position: sticky; top:0; z-index:50; 
-        border-bottom: 1px solid #eee; 
+        background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(10px);
+        padding: 15px 20px; position: sticky; top:0; z-index:50; 
+        border-bottom: 1px solid rgba(255,255,255,0.1); 
         display:flex; justify-content: space-between; align-items: center; 
-        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
       }
-      .brand { color: var(--primary); font-weight: 800; font-size: 24px; cursor:pointer; letter-spacing: -0.5px; }
-      .search-box { display: flex; align-items: center; background: #f1f2f6; border-radius: 50px; padding: 8px 15px; width: 50%; }
-      .search-input { background: transparent; border: none; color: var(--text-main); width: 100%; font-size: 14px; font-family: inherit; }
-      .icon-btn { background: none; border: none; color: var(--text-main); font-size: 22px; cursor: pointer; padding: 5px; }
+      .brand { color: var(--primary); font-weight: 900; font-size: 24px; cursor:pointer; }
+      .search-box { display: flex; align-items: center; background: rgba(255,255,255,0.1); border-radius: 50px; padding: 8px 15px; width: 50%; }
+      .search-input { background: transparent; border: none; color: white; width: 100%; font-size: 14px; font-family: inherit; }
+      .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 5px; }
+
+      /* --- Loader --- */
+      #global-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s; }
+      .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      .hidden-loader { opacity: 0; pointer-events: none; }
 
       /* --- Cards & Layout --- */
       .home-section { padding: 25px 0 10px 20px; }
       .section-head { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; margin-bottom: 15px; }
-      .section-title { color: var(--text-main); font-size: 18px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
+      .section-title { color: #fff; font-size: 18px; font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px; }
       .see-more { color: var(--primary); font-size: 13px; cursor: pointer; font-weight: 600; }
       
       .scroll-row { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; padding-right: 20px; scroll-behavior: smooth; }
       .scroll-row::-webkit-scrollbar { display: none; } 
       
-      .card { position: relative; background: var(--bg-card); border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
+      .card { position: relative; background: var(--bg-card); border-radius: 10px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
       .card:active { transform: scale(0.97); }
       .scroll-row .card { min-width: 120px; max-width: 120px; }
-      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #eee; }
-      .title { padding: 10px 5px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); font-weight: 600; }
+      .card img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
+      .title { padding: 10px 5px; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; font-weight: 600; }
       
-      .prem-tag { position: absolute; top: 8px; left: 8px; background: #ffeaa7; color: #d63031; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-      .year-tag { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.9); color: #2d3436; font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 6px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+      .prem-tag { position: absolute; top: 6px; left: 6px; background: #ffd700; color: #000; font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 4px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+      .year-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
 
-      /* --- Profile Panel (Cool Design) --- */
+      /* --- Profile Panel (Dark Theme) --- */
       .user-panel { 
         position: fixed; top: 0; right: 0; width: 320px; height: 100%; 
-        background: #ffffff; z-index: 100; transform: translateX(100%); 
+        background: #1a1a1a; z-index: 100; transform: translateX(100%); 
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 0; 
-        box-shadow: -10px 0 40px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+        box-shadow: -10px 0 40px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+        border-left: 1px solid #333;
       }
       .user-panel.open { transform: translateX(0); }
       
-      .panel-header { padding: 20px; border-bottom: 1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
-      .panel-header h3 { margin:0; font-size:18px; color: var(--text-main); }
+      .panel-header { padding: 20px; border-bottom: 1px solid #333; display:flex; justify-content:space-between; align-items:center; }
+      .panel-header h3 { margin:0; font-size:18px; color: #fff; }
       
       .profile-card {
           margin: 20px;
           padding: 25px;
-          background: linear-gradient(135deg, var(--primary), #00b894, #55efc4);
+          background: linear-gradient(135deg, var(--primary), #00b894, #006266);
           border-radius: 20px;
           color: white;
           text-align: center;
-          box-shadow: 0 10px 25px rgba(0, 184, 148, 0.3);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255,255,255,0.1);
       }
       .profile-avatar {
-          width: 70px; height: 70px; background: rgba(255,255,255,0.3); 
+          width: 70px; height: 70px; background: rgba(0,0,0,0.2); 
           border-radius: 50%; margin: 0 auto 10px; display:flex; 
           align-items:center; justify-content:center; font-size:30px;
-          border: 2px solid rgba(255,255,255,0.5);
+          border: 2px solid rgba(255,255,255,0.3);
       }
-      .profile-name { font-size: 20px; font-weight: bold; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+      .profile-name { font-size: 20px; font-weight: bold; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
       .profile-status { font-size: 13px; opacity: 0.9; margin-top: 5px; font-weight: 500; }
 
       .panel-body { padding: 0 20px; }
-      .auth-input { width: 100%; padding: 15px; margin-bottom: 15px; background: #f1f2f6; border: none; color: #333; border-radius: 12px; font-size: 14px; font-family: inherit; }
+      .auth-input { width: 100%; padding: 15px; margin-bottom: 15px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 12px; font-size: 14px; font-family: inherit; }
       
       .menu-btn {
           width: 100%; padding: 15px; border-radius: 12px; border: none;
-          background: #fff; color: var(--text-main); text-align: left;
+          background: #2a2a2a; color: #ddd; text-align: left;
           font-weight: 600; font-size: 14px; margin-bottom: 10px; cursor: pointer;
           display: flex; align-items: center; gap: 10px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #f1f2f6;
+          border: 1px solid #333;
       }
-      .menu-btn:active { transform: scale(0.98); }
+      .menu-btn:active { transform: scale(0.98); background: #333; }
       .auth-btn-solid { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; font-weight: bold; border-radius: 50px; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,184,148,0.3); margin-top:10px; }
 
-      /* --- New Details Page UI --- */
+      /* --- Details Page (Dark Theme) --- */
       #playerModal { 
           display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
-          background: #ffffff; z-index:200; overflow-y: auto; overscroll-behavior: contain; 
+          background: var(--bg-body); z-index:200; overflow-y: auto; overscroll-behavior: contain; 
       }
       
-      /* Stylish Circle Buttons for Back/Fav */
+      /* Gradient Header for Dark Mode */
       .details-header { 
           position: sticky; top: 0; left: 0; width: 100%; padding: 15px 20px; 
           display: flex; justify-content: space-between; z-index: 20; 
-          /* Gradient fade for header */
-          background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 80%, rgba(255,255,255,0) 100%);
+          background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.9) 70%, rgba(18,18,18,0) 100%);
       }
       
+      /* Dark Theme Circle Buttons */
       .nav-circle-btn {
           width: 45px; height: 45px; border-radius: 50%;
-          background: #ffffff; 
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-          border: 1px solid #f1f1f1;
+          background: rgba(40, 40, 40, 0.8); 
+          backdrop-filter: blur(5px);
+          border: 1px solid #444;
           display: flex; align-items: center; justify-content: center;
-          font-size: 20px; color: var(--text-main);
+          font-size: 20px; color: #fff;
           cursor: pointer; transition: transform 0.2s;
       }
       .nav-circle-btn:active { transform: scale(0.9); }
 
       .modal-body-content { padding: 10px 20px 40px 20px; }
 
-      /* Side-by-Side Layout */
       .top-info-section { display: flex; gap: 20px; margin-bottom: 30px; align-items: flex-start; }
       .poster-img-sidebar { 
           width: 120px; height: 180px; border-radius: 12px; object-fit: cover; 
-          box-shadow: 0 8px 20px rgba(0,0,0,0.15); flex-shrink: 0; background: #eee; 
+          box-shadow: 0 8px 20px rgba(0,0,0,0.5); flex-shrink: 0; background: #222; 
       }
       
       .meta-col-sidebar { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
-      .movie-title { font-size: 22px; font-weight: 800; color: #2d3436; margin: 0 0 10px 0; line-height: 1.2; }
-      .stats-row { display: flex; align-items: center; gap: 15px; color: #636e72; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
+      .movie-title { font-size: 22px; font-weight: 800; color: #fff; margin: 0 0 10px 0; line-height: 1.2; }
+      .stats-row { display: flex; align-items: center; gap: 15px; color: #bbb; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
       
-      /* Play & Download Buttons (Exact Match) */
       .actions-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
       
       .btn-play { 
@@ -165,7 +170,7 @@ export function renderWebsite() {
           background: var(--primary); color: white;
           font-weight: 700; font-size: 16px; cursor: pointer; 
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          box-shadow: 0 6px 20px rgba(0, 184, 148, 0.25);
+          box-shadow: 0 6px 20px rgba(0, 184, 148, 0.2);
           transition: transform 0.1s;
       }
       .btn-dl { 
@@ -177,19 +182,16 @@ export function renderWebsite() {
       }
       .btn-play:active, .btn-dl:active { transform: scale(0.97); }
 
-      .desc-text { color: #2d3436; font-size: 15px; line-height: 1.8; margin-bottom: 30px; opacity: 0.9; }
+      .desc-text { color: #ccc; font-size: 15px; line-height: 1.8; margin-bottom: 30px; opacity: 0.9; }
 
-      /* Grid & Others */
       .container { max-width: 1200px; margin: 0 auto; padding: 15px; display: none; }
       .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
       @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 15px; } }
-      .back-nav { display: none; padding: 15px 20px; align-items: center; background: #fff; position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid #eee; }
+      .back-nav { display: none; padding: 15px 20px; align-items: center; background: rgba(18,18,18,0.95); position: sticky; top: 60px; z-index: 40; border-bottom: 1px solid #333; }
 
-      /* Loader */
       #scroll-loader { grid-column: 1/-1; text-align: center; padding: 20px; display: none; }
-      .small-spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+      .small-spinner { width: 30px; height: 30px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
 
-      /* Video Overlay */
       .video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 300; display: none; flex-direction: column; }
       .video-wrapper { width: 100%; aspect-ratio: 16/9; background: black; margin: auto 0; position: relative; }
       video { width: 100%; height: 100%; }
@@ -199,20 +201,27 @@ export function renderWebsite() {
       .big-play-btn { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.5); animation: pulse 2s infinite; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-      .accordion { background-color: #f1f2f6; color: #2d3436; padding: 15px; width: 100%; border: none; text-align: left; font-weight: 700; border-radius: 12px; display: flex; justify-content: space-between; margin-top:10px; }
+      .accordion { background-color: #1e1e1e; color: #eee; padding: 15px; width: 100%; border: none; text-align: left; font-weight: 700; border-radius: 12px; display: flex; justify-content: space-between; margin-top:10px; border-bottom: 1px solid #333; }
       .panel { padding: 0 5px; background-color: transparent; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
       .episode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; padding: 15px 5px; }
-      .ep-btn { background: #fff; border: 1px solid #ddd; color: #2d3436; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+      .ep-btn { background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-size: 13px; font-weight: 600; }
       .ep-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
       
-      .genre-tag { background: #f1f2f6; color: #636e72; font-size: 11px; padding: 5px 10px; border-radius: 8px; font-weight: 600; border: 1px solid #e1e1e1; margin-right:5px; margin-bottom:5px; display:inline-block; }
+      .genre-tag { background: #222; color: #ccc; font-size: 11px; padding: 5px 10px; border-radius: 8px; font-weight: 600; border: 1px solid #444; margin-right:5px; margin-bottom:5px; display:inline-block; }
+      
+      /* Skeleton Dark */
+      .skeleton-card { background: transparent; pointer-events: none; }
+      .skeleton { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #222 4%, #333 25%, #222 36%); background-size: 1000px 100%; border-radius: 6px; }
+      .poster-ratio { width: 100%; aspect-ratio: 2/3; margin-bottom: 8px; }
+      .text-line { height: 12px; border-radius: 4px; }
+      @keyframes shimmer { 0% { background-position: -500px 0; } 100% { background-position: 500px 0; } }
     </style>
   </head>
   <body>
 
-    <div id="custom-alert" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center;">
-        <div style="background:#fff; padding:30px; border-radius:20px; text-align:center; width:80%; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
-            <h3 id="alert-title" style="color:#2d3436; margin-top:0;"></h3><p id="alert-msg" style="color:#636e72; margin-bottom:20px;"></p>
+    <div id="custom-alert" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
+        <div style="background:#222; padding:30px; border-radius:20px; text-align:center; width:80%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #333;">
+            <h3 id="alert-title" style="color:#fff; margin-top:0;"></h3><p id="alert-msg" style="color:#aaa; margin-bottom:20px;"></p>
             <button onclick="document.getElementById('custom-alert').style.display='none'" class="auth-btn-solid">OK</button>
         </div>
     </div>
@@ -231,7 +240,7 @@ export function renderWebsite() {
             <input type="text" id="reg_user" class="auth-input" placeholder="Username">
             <input type="password" id="reg_pass" class="auth-input" placeholder="Password">
             <button class="auth-btn-solid" onclick="doLogin()">Log In</button>
-            <button class="auth-btn-solid" style="background:#b2bec3;" onclick="doRegister()">Create Account</button>
+            <button class="auth-btn-solid" style="background:#555;" onclick="doRegister()">Create Account</button>
         </div>
 
         <div id="profileView" style="display:none; flex-direction:column; height:100%;">
@@ -261,7 +270,7 @@ export function renderWebsite() {
 
     <div class="back-nav" id="backNav">
         <button class="nav-circle-btn" onclick="goHome()" style="width:35px; height:35px; border:none; box-shadow:none; font-size:18px;">⬅</button>
-        <span id="gridTitle" style="color:var(--text-main); font-weight:bold; margin-left:10px;">MOVIES</span>
+        <span id="gridTitle" style="color:white; font-weight:bold; margin-left:10px;">MOVIES</span>
     </div>
     <div class="container" id="gridViewContainer">
         <div class="grid" id="mainGrid"></div>
@@ -305,7 +314,7 @@ export function renderWebsite() {
       </div>
 
       <div id="videoOverlay" class="video-overlay">
-         <button class="close-video-btn" onclick="closeVideo()">✕ Close Player</button>
+         <button class="close-video-btn" onclick="closeVideo()">✕ Close</button>
          <div class="video-wrapper">
             <div id="vip-lock" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; align-items:center; justify-content:center; flex-direction:column; z-index:10;">
                 <div style="font-size:40px;">👑</div><p style="color:#ffd700;">VIP Required</p>
