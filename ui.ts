@@ -458,9 +458,13 @@ export function renderWebsite() {
       function closePlayer() { window.history.back(); }
       function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
 
-      // ဒါက ui.ts ထဲမှာ ရှိရမယ့် code ပုံစံပါ
-async function launchVideo() {
-    if (!activeMovieId) return showAlert("Error", "No movie ID found");
+      async function launchVideo() {
+    console.log("Playing ID:", activeMovieId); // Debug လုပ်ဖို့ log ထည့်ကြည့်ပါ
+    
+    if (!activeMovieId) {
+        return showAlert("Error", "Movie ID မတွေ့ပါ။ စာမျက်နှာကို Refresh လုပ်ပြီး ပြန်ကြိုးစားပါ။");
+    }
+
     showLoader();
     try {
         const response = await fetch("/api/sign_url", {
@@ -472,15 +476,20 @@ async function launchVideo() {
             })
         });
 
-        const { token } = await response.json();
-        
-        // 🔥 ဒီစာကြောင်းကို သေချာကြည့်ပြီး အစားထိုးပါ ( \ လေးတွေ ပါရပါမယ် )
-        const maskedLink = \`/api/play?t=\${token}\`;
+        // Response status တွေကို စစ်ဆေးတာ
+        if (response.status === 401) return showAlert("Login", "Login အရင်ဝင်ပါ");
+        if (response.status === 403) return showAlert("VIP", "VIP ဝယ်ယူရန် လိုအပ်ပါသည်");
 
-        document.getElementById('videoOverlay').style.display = 'flex';
-        playViaArtPlayer(maskedLink);
+        const data = await response.json();
+        if (data.token) {
+            const maskedLink = \`/api/play?t=\${data.token}\`;
+            document.getElementById('videoOverlay').style.display = 'flex';
+            playViaArtPlayer(maskedLink);
+        } else {
+            showAlert("Error", "ဗီဒီယို လင့်ခ် မရရှိနိုင်ပါ");
+        }
     } catch (e) {
-        showAlert("Error", "ဗီဒီယို လင့်ခ်ရယူရာတွင် အမှားအယွင်းရှိနေပါသည်။");
+        showAlert("Error", "ချိတ်ဆက်မှု အမှားအယွင်း ရှိနေပါသည်");
     } finally {
         hideLoader();
     }
