@@ -493,7 +493,7 @@ export function renderWebsite() {
         const { token } = await response.json();
 
         // ၄။ Link အစစ်အစား /api/play?t=... ဆိုတဲ့ Masked Link ကို တည်ဆောက်မယ်
-        const maskedLink = `/api/play?t=${token}`;
+        const maskedLink = \`/api/play?t=${token}`;
 
         // ၅။ UI မှာ Player ကို ဖွင့်ပြီး Masked Link ကို ပေးလိုက်မယ်
         document.getElementById('videoOverlay').style.display = 'flex';
