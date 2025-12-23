@@ -459,50 +459,37 @@ export function renderWebsite() {
       function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
 
       async function launchVideo() {
-    // ၁။ Video Link ရှိမရှိ အရင်စစ်မယ်
-    // (အခုပုံစံသစ်မှာ Link အစစ်အစား Movie ID ရှိမရှိ စစ်ပါမယ်)
-    if (!activeMovieId) return showAlert("Error", "No movie ID found");
+    console.log("Playing ID:", activeMovieId); // Debug လုပ်ဖို့ log ထည့်ကြည့်ပါ
+    
+    if (!activeMovieId) {
+        return showAlert("Error", "Movie ID မတွေ့ပါ။ စာမျက်နှာကို Refresh လုပ်ပြီး ပြန်ကြိုးစားပါ။");
+    }
 
-    showLoader(); // Loader လေးပြထားမယ်
-
+    showLoader();
     try {
-        // ၂။ Backend ဆီကနေ Masked Token လှမ်းတောင်းမယ်
         const response = await fetch("/api/sign_url", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                movieId: activeMovieId, // လက်ရှိကြည့်နေတဲ့ Movie ID
-                username: currentUser ? currentUser.username : null,
-                // အပိုင်း (Episode) ရှိရင် epIndex ပါ ထည့်ပေးရပါမယ်
-                epIndex: typeof activeEpIndex !== 'undefined' ? activeEpIndex : null 
+                movieId: activeMovieId,
+                username: currentUser ? currentUser.username : null
             })
         });
 
-        // ၃။ VIP မဟုတ်ရင် ဒါမှမဟုတ် Login မဝင်ရသေးရင် တားမယ်
-        if (response.status === 401) {
-            hideLoader();
-            return showAlert("Login Required", "ကျေးဇူးပြု၍ အရင် Login ဝင်ပါ။");
+        // Response status တွေကို စစ်ဆေးတာ
+        if (response.status === 401) return showAlert("Login", "Login အရင်ဝင်ပါ");
+        if (response.status === 403) return showAlert("VIP", "VIP ဝယ်ယူရန် လိုအပ်ပါသည်");
+
+        const data = await response.json();
+        if (data.token) {
+            const maskedLink = \`/api/play?t=\${data.token}\`;
+            document.getElementById('videoOverlay').style.display = 'flex';
+            playViaArtPlayer(maskedLink);
+        } else {
+            showAlert("Error", "ဗီဒီယို လင့်ခ် မရရှိနိုင်ပါ");
         }
-        if (response.status === 403) {
-            hideLoader();
-            return showAlert("VIP Required", "ဒီကားကြည့်ဖို့ VIP ဝယ်ယူရန် လိုအပ်ပါတယ်။");
-        }
-
-        if (!response.ok) throw new Error("Server error");
-
-        const { token } = await response.json();
-
-        // ၄။ Link အစစ်အစား /api/play?t=... ဆိုတဲ့ Masked Link ကို တည်ဆောက်မယ်
-        // ui.ts ထဲမှာ ဒီလိုမျိုး ပြောင်းရေးပါ
-        const maskedLink = \`/api/play?t=\${token}\`;
-
-        // ၅။ UI မှာ Player ကို ဖွင့်ပြီး Masked Link ကို ပေးလိုက်မယ်
-        document.getElementById('videoOverlay').style.display = 'flex';
-        playViaArtPlayer(maskedLink);
-
     } catch (e) {
-        console.error(e);
-        showAlert("Error", "ဗီဒီယို လင့်ခ်ရယူရာတွင် အမှားအယွင်းရှိနေပါသည်။");
+        showAlert("Error", "ချိတ်ဆက်မှု အမှားအယွင်း ရှိနေပါသည်");
     } finally {
         hideLoader();
     }
