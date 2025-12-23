@@ -458,14 +458,33 @@ export function renderWebsite() {
       function closePlayer() { window.history.back(); }
       function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
 
-      function launchVideo() {
-          if(!activeVideoLink) return showAlert("Error", "No video source");
-          if(activeIsPremium && (!currentUser || currentUser.vipExpiry < Date.now())) {
-             document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='flex'; return;
-          }
-          document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='none'; document.getElementById('fallback-box').style.display='none';
-          playViaArtPlayer(activeVideoLink);
-      }
+      // ဒါက ui.ts ထဲမှာ ရှိရမယ့် code ပုံစံပါ
+async function launchVideo() {
+    if (!activeMovieId) return showAlert("Error", "No movie ID found");
+    showLoader();
+    try {
+        const response = await fetch("/api/sign_url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                movieId: activeMovieId,
+                username: currentUser ? currentUser.username : null
+            })
+        });
+
+        const { token } = await response.json();
+        
+        // 🔥 ဒီစာကြောင်းကို သေချာကြည့်ပြီး အစားထိုးပါ ( \ လေးတွေ ပါရပါမယ် )
+        const maskedLink = \`/api/play?t=\${token}\`;
+
+        document.getElementById('videoOverlay').style.display = 'flex';
+        playViaArtPlayer(maskedLink);
+    } catch (e) {
+        showAlert("Error", "ဗီဒီယို လင့်ခ်ရယူရာတွင် အမှားအယွင်းရှိနေပါသည်။");
+    } finally {
+        hideLoader();
+    }
+}
       
       function closeVideo() {
           if (art) { art.destroy(false); art = null; }
