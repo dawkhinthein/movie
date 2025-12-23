@@ -130,29 +130,46 @@ serve(async (req) => {
       return new Response("Reset Success");
   }
 
-  // --- PLAYBACK ---
-  if (path === "/api/sign_url" && req.method === "POST") {
-    try {
-        const body = await req.json();
-        const { url: realUrl, movieId, username } = body;
-        
-        if (movieId) {
-            const mRes = await kv.get(["movies", movieId]);
-            const movie: any = mRes.value;
-            if (movie && movie.isPremium) {
-                if (!username) return new Response("Login Required", { status: 401 });
-                const uRes = await getUser(username);
-                if (!uRes || uRes.vipExpiry < Date.now()) return new Response("VIP Required", { status: 403 });
-            }
-        }
+  // --- PLAYBACK (ပြင်ဆင်ပြီး) ---
+if (path === "/api/sign_url" && req.method === "POST") {
+  try {
+      const body = await req.json();
+      // UI ကနေ realUrl ကို ပို့စရာမလိုတော့ပါ၊ movieId နဲ့ epIndex ပဲ ပို့ခိုင်းပါမယ်
+      const { movieId, epIndex, username } = body; 
+      
+      if (!movieId) return new Response("Movie ID Required", { status: 400 });
 
-        const expiry = Date.now() + (4 * 60 * 60 * 1000); 
-        const encryptedUrl = xorCipher(realUrl, ADMIN_PASSWORD);
-        const signature = await createSignature(encryptedUrl + expiry);
-        const token = `${encryptedUrl}.${expiry}.${signature}`;
-        return new Response(JSON.stringify({ token }), { headers: secureHeaders });
-    } catch (e) { return new Response("Error", { status: 500 }); }
-  }
+      // Database ထဲမှာ ရုပ်ရှင်သွားရှာမယ်
+      const mRes = await kv.get(["movies", movieId]);
+      const movie: any = mRes.value;
+      if (!movie) return new Response("Movie Not Found", { status: 404 });
+
+      // VIP စစ်ဆေးတဲ့ logic (မူလအတိုင်း)
+      if (movie.isPremium) {
+          if (!username) return new Response("Login Required", { status: 401 });
+          const uRes = await getUser(username);
+          if (!uRes || uRes.vipExpiry < Date.now()) return new Response("VIP Required", { status: 403 });
+      }
+
+      // ဇာတ်လမ်းတွဲဆိုရင် episode link ယူမယ်၊ ရုပ်ရှင်ဆိုရင် downloadLink ယူမယ်
+      let realUrl = "";
+      if (epIndex !== undefined && movie.episodes && movie.episodes[epIndex]) {
+          realUrl = movie.episodes[epIndex].link;
+      } else {
+          realUrl = movie.downloadLink;
+      }
+
+      if (!realUrl) return new Response("No Link Available", { status: 404 });
+
+      // Link ကို Mask လုပ်ပြီး Token ထုတ်ပေးမယ်
+      const expiry = Date.now() + (4 * 60 * 60 * 1000); // 4 hours
+      const encryptedUrl = xorCipher(realUrl, ADMIN_PASSWORD);
+      const signature = await createSignature(encryptedUrl + expiry);
+      const token = `${encryptedUrl}.${expiry}.${signature}`;
+      
+      return new Response(JSON.stringify({ token }), { headers: secureHeaders });
+  } catch (e) { return new Response("Error", { status: 500 }); }
+}
 
   if (path === "/api/play") {
     const token = url.searchParams.get("t");
