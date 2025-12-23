@@ -458,14 +458,54 @@ export function renderWebsite() {
       function closePlayer() { window.history.back(); }
       function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
 
-      function launchVideo() {
-          if(!activeVideoLink) return showAlert("Error", "No video source");
-          if(activeIsPremium && (!currentUser || currentUser.vipExpiry < Date.now())) {
-             document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='flex'; return;
-          }
-          document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='none'; document.getElementById('fallback-box').style.display='none';
-          playViaArtPlayer(activeVideoLink);
-      }
+      async function launchVideo() {
+    // ၁။ Video Link ရှိမရှိ အရင်စစ်မယ်
+    // (အခုပုံစံသစ်မှာ Link အစစ်အစား Movie ID ရှိမရှိ စစ်ပါမယ်)
+    if (!activeMovieId) return showAlert("Error", "No movie ID found");
+
+    showLoader(); // Loader လေးပြထားမယ်
+
+    try {
+        // ၂။ Backend ဆီကနေ Masked Token လှမ်းတောင်းမယ်
+        const response = await fetch("/api/sign_url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                movieId: activeMovieId, // လက်ရှိကြည့်နေတဲ့ Movie ID
+                username: currentUser ? currentUser.username : null,
+                // အပိုင်း (Episode) ရှိရင် epIndex ပါ ထည့်ပေးရပါမယ်
+                epIndex: typeof activeEpIndex !== 'undefined' ? activeEpIndex : null 
+            })
+        });
+
+        // ၃။ VIP မဟုတ်ရင် ဒါမှမဟုတ် Login မဝင်ရသေးရင် တားမယ်
+        if (response.status === 401) {
+            hideLoader();
+            return showAlert("Login Required", "ကျေးဇူးပြု၍ အရင် Login ဝင်ပါ။");
+        }
+        if (response.status === 403) {
+            hideLoader();
+            return showAlert("VIP Required", "ဒီကားကြည့်ဖို့ VIP ဝယ်ယူရန် လိုအပ်ပါတယ်။");
+        }
+
+        if (!response.ok) throw new Error("Server error");
+
+        const { token } = await response.json();
+
+        // ၄။ Link အစစ်အစား /api/play?t=... ဆိုတဲ့ Masked Link ကို တည်ဆောက်မယ်
+        const maskedLink = `/api/play?t=${token}`;
+
+        // ၅။ UI မှာ Player ကို ဖွင့်ပြီး Masked Link ကို ပေးလိုက်မယ်
+        document.getElementById('videoOverlay').style.display = 'flex';
+        playViaArtPlayer(maskedLink);
+
+    } catch (e) {
+        console.error(e);
+        showAlert("Error", "ဗီဒီယို လင့်ခ်ရယူရာတွင် အမှားအယွင်းရှိနေပါသည်။");
+    } finally {
+        hideLoader();
+    }
+}
       
       function closeVideo() {
           if (art) { art.destroy(false); art = null; }
