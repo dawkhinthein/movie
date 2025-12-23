@@ -156,7 +156,7 @@ if (path === "/api/sign_url" && req.method === "POST") {
       if (epIndex !== undefined && movie.episodes && movie.episodes[epIndex]) {
           realUrl = movie.episodes[epIndex].link;
       } else {
-          realUrl = movie.downloadLink;
+          realUrl = movie.Link;
       }
 
       if (!realUrl) return new Response("No Link Available", { status: 404 });
