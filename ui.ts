@@ -458,42 +458,14 @@ export function renderWebsite() {
       function closePlayer() { window.history.back(); }
       function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
 
-      async function launchVideo() {
-    console.log("Playing ID:", activeMovieId); // Debug လုပ်ဖို့ log ထည့်ကြည့်ပါ
-    
-    if (!activeMovieId) {
-        return showAlert("Error", "Movie ID မတွေ့ပါ။ စာမျက်နှာကို Refresh လုပ်ပြီး ပြန်ကြိုးစားပါ။");
-    }
-
-    showLoader();
-    try {
-        const response = await fetch("/api/sign_url", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                movieId: activeMovieId,
-                username: currentUser ? currentUser.username : null
-            })
-        });
-
-        // Response status တွေကို စစ်ဆေးတာ
-        if (response.status === 401) return showAlert("Login", "Login အရင်ဝင်ပါ");
-        if (response.status === 403) return showAlert("VIP", "VIP ဝယ်ယူရန် လိုအပ်ပါသည်");
-
-        const data = await response.json();
-        if (data.token) {
-            const maskedLink = \`/api/play?t=\${data.token}\`;
-            document.getElementById('videoOverlay').style.display = 'flex';
-            playViaArtPlayer(maskedLink);
-        } else {
-            showAlert("Error", "ဗီဒီယို လင့်ခ် မရရှိနိုင်ပါ");
-        }
-    } catch (e) {
-        showAlert("Error", "ချိတ်ဆက်မှု အမှားအယွင်း ရှိနေပါသည်");
-    } finally {
-        hideLoader();
-    }
-}
+      function launchVideo() {
+          if(!activeVideoLink) return showAlert("Error", "No video source");
+          if(activeIsPremium && (!currentUser || currentUser.vipExpiry < Date.now())) {
+             document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='flex'; return;
+          }
+          document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='none'; document.getElementById('fallback-box').style.display='none';
+          playViaArtPlayer(activeVideoLink);
+      }
       
       function closeVideo() {
           if (art) { art.destroy(false); art = null; }
