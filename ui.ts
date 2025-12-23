@@ -1,3 +1,4 @@
+
 export function renderWebsite() {
   function getServerSkeleton() { 
     return Array(6).fill(`
@@ -164,6 +165,7 @@ export function renderWebsite() {
       .video-wrapper { width: 100%; height: 100%; background: black; position: relative; }
       .artplayer-app { width: 100%; height: 100%; display: block; }
       
+      /* 🔥 CUSTOM CONTROLS OVERLAY */
       .custom-controls {
           position: absolute; top: 20px; right: 20px; z-index: 310;
           display: flex; gap: 15px;
@@ -352,146 +354,346 @@ export function renderWebsite() {
 
       window.onload = async () => {
         setTimeout(() => window.hideLoader(), 3000);
+
         try {
-            loadSession(); updateProfileUI(); 
-            await Promise.allSettled([ fetchRow('movies', 'row_movies'), fetchRow('series', 'row_series') ]);
-        } catch(e) {} finally { window.hideLoader(); }
+            loadSession(); 
+            updateProfileUI(); 
+            await Promise.allSettled([
+                fetchRow('movies', 'row_movies'), 
+                fetchRow('series', 'row_series')
+            ]);
+        } catch(e) { console.error("Init Error", e); } 
+        finally { window.hideLoader(); }
+        
         const p = new URLSearchParams(window.location.search);
         const movieId = p.get('id');
-        if (movieId) { fetchSingleMovie(movieId); } else { switchTab('home', false); }
+        const view = p.get('view');
+        
+        if (movieId) { fetchSingleMovie(movieId); } 
+        else if (view === 'profile') { switchTab('profile', false); }
+        else if (view === 'search') { switchTab('search', false); }
+        else if (view === 'fav') { switchTab('fav', false); }
+        else if (view === 'grid') { openCategory(p.get('cat') || 'movies', false); }
+        else { switchTab('home', false); }
+        
+        document.querySelectorAll('.scroll-view, .full-view').forEach(el => {
+            el.addEventListener('scroll', (e) => {
+                if(e.target.id === 'gridViewContainer') {
+                    if ((e.target.scrollTop + e.target.clientHeight) >= e.target.scrollHeight - 300) {
+                        if(!isLoading && hasMore) { pageNum++; fetchMovies(pageNum, currentCat, true); }
+                    }
+                }
+            });
+        });
+      };
+
+      window.onpopstate = function() {
+          const p = new URLSearchParams(window.location.search);
+          const id = p.get('id');
+          const view = p.get('view');
+          const cat = p.get('cat');
+          
+          if (!id) {
+              closePlayerInternal();
+          } else if(document.getElementById('playerModal').style.display === 'none') {
+              fetchSingleMovie(id);
+          }
+
+          if(view === 'profile') switchTabInternal('profile');
+          else if(view === 'search') switchTabInternal('search');
+          else if(view === 'fav') switchTabInternal('fav');
+          else if(view === 'grid') {
+              if (cat) openCategory(cat, false);
+          }
+          else if(!id) switchTabInternal('home');
       };
 
       function switchTab(tab, push = true) {
-          if(push) { const u = tab === 'home' ? window.location.pathname : \`?view=\${tab}\`; window.history.pushState({path:u},'',u); }
+          if(push) {
+              const u = tab === 'home' ? window.location.pathname : \`?view=\${tab}\`;
+              window.history.pushState({path:u},'',u);
+          }
+          switchTabInternal(tab);
+      }
+
+      function switchTabInternal(tab) {
           document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
           const btn = document.getElementById('nav_' + tab);
           if(btn) btn.classList.add('active');
+
           document.getElementById('mainHeader').style.display = 'flex';
           document.getElementById('backNav').style.display = 'none';
-          document.querySelectorAll('.scroll-view, .full-view').forEach(el => el.style.display='none');
+
+          document.getElementById('homeView').style.display='none';
+          document.getElementById('searchView').style.display='none';
+          document.getElementById('gridViewContainer').style.display='none';
+          document.getElementById('profileViewContainer').style.display='none';
+
           if(tab === 'home') document.getElementById('homeView').style.display='block';
-          else if(tab === 'search') document.getElementById('searchView').style.display='block';
+          else if(tab === 'search') { 
+              document.getElementById('searchView').style.display='block';
+              document.getElementById('searchInput').focus();
+          }
           else if(tab === 'fav') openFavoritesInternal();
           else if(tab === 'profile') document.getElementById('profileViewContainer').style.display='block';
       }
 
+      function goHome(){ switchTab('home'); }
+      
       async function openCategory(c, pushState = true){
           currentCat = c; pageNum = 1; hasMore = true;
-          document.getElementById('mainGrid').innerHTML = ""; showLoader(); 
+          document.getElementById('mainGrid').innerHTML = ""; 
+          showLoader(); 
+          
           document.getElementById('homeView').style.display='none'; 
           document.getElementById('gridViewContainer').style.display='block'; 
           document.getElementById('mainHeader').style.display='none';
           document.getElementById('backNav').style.display='flex';
+          
           document.getElementById('gridTitle').innerText = c.toUpperCase();
+          if(pushState) { const u = \`?view=grid&cat=\${encodeURIComponent(c)}\`; window.history.pushState({path:u},'',u); }
           await fetchMovies(1,c, true); hideLoader();
       }
 
-      // 🔥 FIX: play_url ကို Token တောင်းတဲ့ စနစ်သို့ ပြောင်းလဲခြင်း
-      async function launchVideo(epIndex = undefined) {
-          if(!currentMovieId) return;
-          showLoader();
-          try {
-              const username = currentUser ? currentUser.username : "";
-              const res = await fetch('/api/sign_url', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ movieId: currentMovieId, epIndex: epIndex, username: username })
-              });
-              if (!res.ok) { const err = await res.text(); throw new Error(err || "Access Denied"); }
-              const data = await res.json();
-              activeVideoLink = window.location.origin + "/api/play?t=" + data.token;
-              document.getElementById('videoOverlay').style.display='flex';
-              document.getElementById('vip-lock').style.display='none';
-              playViaArtPlayer(activeVideoLink);
-          } catch(e) { showAlert("Error", e.message); } finally { hideLoader(); }
+      function closePlayer() { window.history.back(); }
+      function closePlayerInternal(){ closeVideo(); document.getElementById('playerModal').style.display='none'; }
+
+      function launchVideo() {
+          if(!activeVideoLink) return showAlert("Error", "No video source");
+          if(activeIsPremium && (!currentUser || currentUser.vipExpiry < Date.now())) {
+             document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='flex'; return;
+          }
+          document.getElementById('videoOverlay').style.display='flex'; document.getElementById('vip-lock').style.display='none'; document.getElementById('fallback-box').style.display='none';
+          playViaArtPlayer(activeVideoLink);
       }
       
+      function closeVideo() {
+          if (art) { art.destroy(false); art = null; }
+          document.querySelectorAll('video').forEach(v => { v.pause(); v.src = ""; });
+          // Ensure we exit fullscreen if active
+          if (document.fullscreenElement) {
+              document.exitFullscreen().catch(e => {});
+          }
+          document.getElementById('videoOverlay').style.display='none';
+      }
+      
+      // 🔥 Custom Fullscreen Logic with Immersive Hack
+      function toggleFullScreen() {
+          const wrapper = document.querySelector('.video-wrapper');
+          const video = document.querySelector('video');
+          
+          // 1. Try Native Android Interface (Best for WebViews)
+          if(video && video.webkitEnterFullScreen) {
+              video.webkitEnterFullScreen();
+              return;
+          }
+
+          // 2. Fallback to Standard API
+          if (!document.fullscreenElement) {
+              if (wrapper.requestFullscreen) wrapper.requestFullscreen().catch(e => {});
+              else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+              
+              // Try locking orientation
+              if (screen.orientation && screen.orientation.lock) {
+                  screen.orientation.lock('landscape').catch(e => {});
+              }
+          } else {
+              if (document.exitFullscreen) document.exitFullscreen();
+              if (screen.orientation && screen.orientation.unlock) {
+                  screen.orientation.unlock();
+              }
+          }
+      }
+      
+      function openExternalLink() { if(activeVideoLink) window.open(activeVideoLink, '_blank'); }
+      
       function playViaArtPlayer(url) {
-          if(art) art.destroy();
+          if(art) art.destroy(false);
           art = new Artplayer({
-              container: '#artplayer-app', url: url, autoplay: true,
-              theme: '#00b894', fullscreen: true,
+              container: '#artplayer-app',
+              url: url,
               type: url.includes('.m3u8') ? 'm3u8' : 'auto',
+              autoplay: true,
+              muted: false,
+              // 🔥 Disable Native Controls so we use Custom Ones
+              fullscreen: false, 
+              fullscreenWeb: false,
+              setting: true,
+              playbackRate: true,
+              aspectRatio: true,
+              miniProgressBar: true,
+              autoOrientation: true,
+              theme: '#00b894',
               customType: {
                   m3u8: function (video, url) {
-                      if (Hls.isSupported()) { const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video); }
-                      else { video.src = url; }
+                      if (Hls.isSupported()) {
+                          const hls = new Hls();
+                          hls.loadSource(url);
+                          hls.attachMedia(video);
+                          hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                              video.play().catch(() => { video.muted = true; video.play(); });
+                          });
+                      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                          video.src = url; video.play();
+                      } else {
+                          art.notice.show = 'Unsupported M3U8';
+                          document.getElementById('fallback-box').style.display = 'flex';
+                      }
                   },
               },
           });
+          art.on('ready', () => { art.play(); });
+          art.on('error', () => { document.getElementById('fallback-box').style.display = 'flex'; });
       }
-
-      function closeVideo() { if(art) art.destroy(); document.getElementById('videoOverlay').style.display='none'; }
-      function closePlayer() { window.history.back(); closeVideo(); document.getElementById('playerModal').style.display='none'; }
-      function toggleFullScreen() { if(art) art.fullscreen = !art.fullscreen; }
 
       async function fetchMovies(page, cat, append = false) { 
           if(isLoading) return; isLoading = true;
+          if(page > 1) document.getElementById('scroll-loader').style.display = 'block';
           try {
               const res = await fetch(\`/api/movies?page=\${page}&cat=\${encodeURIComponent(cat)}\`); 
-              const json = await res.json();
-              const html = json.data.map(m => createCardHtml(m)).join('');
-              if(append) document.getElementById('mainGrid').innerHTML += html;
-              else document.getElementById('mainGrid').innerHTML = html;
-          } catch(e) {} finally { isLoading = false; }
+              const json = await res.json(); 
+              if(json.data.length === 0) { hasMore = false; } else {
+                  globalMovieCache = [...globalMovieCache, ...json.data];
+                  globalMovieCache = [...new Map(globalMovieCache.map(item => [item.id, item])).values()];
+                  const html = json.data.map(m => createCardHtml(m)).join('');
+                  if(append) document.getElementById('mainGrid').innerHTML += html;
+                  else document.getElementById('mainGrid').innerHTML = html;
+              }
+          } catch(e) { console.error(e); }
+          isLoading = false; document.getElementById('scroll-loader').style.display = 'none';
       }
       
       async function fetchRow(c,id){
           try{
               const res=await fetch(\`/api/movies?page=1&cat=\${encodeURIComponent(c)}\`);
               const json=await res.json();
-              document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');
+              if(json.data && json.data.length > 0) {
+                  globalMovieCache = [...globalMovieCache, ...json.data];
+                  globalMovieCache = [...new Map(globalMovieCache.map(item => [item.id, item])).values()];
+                  document.getElementById(id).innerHTML=json.data.slice(0,10).map(m=>createCardHtml(m)).join('');
+              }
           }catch(e){}
       }
 
       function createCardHtml(m) { 
-          return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy"><div class="title">\${m.title}</div></div>\`; 
+          const tag = m.isPremium ? '<div class="prem-tag">VIP</div>' : '';
+          const yearNum = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || ''; 
+          const yearHtml = yearNum ? \`<div class="year-tag">\${yearNum}</div>\` : '';
+          return \`<div class="card" onclick="openModalById('\${m.id}')"><img src="\${m.image}" loading="lazy">\${tag}\${yearHtml}<div class="title">\${m.title}</div></div>\`; 
       }
 
-      function openModalById(id) { fetchSingleMovie(id); window.history.pushState({path:'?id='+id},'','?id='+id); }
+      function openModalById(id) { fetchSingleMovie(id); const u = \`?id=\${id}\`; window.history.pushState({path:u},'',u); }
+
+      function resetDetailsUI() {
+           const spacer = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+           document.getElementById('dt_poster').src = spacer; document.getElementById('dt_title').innerText = "Loading..."; document.getElementById('dt_year').innerText = "..."; document.getElementById('dt_desc').innerText = ""; document.getElementById('dt_genres').innerHTML = ""; document.getElementById('ep_section').innerHTML = "";
+      }
 
       async function fetchSingleMovie(id){
-          showLoader(); document.getElementById('playerModal').style.display='block';
+          showLoader(); resetDetailsUI(); document.getElementById('playerModal').style.display='block';
           const res=await fetch(\`/api/get_movie?id=\${id}\`); const m=await res.json();
           hideLoader(); if(m&&m.title) setupDetailsPage(m);
       }
 
       function setupDetailsPage(m){
           currentMovieId=m.id;
-          document.getElementById('dt_poster').src = m.image; document.getElementById('dt_title').innerText = m.title; document.getElementById('dt_desc').innerText = m.description || "";
-          document.getElementById('dt_year').innerText = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || "N/A";
-          document.getElementById('dt_genres').innerHTML = (m.tags || []).filter(t => !/^\\d{4}$/.test(t)).map(t=>\`<span class="genre-tag">\${t}</span>\`).join('');
+          document.getElementById('dt_poster').src = m.image; document.getElementById('dt_title').innerText = m.title; document.getElementById('dt_desc').innerText = m.description || "No description available.";
+          const year = (m.tags && m.tags.find(t => /^\\d{4}$/.test(t))) || "N/A"; document.getElementById('dt_year').innerText = year;
+          if(m.tags) document.getElementById('dt_genres').innerHTML = m.tags.filter(t => !/^\\d{4}$/.test(t)).map(t=>\`<span class="genre-tag">\${t}</span>\`).join('');
+          
           const epSec = document.getElementById('ep_section'); epSec.innerHTML = "";
-          if(m.episodes && m.episodes.length > 1) { renderAccordion(m.episodes); }
+          if(!m.episodes || m.episodes.length <= 1) { const link = (m.episodes && m.episodes[0]) ? m.episodes[0].link : m.link; activeVideoLink = link; activeIsPremium = m.isPremium; } else { activeVideoLink = m.episodes[0].link; activeIsPremium = m.isPremium; renderAccordion(m.episodes, m.isPremium); }
           updateFavBtnState();
       }
 
-      function renderAccordion(episodes) { 
+      function renderAccordion(episodes, isPremium) { 
         const container = document.getElementById('ep_section'); const seasons = {}; 
-        episodes.forEach((ep, idx) => { let g = "Episodes"; if(ep.label.includes("Season")) g = ep.label.split(" ")[1]; if(!seasons[g]) seasons[g] = []; ep.originalIndex = idx; seasons[g].push(ep); }); 
-        Object.keys(seasons).forEach(key => {
-            const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = "Season " + key + ' <span>▼</span>';
-            const panel = document.createElement('div'); panel.className = "panel"; const grid = document.createElement('div'); grid.className = "episode-grid";
-            grid.innerHTML = seasons[key].map(ep => \`<button class="ep-btn" onclick="switchEpisode(this, \${ep.originalIndex})">\${ep.label}</button>\`).join('');
-            panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel);
-            btn.onclick = () => { panel.style.maxHeight = panel.style.maxHeight ? null : "500px"; };
-        }); 
+        episodes.forEach(ep => { let g = "Episodes"; if(ep.label.includes("Season")) g = ep.label.split(" ")[0] + " " + ep.label.split(" ")[1]; if(!seasons[g]) seasons[g] = []; seasons[g].push(ep); }); 
+        Object.keys(seasons).forEach(key => { const btn = document.createElement('button'); btn.className = "accordion"; btn.innerHTML = key + ' <span>▼</span>'; const panel = document.createElement('div'); panel.className = "panel"; const grid = document.createElement('div'); grid.className = "episode-grid"; grid.innerHTML = seasons[key].map(ep => \`<button class="ep-btn" onclick="switchEpisode(this, '\${ep.link}', \${isPremium})">\${ep.label.replace(key,'').trim() || ep.label}</button>\`).join(''); panel.appendChild(grid); container.appendChild(btn); container.appendChild(panel); btn.onclick = () => { panel.style.maxHeight = panel.style.maxHeight ? null : "400px"; }; }); 
       }
 
-      window.switchEpisode = function(btn, idx) {
-          document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); launchVideo(idx);
+      window.switchEpisode = function(btn, link, isPrem) {
+          document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeVideoLink = link; activeIsPremium = isPrem; launchVideo();
       }
 
+      function toggleFavorite(){
+          if(!currentMovieId)return; let f=JSON.parse(localStorage.getItem('my_favs')||'[]'); if(f.includes(currentMovieId))f=f.filter(x=>x!==currentMovieId); else f.push(currentMovieId); localStorage.setItem('my_favs',JSON.stringify(f)); updateFavBtnState();
+      }
+      function updateFavBtnState(){ const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); document.getElementById('favBtn').innerText=f.includes(currentMovieId)?"❤️ Saved":"🤍 Add to List"; }
+
+      function loadSession(){
+          const s = localStorage.getItem('user_session');
+          if (s) {
+              const user = JSON.parse(s);
+              if (user.sessionExpiry && Date.now() > user.sessionExpiry) { doLogout(); return; }
+              currentUser = user;
+          }
+      }
+
+      function toggleUserPanel(){document.getElementById('userPanel').classList.toggle('open');}
+      
       function updateProfileUI(){
-         if(currentUser){ document.getElementById('loginForm').style.display='none'; document.getElementById('profileView').style.display='flex'; document.getElementById('u_name').innerText=currentUser.username; }
-         else { document.getElementById('loginForm').style.display='block'; document.getElementById('profileView').style.display='none'; }
+         if(currentUser){
+            document.getElementById('loginForm').style.display='none'; document.getElementById('profileView').style.display='flex';
+            document.getElementById('u_name').innerText=currentUser.username;
+            if(currentUser.vipExpiry > Date.now()) {
+                const d = new Date(currentUser.vipExpiry); const dStr = d.getDate().toString().padStart(2,'0') + "/" + (d.getMonth()+1).toString().padStart(2,'0') + "/" + d.getFullYear(); document.getElementById('u_status').innerHTML = 'VIP Ends: ' + dStr;
+            } else { document.getElementById('u_status').innerText = "Free Plan"; }
+         } else { document.getElementById('loginForm').style.display='block'; document.getElementById('profileView').style.display='none'; }
       }
+      async function doRegister(){const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; if(!u||!p)return; showLoader(); await fetch('/api/auth/register',{method:'POST',body:JSON.stringify({username:u,password:p})}); hideLoader(); showAlert("Success","Created");}
+      
       async function doLogin(){
           const u=document.getElementById('reg_user').value,p=document.getElementById('reg_pass').value; 
+          showLoader(); 
           const res=await fetch('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})}); 
-          if(res.ok){ currentUser=await res.json(); localStorage.setItem('user_session',JSON.stringify(currentUser)); updateProfileUI(); }
+          hideLoader(); 
+          if(res.ok){ 
+              const user=await res.json(); 
+              user.vipExpiry=user.vipExpiry||0; 
+              const remember = document.getElementById('remember_me').checked;
+              const days = remember ? 15 : 1;
+              user.sessionExpiry = Date.now() + (days * 24 * 60 * 60 * 1000);
+              currentUser=user; 
+              localStorage.setItem('user_session',JSON.stringify(user)); 
+              updateProfileUI(); 
+          } else showAlert("Error","Fail");
       }
+
       function doLogout(){localStorage.removeItem('user_session'); currentUser=null; updateProfileUI();}
+      async function doRedeem(){const c=document.getElementById('vip_code').value; showLoader(); const res=await fetch('/api/auth/redeem',{method:'POST',body:JSON.stringify({username:currentUser.username,code:c})}); hideLoader(); if(res.ok){const u=await res.json(); currentUser=u; localStorage.setItem('user_session',JSON.stringify(u)); updateProfileUI(); showAlert("Success","VIP Added");}}
+      
+      function openFavoritesInternal(){
+          document.getElementById('mainGrid').innerHTML = "";
+          document.getElementById('mainHeader').style.display = 'none';
+          document.getElementById('backNav').style.display = 'flex';
+          document.getElementById('homeView').style.display='none'; document.getElementById('searchView').style.display='none';
+          document.getElementById('gridViewContainer').style.display='block'; 
+          document.getElementById('gridTitle').innerText = "MY LIST";
+          const f=JSON.parse(localStorage.getItem('my_favs')||'[]'); 
+          if(f.length){ Promise.all(f.map(id=>fetch(\`/api/get_movie?id=\${id}\`).then(r=>r.json()))).then(res => renderGrid(res, 'mainGrid')); } 
+          else document.getElementById('mainGrid').innerHTML='<p style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No favorites yet.</p>';
+      }
+      
+      function renderGrid(data, id = 'mainGrid') { document.getElementById(id).innerHTML = data.map(m => createCardHtml(m)).join(''); }
+
+      async function executeSearch(){
+          const q=document.getElementById('searchInput').value.trim(); 
+          if(!q) return; 
+          const grid = document.getElementById('searchGrid'); grid.innerHTML = '<div class="small-spinner"></div>';
+          const qLower = q.toLowerCase();
+          const localResults = globalMovieCache.filter(m => m.title.toLowerCase().includes(qLower));
+          if(localResults.length > 0) { renderGrid(localResults, 'searchGrid'); return; }
+          try {
+              const res = await fetch(\`/api/search?q=\${encodeURIComponent(q)}\`);
+              if (res.status === 404) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No results found.</div>'; return; }
+              const json = await res.json();
+              let results = [];
+              if (Array.isArray(json)) results = json; else if (json.data && Array.isArray(json.data)) results = json.data;
+              if (results.length === 0) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No results found.</div>'; } else { renderGrid(results, 'searchGrid'); }
+          } catch(e) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#aaa;">No results found.</div>'; }
+      }
+      function handleSearchKey(e){if(e.key==='Enter')executeSearch();}
     </script>
   </body>
   </html>
